@@ -1,0 +1,52 @@
+extends Area2D
+
+# =========================
+# Interaction configuration
+# =========================
+@export var timeline_name: String = ""  # Timeline to execute if exists
+@onready var label: Label = $Label      # Unified label name
+
+# =========================
+# Setup
+# =========================
+func _ready() -> void:
+	if label:
+		label.hide()
+
+	area_entered.connect(_on_area_entered)
+	area_exited.connect(_on_area_exited)
+
+# =========================
+# Prompt visibility
+# =========================
+func _on_area_entered(_area: Area2D) -> void:
+	update_label_text()  # Calls child version if it exists
+	if label:
+		label.show()
+
+func _on_area_exited(_area: Area2D) -> void:
+	if label:
+		label.hide()
+
+# =========================
+# Virtual methods (to override in child classes)
+# =========================
+func update_label_text() -> void:
+	pass
+
+func _collect_item() -> void:
+	pass
+
+# =========================
+# Interaction action
+# =========================
+func interact() -> void:
+	if label:
+		label.hide()
+
+	# If there's a Dialogic timeline, start it.
+	if timeline_name != "":
+		Dialogic.start(timeline_name)
+	else:
+		# If no dialogue is associated, collect immediately.
+		_collect_item()

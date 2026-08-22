@@ -1,0 +1,18 @@
+if {GameManager.quest_step} == 0.0:
+	alice: ¿Qué pasa, Wilson?
+	wilson: la mira con los ojos muy abiertos, como si quisiera decirle algo.
+	wilson: señala su plato vacío con el hocico.
+	alice: ¿Tienes hambre?...
+	alice: Mmm... déjame buscarte algo en la cocina.
+	wilson: mueve la cola y la sigue, confiado.
+	[signal arg="step_1"]
+	[signal arg="wilson_start_follow"]
+elif {GameManager.quest_step}  ==  1.0:
+	alice: Wilson, ya sé que tienes hambre.
+	alice: Estoy yendo a la cocina.
+	wilson: maúlla, pero no se mueve.
+	alice: ¿Vas a venir o te quedas ahí?
+	wilson: se levanta y la sigue lentamente.
+else:
+	alice: Wilson... maúlla otra vez.
+	alice: No te preocupes. Ya casi salgo.

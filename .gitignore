@@ -1,0 +1,19 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Local editor configuration
+.vscode/
+
+# Local exports and temporary files
+/build/
+/export/
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example

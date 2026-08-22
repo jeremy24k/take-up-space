@@ -1,0 +1,91 @@
+[gd_scene format=4 uid="uid://bwak4iurpuilf"]
+
+[ext_resource type="Script" uid="uid://c0af6kbvcloj8" path="res://scenes/prologue_scene/script/basic_door.gd" id="1_uo8uu"]
+
+[sub_resource type="PortableCompressedTexture2D" id="PortableCompressedTexture2D_51fls"]
+_data = PackedByteArray("AAADAAUAAAABAAAAgAAAACAAAADmAAAAUklGRt4AAABXRUJQVlA4TNIAAAAvf8AHEFegqJEkZXmPXieA7/wbXCGK2raBunsc9i6D8YdWKWgjSTmmRxOn4v3b+sx/AMD6NxWQ+KJEWzBuCIWu67N9NriNbVtV7syvQBsQIHViL8Ce5EgFVgPknmubX+5TLIvovyK3bRsK6Hn3EVCs2kBzoJjOeS3RzMyr3UCaGZrXAEkWFJoSWVNSaGhM6OYaKQtcaetKlKVuFdmLkTQdyO9im4up25pn7bu5cU2u8g57rseLy9M17P7/f2OrzPp3PyXGGX83HVkNNMl5QbFBAwE=")
+size_override = Vector2(128, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4op3y"]
+atlas = SubResource("PortableCompressedTexture2D_51fls")
+region = Rect2(0, 0, 64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d5s5s"]
+atlas = SubResource("PortableCompressedTexture2D_51fls")
+region = Rect2(64, 0, 64, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_odkdt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4op3y")
+}],
+"loop": 1,
+"name": &"closed_door",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d5s5s")
+}],
+"loop": 1,
+"name": &"open_door",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
+size = Vector2(3.75, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w7mgy"]
+size = Vector2(20, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h4t55"]
+size = Vector2(26, 46.03125)
+
+[node name="BasicDoor" type="StaticBody2D" unique_id=1213027117]
+z_index = 1
+script = ExtResource("1_uo8uu")
+
+[node name="DoorAnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=2024919250]
+y_sort_enabled = true
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_odkdt")
+animation = &"closed_door"
+metadata/_aseprite_wizard_interface_config_ = {
+"pending_changes": {}
+}
+metadata/_aseprite_wizard_config_ = {
+"embed_tex": true,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"scale": "1.0",
+"should_round_fps": true,
+"slice": "",
+"source": "res://scenes/prologue_scene/assets/basic_door.aseprite",
+"source_uid": 2780452902035509557
+}
+metadata/_aseprite_wizard_source_file_hash_ = "9686fcebd477b7b5200b8c2dbe7876c1"
+
+[node name="CollisionBorderRight" type="CollisionShape2D" parent="." unique_id=1444748856]
+y_sort_enabled = true
+position = Vector2(14.875, 0)
+shape = SubResource("RectangleShape2D_8w0r3")
+
+[node name="CollisionBorderLeft" type="CollisionShape2D" parent="." unique_id=475852289]
+position = Vector2(-15, 0)
+shape = SubResource("RectangleShape2D_8w0r3")
+
+[node name="CollisionCenter" type="CollisionShape2D" parent="." unique_id=1633494360]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_w7mgy")
+
+[node name="DetectorArea" type="Area2D" parent="." unique_id=1953287104]
+collision_layer = 0
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectorArea" unique_id=1068395779]
+position = Vector2(0, 5.015625)
+shape = SubResource("RectangleShape2D_h4t55")

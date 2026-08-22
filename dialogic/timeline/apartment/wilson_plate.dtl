@@ -1,0 +1,17 @@
+if {GameManager.quest_step} == 0.0:
+	alice: El plato de Wilson...
+	alice: (lo ve vacío)
+	alice: Está vacío.
+	alice: Tengo que buscar algo en la cocina.
+	wilson: la sigue y maúlla detrás de ella, como diciendo "ya lo sabía".
+	[signal arg="step_1"]
+	[signal arg="wilson_start_follow"]
+elif {GameManager.quest_step}  ==  1.0:
+	alice: El plato de Wilson...
+	alice: Ya lo revisé antes. Está vacío.
+	alice: Tengo que ir a la cocina a buscar algo.
+	wilson: maúlla desde el suelo, como si la estuviera apurando.
+	alice: Ya voy, ya voy.
+else:
+	alice: El plato de Wilson...
+	alice: Está vacío.

@@ -1,0 +1,77 @@
+[gd_scene format=4 uid="uid://ut5yrtng5ajp"]
+
+[sub_resource type="PortableCompressedTexture2D" id="PortableCompressedTexture2D_n3bfg"]
+_data = PackedByteArray("AAADAAUAAAABAAAAYAAAAEAAAACGAQAAUklGRn4BAABXRUJQVlA4THEBAAAvX8APEGdgqG2Uc3AqztdpJBjhzw8BBAXYUBQAhOOlgwReAum8Y8jghqJIUiNOQcjGDIUHXpBEApX5DwAAwP9f29ofpp+adOjIK1dJjKmFFsBtts998jvp9K8M3JFbnOtYp5vA0s919gBpBC9AhtIbkKo8gLdCup9/H5kqov9o27aNnbYri3xBP3dTaMfbCuwIwSodDdFxeqx0uF3Rlb1CO06xDmOoHuIqbyQHSS5HRJaci8PeX7XDQFNvoh0hWIDjQ9sdj5M1HN4oXLVyeQB1dNPX6VICdSx5XsA6jnlRVDsOKZrJA6cTrePIRJObPLYTpIM6zCNSO+S9Axz/HU2hHW8rsCMEC3acbnvJcWyVjuwV2nG6jsMYlaseSHY4nYsswOE8OOK/mwDHB+z9Q9sdjxONwxvZVSuXB1BHN32dLsXgzkkO6sqOJc8LUUdPdHRlxzEviliHv+F0PJMHrSM3eWxDHdRhHpHaIe8d4PgdlQAA")
+size_override = Vector2(96, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l4h54"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kipvy"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4wkqa"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ht3tc"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ggh4b"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xxf66"]
+atlas = SubResource("PortableCompressedTexture2D_n3bfg")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_eyqy6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l4h54")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kipvy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4wkqa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ht3tc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ggh4b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xxf66")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 4.0
+}]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" unique_id=1888046779]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_eyqy6")
+autoplay = "default"
+metadata/_aseprite_wizard_interface_config_ = {
+"pending_changes": {}
+}
+metadata/_aseprite_wizard_config_ = {
+"embed_tex": true,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"scale": "1.0",
+"should_round_fps": true,
+"slice": "",
+"source": "res://global_scenes/prologue_scene/assets/rotten_food.aseprite",
+"source_uid": 1064242111985079099
+}
+metadata/_aseprite_wizard_source_file_hash_ = "cb3f47ef13129f06f169aacfa1e86f41"

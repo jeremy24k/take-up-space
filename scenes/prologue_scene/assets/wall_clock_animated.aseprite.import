@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://ckcu8iwe04jt"
+path="res://.godot/imported/wall_clock_animated.aseprite-73f3df8bd58177c5c6fec811986b1223.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/wall_clock_animated.aseprite"
+dest_files=["res://.godot/imported/wall_clock_animated.aseprite-73f3df8bd58177c5c6fec811986b1223.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bfu4wg7fkntjp"
+path="res://.godot/imported/basic_door.aseprite-56c0e57ba2bcb6c7d2dae4b06b76925c.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/basic_door.aseprite"
+dest_files=["res://.godot/imported/basic_door.aseprite-56c0e57ba2bcb6c7d2dae4b06b76925c.res"]
+
+[params]
+

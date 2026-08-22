@@ -1,0 +1,13 @@
+if {GameManager.quest_step} == 3.0:
+	alice: (los ve encima de la cama)
+	alice: Ahí están.
+	alice: (los toma, los mira un momento)
+	alice: Mis auriculares.
+	alice: No salgo sin ellos.
+	alice: Con ellos es más fácil.
+	alice: Bueno... no siempre. Pero casi.
+	alice: (se los cuelga al cuello)
+	[signal arg="item_picked:alice_headphones"]
+else:
+	alice: Mis auriculares... todavía aquí.
+	alice: Menos mal que no los perdí.

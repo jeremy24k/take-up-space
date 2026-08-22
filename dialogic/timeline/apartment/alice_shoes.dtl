@@ -1,0 +1,19 @@
+if {GameManager.quest_step} == 3.0:
+	alice: ¿Qué hacen mis zapatos aquí?
+	alice: (los mira, confundida)
+	alice: Wilson...
+	alice: (suspira, pero no con enfado)
+	alice: Siempre juegas con ellos, ¿verdad?
+	alice: ¿Cuántas veces te he dicho que no son un juguete?
+	wilson: la mira desde la puerta, con una expresión de "no me arrepiento".
+	alice: (sonríe a pesar de todo)
+	alice: Bueno. Al menos los encontré.
+	alice: Listo. Ahora sí.
+	[signal arg="item_picked:alice_shoes"]
+else:
+	alice: (ve los zapatos en el baño)
+	alice: Mis zapatos... ¿por qué están aquí?
+	alice: (piensa un momento)
+	alice: Ah, Wilson.
+	alice: (los mira, pero no se los pone)
+	alice: Supongo que los recogeré cuando los necesite.

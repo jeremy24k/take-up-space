@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://q6ete3kktuam"
+path="res://.godot/imported/build-stairs.aseprite-2ed4873559726f6d016938614e98b519.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/build-stairs.aseprite"
+dest_files=["res://.godot/imported/build-stairs.aseprite-2ed4873559726f6d016938614e98b519.res"]
+
+[params]
+

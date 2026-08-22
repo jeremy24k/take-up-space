@@ -1,0 +1,53 @@
+[gd_scene format=4 uid="uid://dhgkdyn61b7bp"]
+
+[ext_resource type="PackedScene" uid="uid://bwak4iurpuilf" path="res://scenes/prologue_scene/scenes/basic_door.tscn" id="1_0wqno"]
+
+[sub_resource type="PortableCompressedTexture2D" id="PortableCompressedTexture2D_0wqno"]
+_data = PackedByteArray("AAADAAUAAAABAAAAQAAAACAAAAC2AAAAUklGRq4AAABXRUJQVlA4TKIAAAAvP8AHED+gpm0kNnfrjeUb11fbtg3j3d5Lkk/zvNIABBj6qPzq+fkPAP7/MuvSGUChUAFGsW03+RMTbKuBWGAQ0EFAFZAE/M/8Rt9G9F+R27aNlNH2NF8BccpqQLOPklW3jzxlLJT76BkxQKT7CAdxlFjW0xyEbUXu+rLhLhPk8l3LkVMu24MyKYsVy359+ZLln/534RCXL6fCpKxoHxToUwM=")
+size_override = Vector2(64, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_37m2h"]
+atlas = SubResource("PortableCompressedTexture2D_0wqno")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_61fq5"]
+atlas = SubResource("PortableCompressedTexture2D_0wqno")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mkde3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_37m2h")
+}],
+"loop": 1,
+"name": &"closed_door",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_61fq5")
+}],
+"loop": 1,
+"name": &"open_door",
+"speed": 10.0
+}]
+
+[node name="OutSiteDoor" unique_id=1213027117 instance=ExtResource("1_0wqno")]
+
+[node name="DoorAnimatedSprite" parent="." index="0" unique_id=2024919250]
+sprite_frames = SubResource("SpriteFrames_mkde3")
+metadata/_aseprite_wizard_config_ = {
+"embed_tex": true,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"scale": "1.0",
+"should_round_fps": true,
+"slice": "",
+"source": "res://scenes/prologue_scene/assets/outsite_door.aseprite",
+"source_uid": 6374842185958341035
+}
+metadata/_aseprite_wizard_source_file_hash_ = "ea79d55cb6b164bec77b585234501527"

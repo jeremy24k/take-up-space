@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bp38bbrvj21e2"]
+
+[ext_resource type="Script" uid="uid://dr57smxlg6pod" path="res://global/interactable_area.gd" id="1_rua2f"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_quyxl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vqq2g"]
+
+[node name="InteractableArea" type="Area2D" unique_id=444772387]
+collision_layer = 4
+collision_mask = 4
+script = ExtResource("1_rua2f")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1198806918]
+shape = SubResource("RectangleShape2D_vqq2g")
+debug_color = Color(4.1873755e-06, 0.64279133, 0.31701365, 0.41960785)
+
+[node name="Label" type="Label" parent="." unique_id=1384165053]
+z_index = 2
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -44.0
+offset_top = -25.0
+offset_right = 44.0
+offset_bottom = -11.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/line_spacing = 1
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_quyxl")
+theme_override_font_sizes/font_size = 16
+text = "[Espacio]"
+horizontal_alignment = 1
+vertical_alignment = 1

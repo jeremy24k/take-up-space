@@ -1,0 +1,17 @@
+if {GameManager.quest_step} == 1.0:
+	alice: No hay nada aquí...
+	alice: (mirando la nevera vacía) Ni siquiera huevos. Ni leche. Ni una lata de sopa.
+	alice: ¿Cómo es posible que no tenga nada?
+	wilson: maúlla desde la entrada de la cocina, como si la estuviera apurando.
+	alice: Ya sé, ya sé.
+	alice: (suspira) Vamos, Alice. No queda otra. Voy a tener que pedir a domicilio en la computadora.
+	[signal arg="step_2"]
+elif {GameManager.quest_step} == 2.0:
+	alice: Sigo sin encontrar nada...
+	alice: No sé por qué sigo mirando. Ya sé que no hay comida.
+	wilson: maúlla desde el pasillo, como si le dijera "¿Y?"
+	alice: Ya voy, ya voy. Solo quiero asegurarme.
+	alice: Pero no hay nada. Ni una miga.
+else:
+	alice: Mi refrigerador
+	alice: Hay un par de anotaciones en la puerta...

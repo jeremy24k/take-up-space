@@ -1,0 +1,14 @@
+if {GameManager.quest_step} == 3.0:
+	alice: (la ve sobre la mesa) 
+	alice: La cartera. 
+	alice: (la abre, mira el dinero) 
+	alice: El dinero justo. 
+	alice: No puedo perderlo. No puedo gastarlo en otra cosa. 
+	alice: Solo lo justo para la comida de Wilson. 
+	alice: (la guarda en la mochila) 
+	[signal arg="item_picked:alice_wallet"]
+else:
+	alice: (ve la cartera sobre la mesa)
+	alice: Ahí está mi cartera.
+	alice: El dinero justo... como siempre.
+	alice: Supongo que la necesitaré más tarde.

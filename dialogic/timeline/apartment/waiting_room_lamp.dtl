@@ -1,0 +1,22 @@
+if {lamp_is_on} == true:
+	alice: La lámpara está encendida.
+	alice: (mira la luz, como si dudara)
+	alice: ¿Deberia apagarla?
+	- Sí, apágala.
+		alice: Mejor. No necesito tanta luz.
+		set {lamp_is_on} = false
+		[signal arg="update_lamp"]
+	- No, déjala encendida.
+		alice: Mejor así. La luz me acompaña.
+		set {lamp_is_on} = true
+else:
+	alice: La lámpara está apagada.
+	alice: La sombra se siente más profunda cuando no hay luz.
+	alice: ¿Debería encenderla?
+	- Sí, enciéndela.
+		alice: Un poco de luz. Siempre ayuda.
+		set {lamp_is_on} = true
+		[signal arg="update_lamp"]
+	- No, déjala apagada.
+		alice: La oscuridad a veces es más cómoda.
+		set {lamp_is_on} = false

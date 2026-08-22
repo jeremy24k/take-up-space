@@ -1,0 +1,37 @@
+if {GameManager.quest_step} == 2.0:
+	alice: (mira la pantalla de la PC)
+	alice: ¿Qué...?
+	alice: (se inclina un poco más, como si no pudiera creer lo que ve)
+	alice: No hay servicio de delivery...
+	alice: ¿Cómo es posible que justo hoy...?
+	alice: (mira la puerta, luego a Wilson)
+	alice: Eso significa que voy a tener que salir.
+	alice: (pausa)
+	alice: Tranquila, Alice. Solo es salir a comprar comida. Nada más.
+	alice: (pausa)
+	alice: No quiero hacerlo. Pero Wilson me está mirando.
+	alice: No me mires con esa carita...
+	wilson: maúlla desde el suelo, con una mezcla de ternura y hambre.
+	alice: Sabes que no puedo decirte que no cuando me miras así.
+	alice: Bueno... está bien. Por ti lo haré.
+	alice: Voy a salir. A comprarte comida.
+	alice: (suspiro largo) No sé cómo voy a hacerlo, pero lo haré.
+	alice: Primero... ¿dónde dejé la mochila?
+	[signal arg="step_3"]
+elif {GameManager.quest_step}  ==  3.0:
+	alice: Aún no encuentro el delivery...
+	alice: Pero ya sé que no está. Solo estoy postergando lo inevitable.
+	alice: El plato de Wilson sigue vacío.
+	alice: Y yo sigo aquí, mirando la pantalla.
+	alice: No puedo quedarme más tiempo.
+else:
+	alice: (mira la luz del sol entrando por la ventana)
+	alice: Qué linda mañana hace hoy.
+	alice: (mira su escritorio iluminado)
+	alice: El sol entra justo por aquí a esta hora.
+	alice: Mi café... todavía caliente.
+	alice: (lo toma, lo mira)
+	alice: Debería esperar a que se enfríe un poco.
+	alice: Pero tengo ganas de beberlo ahora.
+	alice: (bebe un sorbo)
+	alice: Quema. Pero vale la pena.

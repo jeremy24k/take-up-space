@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://lyy266imbjlm"]
+
+[ext_resource type="Script" uid="uid://f54bis3wl1kc" path="res://global/npcs/scripts/base_npc.gd" id="1_xvse1"]
+[ext_resource type="Texture2D" uid="uid://dgtd48eg1i1pj" path="res://global/npcs/assets/npcs_sprite_sheet.aseprite" id="2_55e2e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
+size = Vector2(14, 28)
+
+[node name="BaseNPC" type="CharacterBody2D" unique_id=1283702522]
+script = ExtResource("1_xvse1")
+animation_start_delay_max = 0.3
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2102186028]
+texture_filter = 1
+texture = ExtResource("2_55e2e")
+hframes = 10
+vframes = 10
+metadata/_aseprite_wizard_interface_config_ = {
+"animation_section": true,
+"layer_section": false,
+"output_section": false,
+"pending_changes": {
+"convert_fps_field": 60.0,
+"convert_ms_field": 16.0,
+"convert_to_fps": false,
+"i_mode": 0,
+"keep_anim_length": false,
+"player": ""
+},
+"slice_section": false
+}
+metadata/_aseprite_wizard_config_ = {
+"embed_tex": true,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"scale": "1.0",
+"should_round_fps": true,
+"slice": "",
+"source": "res://global/npcs/assets/npcs_sprite_sheet.aseprite",
+"source_uid": 7619853968993649295
+}
+metadata/_aseprite_wizard_source_file_hash_ = "83b3d0f9a180b67d2e0db06a7f5044a2"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1201320476]
+position = Vector2(0, 1)
+shape = SubResource("RectangleShape2D_8w0r3")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1008644508]
+rect = Rect2(-7, -12, 14, 26)

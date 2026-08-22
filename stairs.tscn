@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://db538xhfu5yol"]
+
+[ext_resource type="Script" uid="uid://ewa33lxlcka6" path="res://stairs.gd" id="1_g0mii"]
+[ext_resource type="Texture2D" uid="uid://dehidi0s65wkm" path="res://scenes/prologue_scene/assets/stairs.aseprite" id="1_l5oqe"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_8w0r3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
+size = Vector2(60, 79)
+
+[node name="Staircase" type="Node2D" unique_id=922436665]
+y_sort_enabled = true
+script = ExtResource("1_g0mii")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=180892515]
+texture = ExtResource("1_l5oqe")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=2036958770]
+physics_material_override = SubResource("PhysicsMaterial_8w0r3")
+
+[node name="CollisionShape2D" type="CollisionPolygon2D" parent="StaticBody2D" unique_id=1663200934]
+position = Vector2(0, 64)
+polygon = PackedVector2Array(-22, -8, -22, -39, 8, -54, 8, -55, 14, -55, 14, 0, -64, 0, -64, -98, 14, -99, 14, -89, 8, -89, -23, -73, -58, -73, -58, -8)
+
+[node name="Area2D" type="Area2D" parent="." unique_id=692829411]
+position = Vector2(-38, 2)
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=821124337]
+position = Vector2(9, 14.5)
+shape = SubResource("RectangleShape2D_8w0r3")

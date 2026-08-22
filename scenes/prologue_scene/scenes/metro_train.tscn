@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://bn78jgka84ira"]
+
+[ext_resource type="Script" uid="uid://cr5ndkk0mv4j" path="res://scenes/prologue_scene/scenes/metro_train.gd" id="1_j7mxh"]
+[ext_resource type="Texture2D" uid="uid://ciiubafr7rufg" path="res://scenes/prologue_scene/assets/metro_train.aseprite" id="1_sdaxm"]
+[ext_resource type="SpriteFrames" uid="uid://byb635li14uye" path="res://scenes/prologue_scene/assets/metro_door_animation.aseprite" id="3_cbvb0"]
+[ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="4_ss7yl"]
+[ext_resource type="Script" uid="uid://da8klywq0ofsu" path="res://global/train_door_area.gd" id="5_ek8mm"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ek8mm"]
+size = Vector2(9.28125, 15.5)
+
+[node name="MetroTrain" type="Node2D" unique_id=2072911588]
+script = ExtResource("1_j7mxh")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1608785026]
+position = Vector2(-368.5, 0)
+texture = ExtResource("1_sdaxm")
+region_enabled = true
+region_rect = Rect2(33, 4, 57, 60)
+
+[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=1458330124]
+position = Vector2(-228.5, 0)
+texture = ExtResource("1_sdaxm")
+region_enabled = true
+region_rect = Rect2(97, 4, 224, 60)
+
+[node name="Sprite2D4" type="Sprite2D" parent="." unique_id=1717439535]
+position = Vector2(-4.5, 0)
+texture = ExtResource("1_sdaxm")
+region_enabled = true
+region_rect = Rect2(97, 4, 224, 60)
+
+[node name="Sprite2D5" type="Sprite2D" parent="." unique_id=936273055]
+position = Vector2(219, 0)
+texture = ExtResource("1_sdaxm")
+region_enabled = true
+region_rect = Rect2(97, 4, 224, 60)
+
+[node name="Sprite2D3" type="Sprite2D" parent="." unique_id=1360502631]
+position = Vector2(363, 0)
+texture = ExtResource("1_sdaxm")
+region_enabled = true
+region_rect = Rect2(560, 4, 64, 60)
+
+[node name="AnimatedDoor" type="AnimatedSprite2D" parent="." unique_id=1694909074]
+position = Vector2(268, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"opening_door"
+
+[node name="AnimatedDoor2" type="AnimatedSprite2D" parent="." unique_id=1205192406]
+position = Vector2(160, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"closed"
+
+[node name="AnimatedDoor3" type="AnimatedSprite2D" parent="." unique_id=1774628882]
+position = Vector2(44.5, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"closed"
+
+[node name="AnimatedDoor4" type="AnimatedSprite2D" parent="." unique_id=674371337]
+position = Vector2(-63.5, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"closed"
+
+[node name="AnimatedDoor5" type="AnimatedSprite2D" parent="." unique_id=1995167364]
+position = Vector2(-179.5, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"closed"
+
+[node name="AnimatedDoor6" type="AnimatedSprite2D" parent="." unique_id=888254085]
+position = Vector2(-287.5, 13)
+sprite_frames = ExtResource("3_cbvb0")
+animation = &"closed"
+
+[node name="EnteredTrainArea" type="Node2D" parent="." unique_id=132876142]
+
+[node name="InteractableArea" parent="EnteredTrainArea" unique_id=444772387 instance=ExtResource("4_ss7yl")]
+position = Vector2(-287, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[node name="InteractableArea2" parent="EnteredTrainArea" unique_id=1976454218 instance=ExtResource("4_ss7yl")]
+position = Vector2(-179, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea2" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[node name="InteractableArea3" parent="EnteredTrainArea" unique_id=1985541345 instance=ExtResource("4_ss7yl")]
+position = Vector2(-63, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea3" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[node name="InteractableArea4" parent="EnteredTrainArea" unique_id=1985351566 instance=ExtResource("4_ss7yl")]
+position = Vector2(45, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea4" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[node name="InteractableArea5" parent="EnteredTrainArea" unique_id=1917811816 instance=ExtResource("4_ss7yl")]
+position = Vector2(160, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea5" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[node name="InteractableArea6" parent="EnteredTrainArea" unique_id=1239145669 instance=ExtResource("4_ss7yl")]
+position = Vector2(268, 14)
+script = ExtResource("5_ek8mm")
+
+[node name="CollisionShape2D" parent="EnteredTrainArea/InteractableArea6" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ek8mm")
+
+[editable path="EnteredTrainArea/InteractableArea"]
+[editable path="EnteredTrainArea/InteractableArea2"]
+[editable path="EnteredTrainArea/InteractableArea3"]
+[editable path="EnteredTrainArea/InteractableArea4"]
+[editable path="EnteredTrainArea/InteractableArea5"]
+[editable path="EnteredTrainArea/InteractableArea6"]

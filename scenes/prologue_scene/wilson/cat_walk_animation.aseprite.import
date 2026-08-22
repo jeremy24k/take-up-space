@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://es0c05y1ykx4"
+path="res://.godot/imported/cat_walk_animation.aseprite-e96983e59f0c471804c048d05df597ca.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/wilson/cat_walk_animation.aseprite"
+dest_files=["res://.godot/imported/cat_walk_animation.aseprite-e96983e59f0c471804c048d05df597ca.res"]
+
+[params]
+

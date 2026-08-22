@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://b1cw264wib0kv"
+path="res://.godot/imported/coffe_cup_animated.aseprite-8f7152384f9359e680d0d56e2a3a9584.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/coffe_cup_animated.aseprite"
+dest_files=["res://.godot/imported/coffe_cup_animated.aseprite-8f7152384f9359e680d0d56e2a3a9584.res"]
+
+[params]
+

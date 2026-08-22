@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://ca0ir4bh61xt6"
+path="res://.godot/imported/wallet.aseprite-b2ef715d0f1848d87b79d39b07bcec52.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/wallet.aseprite"
+dest_files=["res://.godot/imported/wallet.aseprite-b2ef715d0f1848d87b79d39b07bcec52.res"]
+
+[params]
+

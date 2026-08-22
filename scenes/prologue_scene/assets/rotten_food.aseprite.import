@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://pfr6anbvgsid"
+path="res://.godot/imported/rotten_food.aseprite-32cf1992c94ff55a7a7f18dbb4bf7834.res"
+
+[deps]
+
+source_file="res://scenes/prologue_scene/assets/rotten_food.aseprite"
+dest_files=["res://.godot/imported/rotten_food.aseprite-32cf1992c94ff55a7a7f18dbb4bf7834.res"]
+
+[params]
+

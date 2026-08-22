@@ -1,0 +1,94 @@
+[gd_scene format=4 uid="uid://b8wga5yfrsc0t"]
+
+[sub_resource type="PortableCompressedTexture2D" id="PortableCompressedTexture2D_3qu71"]
+_data = PackedByteArray("AAADAAUAAAABAAAAYAAAAGAAAAB4AQAAUklGRnABAABXRUJQVlA4TGQBAAAvX8AXEEdAJmChfzIl3HMpoIjitk2gthz778ULMQl/kNQEAMGIoX8Pt0sEHfb65j8EwPL/axsbybQfosRSAY5r23Ebl2zVsf4N1WdcwLgBAlyBoNpjq+kLXDf5oe//MidNRP8ZuW0bSQZ6Zmf5xO53sCwGdAxPYg7neIu5LC44R+KbssRAx2NthjpoT6Q4yOhoa9OmY0+aozaZomDvEmyO/eUSdDfU4fGOpmxEOriWgI5efmcrzjF0Ys7uwP9H/wjLYkDH8CTmcI63mMvignMkvilLDHQ81maog8qgjrY2fWzH/hLAjqC79SPQZn5PSl7NE+2VmrIR6eBaAjp6+Z2tOMfQiTm7A/8f/SMsi+kOQ8OTmNMd1/cWc1lcdMf1Jb4pS6w7DD3WZlYdpqhsZs1hqq1NvO3Y0wQuWNtfwsSaA30QmfJq3l5TNrLqsMS1xKrDUC+/u1V3XN/QiTndgf+PfiXbAQ==")
+size_override = Vector2(96, 96)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lwr2v"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rasy5"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8lm6i"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rpb2n"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgd5b"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2is1h"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o4ss2"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ac82m"]
+atlas = SubResource("PortableCompressedTexture2D_3qu71")
+region = Rect2(32, 64, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ivrse"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lwr2v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rasy5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8lm6i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rpb2n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dgd5b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2is1h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o4ss2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ac82m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lwr2v")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 1.0
+}]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" unique_id=1048818784]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_ivrse")
+autoplay = "default"
+metadata/_aseprite_wizard_interface_config_ = {
+"pending_changes": {}
+}
+metadata/_aseprite_wizard_config_ = {
+"embed_tex": true,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"scale": "1.0",
+"should_round_fps": true,
+"slice": "",
+"source": "res://global_scenes/prologue_scene/assets/wall_clock_animated.aseprite",
+"source_uid": 161180361315224577
+}
+metadata/_aseprite_wizard_source_file_hash_ = "8b2fc8c0ffc27f78aac25f86d5a4cbb7"

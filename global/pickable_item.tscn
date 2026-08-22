@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://b0alaanwp2llk"]
+
+[ext_resource type="Script" uid="uid://co0dfo6qk7lhm" path="res://global/pickable_item.gd" id="1_0mtuc"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_awr7p"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_h4t55"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w7mgy"]
+size = Vector2(8.5, 8.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
+size = Vector2(13, 14)
+
+[node name="PickableItem" type="Area2D" unique_id=823515321]
+z_index = 1
+collision_layer = 5
+collision_mask = 5
+script = ExtResource("1_0mtuc")
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1890007023]
+texture = SubResource("PlaceholderTexture2D_h4t55")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=46590717]
+
+[node name="PhysicCollision" type="CollisionShape2D" parent="StaticBody2D" unique_id=173576806]
+shape = SubResource("RectangleShape2D_w7mgy")
+
+[node name="Label" type="Label" parent="." unique_id=914168138]
+z_index = 2
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -44.0
+offset_top = -19.0
+offset_right = 44.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/line_spacing = 1
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_awr7p")
+theme_override_font_sizes/font_size = 16
+text = "[Recoger]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AreaDetector" type="CollisionShape2D" parent="." unique_id=1984041911]
+visible = false
+shape = SubResource("RectangleShape2D_8w0r3")
