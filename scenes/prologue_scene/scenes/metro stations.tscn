@@ -1073,7 +1073,7 @@ size = Vector2(967, 20)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7lswf"]
 size = Vector2(202, 20)
 
-[node name="Node2D" type="Node2D" unique_id=382017951]
+[node name="MetroStation" type="Node2D" unique_id=382017951]
 y_sort_enabled = true
 script = ExtResource("1_sxvvj")
 
@@ -1103,14 +1103,12 @@ y_sort_enabled = true
 [node name="ReadingStandNPC" parent="MiddleLayer/NPCS" unique_id=1283702522 instance=ExtResource("7_wgfvr")]
 y_sort_enabled = true
 position = Vector2(879, 266)
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="ReadingSitDownNPC" parent="MiddleLayer/NPCS" unique_id=1356169838 instance=ExtResource("7_wgfvr")]
 y_sort_enabled = true
 position = Vector2(520, 683)
 column_npc = 1
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/ReadingSitDownNPC" index="0" unique_id=2102186028]
@@ -1127,7 +1125,6 @@ position = Vector2(0, -20)
 y_sort_enabled = true
 position = Vector2(210, 266)
 column_npc = 2
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/StudentGirlNPC" index="0" unique_id=2102186028]
@@ -1137,7 +1134,6 @@ frame = 2
 y_sort_enabled = true
 position = Vector2(761, 206)
 column_npc = 3
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/PhoneGirlNPC" index="0" unique_id=2102186028]
@@ -1147,7 +1143,6 @@ frame = 3
 y_sort_enabled = true
 position = Vector2(782, 217)
 column_npc = 4
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/LinseningGuyNPC" index="0" unique_id=2102186028]
@@ -1157,7 +1152,6 @@ frame = 4
 y_sort_enabled = true
 position = Vector2(496, 284)
 column_npc = 7
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/OficinistManNPC" index="0" unique_id=2102186028]
@@ -1167,14 +1161,13 @@ frame = 7
 y_sort_enabled = true
 position = Vector2(186, 260)
 column_npc = 6
-random_start_offset = null
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/NormalGuyNPC" index="0" unique_id=2102186028]
 frame = 6
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("23_ru8rr")]
-position = Vector2(609, 754)
+position = Vector2(608, 757)
 
 [node name="MetroTrain" parent="MiddleLayer" unique_id=2072911588 instance=ExtResource("8_rb574")]
 position = Vector2(2172, 129)

@@ -4,6 +4,7 @@ extends Node2D
 @export var station_position_x: float = 0.0
 @onready var interactive_areas: Node2D = $EnteredTrainArea
 signal train_arrived
+signal train_leaving_station
 signal doors_opened
 signal doors_closed
 
@@ -44,3 +45,20 @@ func close_doors() -> void:
 	print("Doors have been closed.")
 	doors_closed.emit()
 	interactive_areas.visible = false
+
+	# Wait for the doors to close.
+	await get_tree().create_timer(2.0).timeout
+	leave_station()
+
+func leave_station() -> void:
+	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	var leave_station_position_x: float = station_position_x - station_position_x * 2
+
+	tween.tween_property(self, "position:x", leave_station_position_x, arrival_time * 2)
+
+	await tween.finished
+	train_leaving_station.emit()
+
+	print("Train has left the station.")
+	z
