@@ -16,7 +16,7 @@ shape = SubResource("RectangleShape2D_8w0r3")
 [node name="Label" type="Label" parent="." unique_id=679395730]
 z_index = 1
 texture_filter = 1
-texture_repeat = 1
+texture_repeat = 2
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0

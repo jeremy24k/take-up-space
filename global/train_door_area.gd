@@ -1,19 +1,32 @@
 class_name TrainDoorArea
 extends "res://global/interactable_area.gd"
 
+# =========================
+# Train door configuration
+# =========================
 @export var metro_train: Node2D
+@export var door_id: int = 1
 
+# =========================
+# Setup
+# =========================
 func _ready() -> void:
 	super._ready()
 	# 'owner' hace referencia a la raíz de la escena donde vive este nodo (MetroTrain)
 	if not metro_train:
 		metro_train = owner as Node2D
 
+# =========================
+# Prompt text
+# =========================
 ## Updates the interaction label text displayed to the player
 # func update_label_text() -> void:
 # 	if label:
 # 		label.text = "[E] Enter the train"
 
+# =========================
+# Interaction action
+# =========================
 ## Overrides the base interaction/collection action for the train boarding flow
 func _collect_item() -> void:
 	# Prevent multiple interactions while the sequence is starting
@@ -25,6 +38,9 @@ func _collect_item() -> void:
 	if metro_train and player:     
 		_board_train(player)
 
+# =========================
+# Boarding sequence
+# =========================
 ## Handles the complete train boarding sequence
 func _board_train(player: CharacterBody2D) -> void:
 	# 1. Disable player movement
@@ -56,4 +72,4 @@ func _board_train(player: CharacterBody2D) -> void:
 
 	# 4. Transition to the train interior scene
 	await get_tree().create_timer(1.2).timeout
-	# get_tree().change_scene_to_file("res://scenes/TrainInterior.tscn")
+	GameManager.target_door_id = door_id

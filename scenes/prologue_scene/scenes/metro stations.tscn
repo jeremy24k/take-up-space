@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://cl6halltp7cwt"]
+[gd_scene format=4 uid="uid://b03pssfl5xa3i"]
 
 [ext_resource type="Texture2D" uid="uid://580urw76480x" path="res://scenes/prologue_scene/assets/wall_outside.aseprite" id="1_ip4l7"]
 [ext_resource type="Script" uid="uid://cc15ixql8gyer" path="res://scenes/prologue_scene/scenes/metro_stations.gd" id="1_sxvvj"]
@@ -1301,7 +1301,7 @@ shape = SubResource("RectangleShape2D_8w0r3")
 [node name="ThoughtTriggers" type="Node2D" parent="." unique_id=1252145260]
 
 [node name="Metro" parent="ThoughtTriggers" unique_id=175741016 instance=ExtResource("17_qodp8")]
-position = Vector2(609, 358)
+position = Vector2(610, 354)
 thought_text = "Ya casi, Alice..."
 metadata/_edit_group_ = true
 

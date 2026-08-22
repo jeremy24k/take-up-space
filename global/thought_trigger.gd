@@ -1,3 +1,4 @@
+class_name ThoughtTrigger
 extends Area2D
 
 @export var thought_text: String = "I'm thinking..."
@@ -12,14 +13,14 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		_show_thought(body)
+		show_thought(body)
 
 		if trigger_once:
 			set_deferred("monitoring", false)
 			# Nota: No destruimos el Area2D inmediatamente si queremos que el script termine limpiamente, 
 			# o si usas trigger_once puedes simplemente desactivar el monitoreo.
 
-func _show_thought(player_node: CharacterBody2D) -> void:
+func show_thought(player_node: CharacterBody2D) -> void:
 	# 1. Si ya hay un pensamiento activo en Alice, lo eliminamos
 	if player_node.has_node("ThoughtBubble"):
 		player_node.get_node("ThoughtBubble").queue_free()

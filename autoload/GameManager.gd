@@ -3,6 +3,9 @@ extends Node
 # =========================
 # Quest state
 # =========================
+# Door used to enter the train interior.
+var target_door_id: int = 1
+
 @export var quest_step: int = 0
 var collected_items: Array[String] = []  # List of collected item IDs
 
