@@ -1309,7 +1309,7 @@ shape = SubResource("RectangleShape2D_8w0r3")
 
 [node name="Metro" parent="ThoughtTriggers" unique_id=175741016 instance=ExtResource("17_qodp8")]
 position = Vector2(609, 358)
-thought_text = "el metro debe estar por llegar"
+thought_text = "Ya casi, Alice..."
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" parent="ThoughtTriggers/Metro" index="0" unique_id=1377474002]
@@ -1317,7 +1317,7 @@ shape = SubResource("RectangleShape2D_7lswf")
 
 [node name="Entry" parent="ThoughtTriggers" unique_id=1302685200 instance=ExtResource("17_qodp8")]
 position = Vector2(610, 718)
-thought_text = "hace frío aquí..."
+thought_text = "Hace frío aquí..."
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" parent="ThoughtTriggers/Entry" index="0" unique_id=1377474002]
