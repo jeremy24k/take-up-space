@@ -66,9 +66,16 @@ func _physics_process(_delta: float) -> void:
 # =========================
 func _on_dialogic_started() -> void:
 	can_move = false
+	set_static_idle()
 
 func _on_dialogic_ended() -> void:
 	can_move = true
+
+func set_static_idle() -> void:
+	current_state = State.IDLE
+	var direction_suffix: String = get_direction_suffix(last_direction)
+	player_animation.animation = "idle_" + direction_suffix
+	player_animation.stop()
 
 # =========================
 # State helpers

@@ -53,7 +53,9 @@ directories/dtl_directory={
 "metro/important_man": "res://dialogic/timeline/metro/important_man.dtl",
 "metro/metro_notice_board": "res://dialogic/timeline/metro/metro_notice_board.dtl",
 "metro/ticket_store": "res://dialogic/timeline/metro/ticket_store.dtl",
-"metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl"
+"metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
+"metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
+"metro_station": "res://dialogic/timeline/metro/metro_station.dtl"
 }
 layout/style_directory={}
 layout/style_list=[]

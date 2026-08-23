@@ -1167,7 +1167,8 @@ metadata/_edit_group_ = true
 frame = 6
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("23_ru8rr")]
-position = Vector2(608, 757)
+position = Vector2(609, 757)
+metadata/_edit_group_ = true
 
 [node name="Camera2D" parent="MiddleLayer/Player" index="0" unique_id=1567288049]
 limit_left = 152
@@ -1298,7 +1299,7 @@ offset_top = -14.0
 offset_bottom = -2.0
 
 [node name="TrainTriggerArea" type="Area2D" parent="." unique_id=368345101]
-position = Vector2(521, 259)
+position = Vector2(521, 212)
 collision_mask = 3
 metadata/_edit_group_ = true
 
@@ -1316,7 +1317,7 @@ metadata/_edit_group_ = true
 shape = SubResource("RectangleShape2D_7lswf")
 
 [node name="Entry" parent="ThoughtTriggers" unique_id=1302685200 instance=ExtResource("17_qodp8")]
-position = Vector2(610, 718)
+position = Vector2(611, 670)
 thought_text = "Hace frío aquí..."
 metadata/_edit_group_ = true
 
