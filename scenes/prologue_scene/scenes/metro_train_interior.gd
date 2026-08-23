@@ -21,6 +21,7 @@ func _ready() -> void:
 	if door_spawn:
 		player.global_position = door_spawn.global_position
 		thought_trigger.call("show_thought", player)
+		
 
 # =========================
 # Camera movement

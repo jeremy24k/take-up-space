@@ -74,4 +74,4 @@ func leave_station() -> void:
 	print("Train has left the station.")
 
 	# chage scene
-	get_tree().change_scene_to_file("res://scenes/prologue_scene/scenes/metro_train_interior.tscn")
+	FadeTransition.transition_to_scene("res://scenes/prologue_scene/scenes/metro_train_interior.tscn")

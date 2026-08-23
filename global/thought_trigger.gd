@@ -2,6 +2,7 @@ class_name ThoughtTrigger
 extends Area2D
 
 @export var thought_text: String = "I'm thinking..."
+@export var thought_lines: Array[String] = []
 @export var display_duration: float = 2.5
 @export var trigger_once: bool = true
 
@@ -21,16 +22,23 @@ func _on_body_entered(body: Node2D) -> void:
 			# o si usas trigger_once puedes simplemente desactivar el monitoreo.
 
 func show_thought(player_node: CharacterBody2D) -> void:
+	var lines: Array[String] = []
+	if thought_lines.is_empty():
+		lines.append(thought_text)
+	else:
+		lines = thought_lines
+	_play_thought_sequence(player_node, lines)
+
+func _play_thought_sequence(player_node: CharacterBody2D, lines: Array[String]) -> void:
 	# 1. Si ya hay un pensamiento activo en Alice, lo eliminamos
 	if player_node.has_node("ThoughtBubble"):
 		player_node.get_node("ThoughtBubble").queue_free()
 
-	# 2. Duplicamos la plantilla para no destruir el $Label original de la escena
+	# Create one bubble and reuse it for every line.
 	var new_label: Label = label_template.duplicate() as Label
 	new_label.name = "ThoughtBubble"
-	new_label.text = thought_text
 	
-	# Añadimos la copia directamente como hija de Alice
+	# Add the copy directly as a child of Alice.
 	player_node.add_child(new_label)
 	
 	# 3. Configuración de tamaño y envolvente
@@ -47,12 +55,21 @@ func show_thought(player_node: CharacterBody2D) -> void:
 	var base_height_above_head: float = 24.0 # Ajusta la altura deseada sobre el personaje
 	new_label.position = Vector2(-max_width / 2.0, -new_label.size.y - base_height_above_head)
 	
-	new_label.show()
-	new_label.modulate.a = 0.0
+	# Show each line in order using the same bubble.
+	for line in lines:
+		if line.is_empty():
+			continue
 
-	# 5. Animación de aparición y desvanecimiento
-	var tween := player_node.create_tween()
-	tween.tween_property(new_label, "modulate:a", 1.0, 0.3)
-	tween.tween_interval(display_duration)
-	tween.tween_property(new_label, "modulate:a", 0.0, 0.4)
-	tween.tween_callback(new_label.queue_free)
+		new_label.text = line
+		new_label.reset_size()
+		new_label.position = Vector2(-max_width / 2.0, -new_label.size.y - base_height_above_head)
+		new_label.show()
+		new_label.modulate.a = 0.0
+
+		var tween := player_node.create_tween()
+		tween.tween_property(new_label, "modulate:a", 1.0, 0.3)
+		tween.tween_interval(display_duration)
+		tween.tween_property(new_label, "modulate:a", 0.0, 0.4)
+		await tween.finished
+
+	new_label.queue_free()

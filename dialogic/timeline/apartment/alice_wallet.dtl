@@ -1,4 +1,4 @@
-if {GameManager.quest_step} == 3.0:
+if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: (la ve sobre la mesa) 
 	alice: La cartera. 
 	alice: (la abre, mira el dinero) 

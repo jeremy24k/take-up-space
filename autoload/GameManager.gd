@@ -6,6 +6,9 @@ extends Node
 # Door used to enter the train interior.
 var target_door_id: int = 1
 
+# True after Alice checks the backpack.
+var prep_items_unlocked: bool = false
+
 @export var quest_step: int = 0
 var collected_items: Array[String] = []  # List of collected item IDs
 
@@ -40,6 +43,8 @@ func _on_dialogic_signal(argument: String) -> void:
 		"step_3":
 			if quest_step == 2:
 				set_quest_step(3)
+		"prep_items_unlocked":
+			prep_items_unlocked = true
 		"step_4":
 			if quest_step == 3 and has_all_prep_items():  # All required items collected
 				set_quest_step(4)
@@ -64,6 +69,9 @@ func add_item(item_id: String) -> void:
 
 func is_item_collected(item_id: String) -> bool:
 	return collected_items.has(item_id)
+
+func are_prep_items_unlocked() -> bool:
+	return prep_items_unlocked
 
 # =========================
 # Quest validation

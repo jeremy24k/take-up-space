@@ -1262,15 +1262,15 @@ z_index = 3
 
 [node name="TicketStore" parent="InteractableDetectors" unique_id=444772387 instance=ExtResource("16_0u374")]
 position = Vector2(449, 651)
-timeline_name = "ticket_store"
+timeline_name = "metro/ticket_store"
 
 [node name="ImportantMan" parent="InteractableDetectors" unique_id=176282367 instance=ExtResource("16_0u374")]
 position = Vector2(497, 282)
-timeline_name = "important_man"
+timeline_name = "metro/important_man"
 
 [node name="TwoYoungGuys" parent="InteractableDetectors" unique_id=2012285578 instance=ExtResource("16_0u374")]
 position = Vector2(197, 264)
-timeline_name = "two_young_guys"
+timeline_name = "metro/two_young_guys"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/TwoYoungGuys" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_qodp8")
@@ -1281,7 +1281,7 @@ offset_bottom = -12.0
 
 [node name="MetroNoticeBoard" parent="InteractableDetectors" unique_id=931401588 instance=ExtResource("16_0u374")]
 position = Vector2(1012, 272)
-timeline_name = "metro_notice_board"
+timeline_name = "metro/metro_notice_board"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/MetroNoticeBoard" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_0u374")

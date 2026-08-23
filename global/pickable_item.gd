@@ -22,10 +22,19 @@ func _ready() -> void:
 # Override label text using quest_step logic.
 func update_label_text() -> void:
 	if label:
-		if GameManager.quest_step >= 3:
+		if GameManager.quest_step >= 3 and _can_be_interacted_with():
 			label.text = "[Recoger]"
 		else:
 			label.text = "[Espacio]"
+
+func interact() -> void:
+	# Always allow the dialogue to explain why the item is unavailable.
+	super.interact()
+
+func _can_be_interacted_with() -> bool:
+	if GameManager.quest_step < 3:
+		return false
+	return item_id == "alice_backpack" or GameManager.are_prep_items_unlocked()
 
 # =========================
 # Dialogic event handling
@@ -41,7 +50,7 @@ func _on_dialogic_signal(argument: String) -> void:
 # =========================
 func _collect_item() -> void:
 	# Only allow saving/removing if we're in the correct phase.
-	if GameManager.quest_step >= 3:
+	if _can_be_interacted_with():
 		GameManager.add_item(item_id)
 		print("Item saved in GameManager: ", item_id)
 		queue_free()

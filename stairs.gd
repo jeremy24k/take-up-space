@@ -57,7 +57,7 @@ func _on_stairs_area_body_entered(body: Node2D) -> void:
 		sprite.play(final_anim)
 	
 	# Uncomment to change scene after stairs animation
-	get_tree().change_scene_to_file("res://scenes/prologue_scene/scenes/metro_stations.tscn")
+	FadeTransition.transition_to_scene("res://scenes/prologue_scene/scenes/metro_stations.tscn")
 
 # =========================
 # Stairs exit handling

@@ -273,7 +273,7 @@ target_desired_distance = 45.0
 radius = 20.0
 
 [node name="WilsonArea" parent="." unique_id=444772387 instance=ExtResource("2_lcobl")]
-timeline_name = "wilson"
+timeline_name = "apartment/wilson"
 
 [node name="CollisionShape2D" parent="WilsonArea" index="0" unique_id=1198806918]
 position = Vector2(0.5, 0)

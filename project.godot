@@ -50,14 +50,10 @@ directories/dtl_directory={
 "apartment/wilson_cushion": "res://dialogic/timeline/apartment/wilson_cushion.dtl",
 "apartment/wilson_plate": "res://dialogic/timeline/apartment/wilson_plate.dtl",
 "apartment/wilson_stay_home": "res://dialogic/timeline/apartment/wilson_stay_home.dtl",
-"important_man": "res://dialogic/timeline/important_man.dtl",
 "metro/important_man": "res://dialogic/timeline/metro/important_man.dtl",
 "metro/metro_notice_board": "res://dialogic/timeline/metro/metro_notice_board.dtl",
 "metro/ticket_store": "res://dialogic/timeline/metro/ticket_store.dtl",
-"metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
-"metro_notice_board": "res://dialogic/timeline/metro_notice_board.dtl",
-"ticket_store": "res://dialogic/timeline/ticket_store.dtl",
-"two_young_guys": "res://dialogic/timeline/two_young_guys.dtl"
+"metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl"
 }
 layout/style_directory={}
 layout/style_list=[]

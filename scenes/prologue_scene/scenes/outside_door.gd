@@ -35,10 +35,10 @@ func _on_area_2d_body_exited(_body: Node2D) -> void:
 # Dialogue triggers
 # =========================
 func _trigger_missing_items_dialogue() -> void:
-	Dialogic.start("alice_cant_leave_yet")
+	Dialogic.start("apartment/alice_cant_leave_yet")
 
 func _trigger_exit_sequence() -> void:
-	Dialogic.start("wilson_stay_home")
+	Dialogic.start("apartment/wilson_stay_home")
 
 	if not Dialogic.timeline_ended.is_connected(_on_goodbye_finished):
 		Dialogic.timeline_ended.connect(_on_goodbye_finished, CONNECT_ONE_SHOT)

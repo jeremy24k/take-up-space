@@ -13,6 +13,7 @@ if {GameManager.quest_step} == 3.0:
 		alice: (se queda pensando un momento)
 		alice: Ahora que lo pienso... no sé dónde están.
 		alice: Bueno. Empezaré a buscar.
+		[signal arg="prep_items_unlocked"]
 	else:
 		alice: Al fin tengo todo.
 		alice: Ok... es hora de irme.

@@ -1,4 +1,4 @@
-if {GameManager.quest_step} == 3.0:
+if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: ¿Qué hacen mis zapatos aquí?
 	alice: (los mira, confundida)
 	alice: Wilson...

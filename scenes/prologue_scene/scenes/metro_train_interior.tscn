@@ -536,7 +536,8 @@ debug_color = Color(0.87, 0.19140002, 0.31581008, 0.41960785)
 visible = false
 position = Vector2(-181, -11)
 monitoring = false
-thought_text = "Ya está... Alice, solo tienes que quedarte aquí."
+thought_text = ""
+thought_lines = Array[String](["Ya está... Alice, solo tienes que quedarte aquí.", "Me siento cansada...", "Ayer no dormi mucho...", "Quizas deberia..."])
 display_duration = 3.5
 
 [node name="InitialThoughtTrigger" parent="." unique_id=175741016 instance=ExtResource("9_thought")]
