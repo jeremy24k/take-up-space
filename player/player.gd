@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 # =========================
@@ -17,6 +18,7 @@ const INTERACTION_DISTANCE: float = 16.0
 var current_state: State = State.IDLE
 var last_direction: Vector2 = Vector2.DOWN # Face down by default while idle.
 var can_move: bool = true
+var is_control_locked: bool = false  # True while a scripted sequence owns the player.
 
 # =========================
 # Setup and dialogue hooks
@@ -69,13 +71,29 @@ func _on_dialogic_started() -> void:
 	set_static_idle()
 
 func _on_dialogic_ended() -> void:
-	can_move = true
+	# A cutscene lock outlives any dialogue played inside it.
+	if not is_control_locked:
+		can_move = true
 
 func set_static_idle() -> void:
 	current_state = State.IDLE
 	var direction_suffix: String = get_direction_suffix(last_direction)
 	player_animation.animation = "idle_" + direction_suffix
 	player_animation.stop()
+
+# =========================
+# Cutscene control lock
+# =========================
+## Blocks movement and interaction while a scripted sequence is running.
+func lock_control() -> void:
+	is_control_locked = true
+	can_move = false
+	set_static_idle()
+
+## Gives control back to the player once the sequence is over.
+func unlock_control() -> void:
+	is_control_locked = false
+	can_move = true
 
 # =========================
 # State helpers
@@ -114,6 +132,14 @@ func process_animation_state() -> void:
 			player_animation.animation = "walk_" + direccion_suffix
 
 
+## Plays an animation only if it exists, so sequences keep working while
+## the sprites for them are still missing.
+func play_animation(animation_name: String, fallback_name: String = "") -> void:
+	if player_animation.sprite_frames.has_animation(animation_name):
+		player_animation.play(animation_name)
+	elif fallback_name != "" and player_animation.sprite_frames.has_animation(fallback_name):
+		player_animation.play(fallback_name)
+
 # =========================
 # Direction and facing helper
 # =========================
@@ -130,6 +156,9 @@ func get_direction_suffix(direction: Vector2) -> String:
 # Interaction input flow
 # =========================
 func _unhandled_input(event: InputEvent) -> void:
+	if not can_move:
+		return
+
 	if Dialogic.current_timeline != null:
 		return
 		

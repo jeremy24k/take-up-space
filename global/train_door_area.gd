@@ -12,7 +12,7 @@ extends "res://global/interactable_area.gd"
 # =========================
 func _ready() -> void:
 	super._ready()
-	# 'owner' hace referencia a la raíz de la escena donde vive este nodo (MetroTrain)
+	# 'owner' is the root of the scene this node lives in (MetroTrain).
 	if not metro_train:
 		metro_train = owner as Node2D
 
@@ -32,8 +32,8 @@ func _collect_item() -> void:
 	# Prevent multiple interactions while the sequence is starting
 	monitoring = false 
 	
-	# Buscamos al jugador por grupo en la escena de la estación
-	var player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+	# Look the player up by group in the station scene.
+	var player = get_tree().get_first_node_in_group("player") as Player
 	
 	if metro_train and player:     
 		_board_train(player)
@@ -42,15 +42,12 @@ func _collect_item() -> void:
 # Boarding sequence
 # =========================
 ## Handles the complete train boarding sequence
-func _board_train(player: CharacterBody2D) -> void:
+func _board_train(player: Player) -> void:
 	# 1. Disable player movement
-	if player.has_method("set_physics_process"):
-		player.set_physics_process(false)
-	
+	player.lock_control()
+
 	# Optional: Play walking animation towards the train
-	var player_animation = player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
-	if player_animation:
-		player_animation.play("walk_back")
+	player.play_animation("walk_back")
 
 	# 2. Move player towards the dark area inside the train car using a Tween
 	var dark_position: Vector2 = player.global_position + Vector2(0, -16)
@@ -61,9 +58,8 @@ func _board_train(player: CharacterBody2D) -> void:
 	tween.parallel().tween_property(player, "z_index", -1, 0.8)
 
 	await tween.finished
-	
-	if player_animation:
-		player_animation.play("idle_back")
+
+	player.play_animation("idle_back")
 
 	# 3. Close the train doors
 	await get_tree().create_timer(0.2).timeout

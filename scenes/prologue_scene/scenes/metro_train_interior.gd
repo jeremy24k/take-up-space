@@ -29,10 +29,10 @@ extends Node2D
 signal player_fell_asleep
 
 @onready var camera: Camera2D = $Player/Camera2D
-@onready var player: CharacterBody2D = $Player
-@onready var thought_trigger: Node = $InitialThoughtTrigger
+@onready var player: Player = $Player
+@onready var thought_trigger: ThoughtTrigger = $InitialThoughtTrigger
 @onready var interactive_container: Node2D = $InteractiveContainer
-@onready var lights_container: Node2D = $LightsContainer
+@onready var lights_container: LightsContainer = $LightsContainer
 @onready var dark_filter: CanvasModulate = $LightsContainer/DarkFilter
 @onready var train_ambience: AudioStreamPlayer = $TrainAmbience
 
@@ -47,7 +47,7 @@ func _ready() -> void:
 	var door_spawn := get_node_or_null("SpawnContainers/DoorSpawn_%d" % GameManager.target_door_id) as Marker2D
 	if door_spawn:
 		player.global_position = door_spawn.global_position
-		thought_trigger.call("show_thought", player)
+		thought_trigger.show_thought(player)
 
 	# Start the train loop only if an ambience track has been assigned.
 	if train_ambience.stream:
@@ -71,23 +71,21 @@ func _process(delta: float) -> void:
 # =========================
 # Falling asleep sequence
 # =========================
-func _on_player_sat_down(seated_player: CharacterBody2D) -> void:
+func _on_player_sat_down(seated_player: Player) -> void:
 	# Prevent the sequence from starting more than once.
 	if is_falling_asleep:
 		return
 	is_falling_asleep = true
 	_fall_asleep(seated_player)
 
-func _fall_asleep(seated_player: CharacterBody2D) -> void:
-	var player_animation := seated_player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
-
+func _fall_asleep(seated_player: Player) -> void:
 	# 1. Alice starts to nod off.
 	await get_tree().create_timer(sleepy_delay).timeout
-	_play_animation_if_available(player_animation, sleepy_animation)
+	seated_player.play_animation(sleepy_animation)
 
 	# 2. Her head drops.
 	await get_tree().create_timer(asleep_delay).timeout
-	_play_animation_if_available(player_animation, asleep_animation)
+	seated_player.play_animation(asleep_animation)
 
 	# 3. Image, shake and sound fade out together.
 	var tween := create_tween().set_parallel(true)
@@ -95,7 +93,7 @@ func _fall_asleep(seated_player: CharacterBody2D) -> void:
 	tween.tween_property(self, "shake_intensity", 0.0, darkening_duration)
 	if train_ambience.stream:
 		tween.tween_property(train_ambience, "volume_db", ambience_silence_db, darkening_duration)
-	lights_container.call("fade_out_lights", darkening_duration)
+	lights_container.fade_out_lights(darkening_duration)
 
 	await tween.finished
 
@@ -104,13 +102,3 @@ func _fall_asleep(seated_player: CharacterBody2D) -> void:
 		train_ambience.stop()
 
 	player_fell_asleep.emit()
-
-# =========================
-# Animation helper
-# =========================
-func _play_animation_if_available(player_animation: AnimatedSprite2D, animation_name: String) -> void:
-	# Keep the current animation while the sleeping frames do not exist yet.
-	if not player_animation:
-		return
-	if player_animation.sprite_frames.has_animation(animation_name):
-		player_animation.play(animation_name)

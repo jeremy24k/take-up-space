@@ -537,7 +537,7 @@ visible = false
 position = Vector2(-181, -11)
 monitoring = false
 thought_text = ""
-thought_lines = Array[String](["Ya está... Alice, solo tienes que quedarte aquí.", "Me siento cansada... Quizás pueda cerrar los ojos un momento ."])
+thought_lines = Array[String](["Ya está... Alice, solo tienes que quedarte aquí.", "Me siento cansada... Quizás pueda cerrar los ojos un momento"])
 display_duration = 3.5
 
 [node name="InitialThoughtTrigger" parent="." unique_id=175741016 instance=ExtResource("9_thought")]

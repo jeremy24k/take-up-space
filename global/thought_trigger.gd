@@ -8,20 +8,26 @@ extends Area2D
 
 @onready var label_template: Label = $Label
 
+# Shared by every trigger, so a new thought can cancel the one still running.
+static var active_sequence_id: int = 0
+
 func _ready() -> void:
 	label_template.hide()
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player"):
-		if trigger_once:
-			# The Area2D is kept alive, only the monitoring is turned off.
-			set_deferred("monitoring", false)
+	var player := body as Player
+	if not player:
+		return
 
-		show_thought(body)
+	if trigger_once:
+		# The Area2D is kept alive, only the monitoring is turned off.
+		set_deferred("monitoring", false)
+
+	show_thought(player)
 
 # Coroutine: can be awaited to know when every thought line is over.
-func show_thought(player_node: CharacterBody2D) -> void:
+func show_thought(player_node: Player) -> void:
 	var lines: Array[String] = []
 	if thought_lines.is_empty():
 		lines.append(thought_text)
@@ -29,10 +35,13 @@ func show_thought(player_node: CharacterBody2D) -> void:
 		lines = thought_lines
 	await _play_thought_sequence(player_node, lines)
 
-func _play_thought_sequence(player_node: CharacterBody2D, lines: Array[String]) -> void:
-	# 1. Remove the thought bubble Alice may already be showing.
-	if player_node.has_node("ThoughtBubble"):
-		player_node.get_node("ThoughtBubble").queue_free()
+func _play_thought_sequence(player_node: Player, lines: Array[String]) -> void:
+	# 1. Take ownership: any sequence still running on Alice is now stale.
+	active_sequence_id += 1
+	var sequence_id: int = active_sequence_id
+
+	# 2. Remove the thought bubble Alice may already be showing.
+	_clear_active_bubble(player_node)
 
 	# Create one bubble and reuse it for every line.
 	var new_label: Label = label_template.duplicate() as Label
@@ -72,4 +81,22 @@ func _play_thought_sequence(player_node: CharacterBody2D, lines: Array[String]) 
 		tween.tween_property(new_label, "modulate:a", 0.0, 0.4)
 		await tween.finished
 
+		# A newer thought took over while this line was playing, and it already
+		# freed this bubble. Leaving now avoids touching a dead instance.
+		if sequence_id != active_sequence_id:
+			return
+
 	new_label.queue_free()
+
+# =========================
+# Bubble cleanup
+# =========================
+func _clear_active_bubble(player_node: Player) -> void:
+	var bubble := player_node.get_node_or_null("ThoughtBubble")
+	if not bubble:
+		return
+
+	# Detaching first releases the name, so the next bubble can reuse it
+	# instead of being renamed to "ThoughtBubble2" by the engine.
+	player_node.remove_child(bubble)
+	bubble.queue_free()

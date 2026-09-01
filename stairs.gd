@@ -30,82 +30,79 @@ func _ready() -> void:
 
 # =========================
 # Stairs entry handling
-# 1) Disable physics
+# 1) Lock player control
 # 2) Apply visual effects
 # 3) Execute movement sequence
 # 4) Play final animation
 # =========================
 func _on_stairs_area_body_entered(body: Node2D) -> void:
-	if not body.is_in_group("player"):
+	var player := body as Player
+	if not player:
 		return
-	
-	# Disable physics while on stairs
-	body.set_physics_process(false)
-	
-	# Get the player's sprite
-	var sprite = body.get_node_or_null("AnimatedSprite2D")
+
+	# Take control away from the player while she is on the stairs
+	player.lock_control()
+
 	var total_time = step_duration * 2.0
-	
+
 	# Apply continuous visual animations (scale + color tint)
-	_apply_visual_effects(body, total_time)
-	
+	_apply_visual_effects(player, total_time)
+
 	# Execute movement sequence
-	await _execute_movement_sequence(body, sprite)
-	
+	await _execute_movement_sequence(player)
+
 	# Play final idle animation
-	if sprite and final_anim != "":
-		sprite.play(final_anim)
+	player.play_animation(final_anim)
 	
 	# Uncomment to change scene after stairs animation
 	FadeTransition.transition_to_scene("res://scenes/prologue_scene/scenes/metro_stations.tscn")
 
 # =========================
 # Stairs exit handling
-# 1) Re-enable physics
+# 1) Unlock player control
 # 2) Restore visual properties
 # =========================
 func _on_stairs_area_body_exited(body: Node2D) -> void:
-	if not body.is_in_group("player"):
+	var player := body as Player
+	if not player:
 		return
-	
-	# Re-enable physics when leaving stairs
-	body.set_physics_process(true)
-	
+
+	# Give control back when leaving the stairs
+	player.unlock_control()
+
 	# Restore original scale and color
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(body, "scale", Vector2(1.0, 1.0), 0.5)
-	tween.tween_property(body, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.5)
+	tween.tween_property(player, "scale", Vector2(1.0, 1.0), 0.5)
+	tween.tween_property(player, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.5)
 	
 	await tween.finished
 
 # =========================
 # Visual effects helper
 # =========================
-func _apply_visual_effects(body: Node2D, total_time: float) -> void:
+func _apply_visual_effects(player: Player, total_time: float) -> void:
 	var visual_tween = create_tween().set_parallel(true)
-	visual_tween.tween_property(body, "scale", target_scale, total_time)
-	visual_tween.tween_property(body, "modulate", target_color, total_time)
+	visual_tween.tween_property(player, "scale", target_scale, total_time)
+	visual_tween.tween_property(player, "modulate", target_color, total_time)
 
 # =========================
 # Movement sequence helper
 # =========================
-func _execute_movement_sequence(body: Node2D, sprite: AnimatedSprite2D) -> void:
+func _execute_movement_sequence(player: Player) -> void:
 	var pos_tween = create_tween()
-	
+
 	# First segment - walking sideways
-	if sprite and first_anim != "":
-		sprite.play(first_anim)
-		if flip_sprite:
-			sprite.flip_h = true
-	
-	pos_tween.tween_property(body, "global_position", body.global_position + first_step_vector, step_duration)
-	
+	player.play_animation(first_anim)
+	if flip_sprite:
+		player.player_animation.flip_h = true
+
+	pos_tween.tween_property(player, "global_position", player.global_position + first_step_vector, step_duration)
+
 	# Second segment - walking down
 	pos_tween.tween_callback(func():
-		if sprite and second_anim != "":
-			sprite.play(second_anim)
+		player.play_animation(second_anim)
 	)
-	
-	pos_tween.tween_property(body, "global_position", body.global_position + first_step_vector + second_step_vector, step_duration)
-	
+
+	pos_tween.tween_property(player, "global_position", player.global_position + first_step_vector + second_step_vector, step_duration)
+
 	await pos_tween.finished

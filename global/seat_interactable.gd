@@ -7,7 +7,7 @@ extends "res://global/interactable_area.gd"
 @export var fade_duration: float = 1.0
 
 # Emitted once Alice is seated and her sitting thoughts are over.
-signal player_sat_down(seated_player: CharacterBody2D)
+signal player_sat_down(seated_player: Player)
 
 @onready var thought_trigger: ThoughtTrigger = get_parent().get_parent().get_node("SeatThoughtTrigger") as ThoughtTrigger
 @onready var sit_point: Area2D = $SitPoint
@@ -39,24 +39,19 @@ func sit_down() -> void:
 	if label:
 		label.hide()
 
-	var player := get_tree().get_first_node_in_group("player") as CharacterBody2D
+	var player := get_tree().get_first_node_in_group("player") as Player
 	if not player:
 		sequence_started = false
 		monitoring = true
 		return
 
 	# Stop the player while the sitting sequence is running.
-	player.set_physics_process(false)
-	var player_animation := player.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	player.lock_control()
 	await FadeTransition.fade_out(fade_duration)
 
 	# Move and change the player while the screen is black.
 	player.global_position = sit_point.global_position
-	if player_animation:
-		if player_animation.sprite_frames.has_animation(sitting_animation):
-			player_animation.play(sitting_animation)
-		else:
-			player_animation.play("idle_front")
+	player.play_animation(sitting_animation, "idle_front")
 
 	await FadeTransition.fade_in(fade_duration)
 

@@ -1,3 +1,4 @@
+class_name LightsContainer
 extends Node2D
 
 # =========================
