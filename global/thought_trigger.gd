@@ -14,23 +14,23 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
+		if trigger_once:
+			# The Area2D is kept alive, only the monitoring is turned off.
+			set_deferred("monitoring", false)
+
 		show_thought(body)
 
-		if trigger_once:
-			set_deferred("monitoring", false)
-			# Nota: No destruimos el Area2D inmediatamente si queremos que el script termine limpiamente, 
-			# o si usas trigger_once puedes simplemente desactivar el monitoreo.
-
+# Coroutine: can be awaited to know when every thought line is over.
 func show_thought(player_node: CharacterBody2D) -> void:
 	var lines: Array[String] = []
 	if thought_lines.is_empty():
 		lines.append(thought_text)
 	else:
 		lines = thought_lines
-	_play_thought_sequence(player_node, lines)
+	await _play_thought_sequence(player_node, lines)
 
 func _play_thought_sequence(player_node: CharacterBody2D, lines: Array[String]) -> void:
-	# 1. Si ya hay un pensamiento activo en Alice, lo eliminamos
+	# 1. Remove the thought bubble Alice may already be showing.
 	if player_node.has_node("ThoughtBubble"):
 		player_node.get_node("ThoughtBubble").queue_free()
 
@@ -41,18 +41,18 @@ func _play_thought_sequence(player_node: CharacterBody2D, lines: Array[String]) 
 	# Add the copy directly as a child of Alice.
 	player_node.add_child(new_label)
 	
-	# 3. Configuración de tamaño y envolvente
+	# 3. Size and word wrapping setup.
 	var max_width: float = 110.0
 	new_label.custom_minimum_size = Vector2(max_width, 0.0)
 	new_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	new_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	
-	# Forzamos el cálculo de dimensiones reales según el número de líneas
+	# Force the real size to be recalculated from the number of lines.
 	new_label.reset_size()
 	
-	# 4. Posicionamiento dinámico hacia ARRIBA
-	# Le restamos new_label.size.y para que la parte INFERIOR del texto quede siempre sobre la cabeza
-	var base_height_above_head: float = 24.0 # Ajusta la altura deseada sobre el personaje
+	# 4. Dynamic positioning ABOVE the character.
+	# Subtracting new_label.size.y keeps the BOTTOM of the text above her head.
+	var base_height_above_head: float = 24.0 # Height of the bubble above the character.
 	new_label.position = Vector2(-max_width / 2.0, -new_label.size.y - base_height_above_head)
 	
 	# Show each line in order using the same bubble.

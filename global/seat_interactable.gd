@@ -6,7 +6,10 @@ extends "res://global/interactable_area.gd"
 @export var sitting_animation: String = "idle_front"
 @export var fade_duration: float = 1.0
 
-@onready var thought_trigger: Node = get_parent().get_parent().get_node("SeatThoughtTrigger")
+# Emitted once Alice is seated and her sitting thoughts are over.
+signal player_sat_down(seated_player: CharacterBody2D)
+
+@onready var thought_trigger: ThoughtTrigger = get_parent().get_parent().get_node("SeatThoughtTrigger") as ThoughtTrigger
 @onready var sit_point: Area2D = $SitPoint
 
 var sequence_started: bool = false
@@ -58,4 +61,8 @@ func sit_down() -> void:
 	await FadeTransition.fade_in(fade_duration)
 
 	# Use the existing thought trigger system.
-	thought_trigger.call("show_thought", player)
+	if thought_trigger:
+		await thought_trigger.show_thought(player)
+
+	# Let the scene decide what happens next (falling asleep, dialogue, ...).
+	player_sat_down.emit(player)

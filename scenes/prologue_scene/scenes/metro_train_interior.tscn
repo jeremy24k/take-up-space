@@ -582,6 +582,8 @@ metadata/_edit_lock_ = true
 [node name="DarkFilter" type="CanvasModulate" parent="LightsContainer" unique_id=614684389]
 color = Color(0.6484137, 0.7359695, 0.82915205, 1)
 
+[node name="TrainAmbience" type="AudioStreamPlayer" parent="." unique_id=2072911592]
+
 [editable path="Train/NPCS/ReadingSitDownNPC"]
 [editable path="Train/NPCS/LinseningGuyNPC"]
 [editable path="Train/NPCS/NormalGuyNPC"]
