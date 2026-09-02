@@ -73,13 +73,27 @@ func _do_flicker_animation(light: PointLight2D) -> void:
 # =========================
 ## Stops the flicker loop and dims every light (used when Alice falls asleep).
 func fade_out_lights(duration: float) -> void:
-	flicker_enabled = false
-
-	# Kill the flicker in progress so it does not fight the fade.
-	if flicker_tween and flicker_tween.is_running():
-		flicker_tween.kill()
+	_stop_flickering()
 
 	var tween := create_tween().set_parallel(true)
 	for light in flickering_lights:
 		if light:
 			tween.tween_property(light, "energy", 0.0, duration)
+
+## Turns every light off right away, with no fade (used on a dark scene start).
+func turn_off_lights() -> void:
+	_stop_flickering()
+
+	for light in flickering_lights:
+		if light:
+			light.energy = 0.0
+
+# =========================
+# Flicker teardown
+# =========================
+func _stop_flickering() -> void:
+	flicker_enabled = false
+
+	# Kill the flicker in progress so it does not fight the fade.
+	if flicker_tween and flicker_tween.is_running():
+		flicker_tween.kill()

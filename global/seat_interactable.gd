@@ -9,7 +9,6 @@ extends "res://global/interactable_area.gd"
 # Emitted once Alice is seated and her sitting thoughts are over.
 signal player_sat_down(seated_player: Player)
 
-@onready var thought_trigger: ThoughtTrigger = get_parent().get_parent().get_node("SeatThoughtTrigger") as ThoughtTrigger
 @onready var sit_point: Area2D = $SitPoint
 
 var sequence_started: bool = false
@@ -55,9 +54,5 @@ func sit_down() -> void:
 
 	await FadeTransition.fade_in(fade_duration)
 
-	# Use the existing thought trigger system.
-	if thought_trigger:
-		await thought_trigger.show_thought(player)
-
-	# Let the scene decide what happens next (falling asleep, dialogue, ...).
+	# Let the scene decide what happens next (thoughts, falling asleep, ...).
 	player_sat_down.emit(player)

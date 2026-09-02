@@ -9,7 +9,7 @@ extends CharacterBody2D
 
 @export var is_animated: bool = true
 @export var animation_speed: float = 0.5
-@export var random_start_offset: bool = true # Opción para activar/desactivar la desincronización
+@export var random_start_offset: bool = true # Enables/disables the start desync
 
 @onready var sprite: Sprite2D = $Sprite2D
 var timer_animation: float = 0.0
@@ -24,7 +24,7 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		set_process(false)
 	else:
-		# Desfase aleatorio para romper la sincronía al iniciar la escena
+		# Random offset so the NPCs do not animate in lockstep on scene start
 		if random_start_offset and is_animated:
 			timer_animation = randf_range(0.0, animation_speed)
 			current_frame = randi() % total_frames

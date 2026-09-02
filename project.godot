@@ -25,6 +25,7 @@ FadeTransition="*uid://cikuexy8o2qwo"
 
 directories/dch_directory={
 "alice": "res://dialogic/characters/alice.dch",
+"metro_worker": "res://dialogic/characters/metro_worker.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
 }
 directories/dtl_directory={
@@ -55,7 +56,8 @@ directories/dtl_directory={
 "metro/ticket_store": "res://dialogic/timeline/metro/ticket_store.dtl",
 "metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
 "metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
-"metro_station": "res://dialogic/timeline/metro/metro_station.dtl"
+"metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
+"unknown_station_worker": "res://dialogic/timeline/metro/unknown_station_worker.dtl"
 }
 layout/style_directory={}
 layout/style_list=[]
