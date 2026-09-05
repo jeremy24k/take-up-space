@@ -29,18 +29,19 @@ extends Node2D
 # Awakening configuration
 # =========================
 @export_group("Awakening")
-## Animation played while Alice is still sitting asleep.
+## Animation played once Alice opens her eyes, signaled by the worker's
+## dialogue (a [signal arg="alice_wakes_up"] event mid-timeline).
 @export var awakening_animation: String = "sit_down"
-## Time the screen stays on the sleeping Alice before she stirs.
-@export var awakening_delay: float = 1.5
-## Time between opening her eyes and being fully awake.
-@export var awakening_wake_delay: float = 1.2
 ## Cold tone of the stopped, powered down train car.
 @export var awakening_color: Color = Color(0.28, 0.33, 0.46, 1.0)
 ## How long the car takes to come back into view as she opens her eyes.
 @export var awakening_fade_duration: float = 2.0
-## Timeline played by the worker, from either the NPC or the blocked door.
+## Energy the exit light reaches once it is guiding Alice to the platform.
+@export var exit_light_energy: float = 0.9
+## Timeline the worker plays once he reaches Alice.
 @export var worker_timeline: String = "unknown_station_worker"
+## How fast the worker walks over to Alice's seat.
+@export var worker_walk_speed: float = 40.0
 
 # Emitted once the screen is fully dark and Alice is asleep.
 signal player_fell_asleep
@@ -51,20 +52,18 @@ signal player_woke_up
 @onready var player: Player = $Player
 @onready var thought_trigger: ThoughtTrigger = $ThoughtTriggers/InitialThoughtTrigger
 @onready var seat_thought_trigger: ThoughtTrigger = $ThoughtTriggers/SeatThoughtTrigger
-@onready var awakening_thought_trigger: ThoughtTrigger = $ThoughtTriggers/AwakeningThoughtTrigger
 @onready var interactive_container: Node2D = $InteractiveContainer
 @onready var lights_container: LightsContainer = $LightsContainer
 @onready var dark_filter: CanvasModulate = $LightsContainer/DarkFilter
+@onready var exit_light: PointLight2D = $LightsContainer/ExitLight
 @onready var train_ambience: AudioStreamPlayer = $TrainAmbience
 @onready var npcs: Node2D = $Train/NPCS
-@onready var worker_npc: CharacterBody2D = $Train/NPCS/WorkerNPC
+@onready var worker_npc: WalkingNPC = $Train/NPCS/WorkerNPC
 @onready var worker_collision: CollisionShape2D = $Train/NPCS/WorkerNPC/CollisionShape2D
-@onready var worker_interactable: InteractableArea = $Train/NPCS/WorkerNPC/InteractableArea
 @onready var exit_door: SceneTransitionArea = $ExitDoorArea
 
 var noise_y: float = 0.0
 var is_falling_asleep: bool = false
-var worker_dialogue_started: bool = false
 
 # =========================
 # Setup
@@ -145,6 +144,7 @@ func _fall_asleep(seated_player: Player) -> void:
 	_setup_awakening_mode()
 	await _wake_up(seated_player)
 
+
 # =========================
 # Awakening sequence
 # =========================
@@ -160,56 +160,46 @@ func _setup_awakening_mode() -> void:
 	for seat in interactive_container.get_children():
 		seat.set_deferred("monitoring", false)
 
-	# The worker and the open door were waiting for this moment.
+	# The worker steps in and the door opens once the train has stopped.
 	_set_worker_active(true)
 	exit_door.show()
 	exit_door.set_deferred("monitoring", true)
 
-	# The exit stays locked until the worker has explained what happened.
-	exit_door.is_locked = true
-	exit_door.blocked_interaction.connect(_on_exit_blocked)
-	worker_interactable.interacted.connect(_talk_to_worker)
-
 func _wake_up(sleeping_player: Player) -> void:
-	sleeping_player.lock_control()
+	# She is already locked from sitting down, and re-locking here would reset
+	# her pose to a generic idle, erasing the sit_asleep animation she is in.
 
-	# 1. The car comes back into view while she is still out.
-	var tween := create_tween()
+	# 1. The car comes back into view while she is still out, and the open
+	# door lights up so she has somewhere to head towards once she can move.
+	var tween := create_tween().set_parallel(true)
 	tween.tween_property(dark_filter, "color", awakening_color, awakening_fade_duration)
+	tween.tween_property(exit_light, "energy", exit_light_energy, awakening_fade_duration)
 
-	await get_tree().create_timer(awakening_delay).timeout
-	sleeping_player.play_animation(sleepy_animation)
+	# 2. The worker walks over while she is still out. She stays on
+	# asleep_animation the whole time, since nothing here touches it.
+	var approach_point: Vector2 = worker_npc.resolve_approach_point(sleeping_player.global_position)
+	await worker_npc.walk_to(approach_point, worker_walk_speed)
+	worker_npc.face_direction(worker_npc.global_position.direction_to(sleeping_player.global_position))
 
-	# 2. She opens her eyes.
-	await get_tree().create_timer(awakening_wake_delay).timeout
-	sleeping_player.play_animation(awakening_animation)
+	# 3. Dialogic drives the whole conversation, including the exact moment
+	# her eyes open - a [signal arg="alice_wakes_up"] event mid-timeline.
+	Dialogic.start(worker_timeline)
+	await _wait_for_signal("alice_wakes_up")
+	sleeping_player.play_animation_backwards(awakening_animation)
 
-	# 3. Her first thought, then she can move again.
-	await awakening_thought_trigger.show_thought(sleeping_player)
+	await Dialogic.timeline_ended
 
+	# 4. She faces the open door before Alice gets control back.
+	sleeping_player.face_direction(Vector2.DOWN)
 	sleeping_player.unlock_control()
 	player_woke_up.emit()
 
-# =========================
-# Worker conversation
-# =========================
-func _on_exit_blocked() -> void:
-	# Reaching for the door without asking gets her stopped by the worker.
-	_talk_to_worker()
-
-func _talk_to_worker() -> void:
-	# Both routes lead to the same conversation, and it only happens once.
-	if worker_dialogue_started:
-		return
-	worker_dialogue_started = true
-
-	Dialogic.start(worker_timeline)
-	Dialogic.timeline_ended.connect(_on_worker_dialogue_finished, CONNECT_ONE_SHOT)
-
-func _on_worker_dialogue_finished() -> void:
-	# Now she knows where she is, so the platform is reachable.
-	exit_door.is_locked = false
-	worker_interactable.set_deferred("monitoring", false)
+## Waits for a specific Dialogic [signal] event, ignoring any other signal
+## that might fire in the meantime (Dialogic.signal_event is global).
+func _wait_for_signal(expected_argument: String) -> void:
+	var argument: Variant = await Dialogic.signal_event
+	while argument != expected_argument:
+		argument = await Dialogic.signal_event
 
 # =========================
 # Passenger helpers
@@ -232,10 +222,9 @@ func _empty_the_car() -> void:
 # =========================
 # Worker visibility helper
 # =========================
-## Hiding the NPC is not enough: his body would still block Alice and his
-## prompt would still answer, so the collision and the area go with him.
+## Hiding the NPC is not enough: his body would still block Alice, so the
+## collision goes with him.
 func _set_worker_active(is_active: bool) -> void:
 	worker_npc.visible = is_active
 	worker_npc.process_mode = Node.PROCESS_MODE_INHERIT if is_active else Node.PROCESS_MODE_DISABLED
 	worker_collision.set_deferred("disabled", not is_active)
-	worker_interactable.set_deferred("monitoring", is_active)

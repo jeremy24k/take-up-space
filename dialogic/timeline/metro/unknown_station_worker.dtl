@@ -1,23 +1,16 @@
-alice: (un hombre con chaleco reflectante la mira desde el pasillo)
-metro_worker: Eh. Tú.
-metro_worker: No puedes quedarte aquí.
-alice: (se levanta despacio)
-alice: Yo... me quedé dormida.
-metro_worker: Ya somos dos, entonces.
-alice: ¿Dónde estamos?
-metro_worker: Final de línea.
-metro_worker: El tren no sigue.
-alice: Eso no...
-alice: Eso no puede ser.
-alice: Yo iba a tres paradas de aquí.
-metro_worker: (se encoge de hombros)
-metro_worker: Pues has ido bastante más lejos.
-alice: ¿Y cómo vuelvo?
-metro_worker: Mañana.
-metro_worker: Hoy ya no sale nada.
-alice: (mira por la ventana)
-alice: No reconozco nada.
-metro_worker: Sal al andén y pregunta arriba.
-metro_worker: Yo tengo que cerrar el tren.
-alice: Ya. Claro.
-alice: Gracias.
+metro_worker: Oye... te quedaste dormida.
+[signal arg="alice_wakes_up"]
+alice: (despierta sobresaltada)
+alice: ¡Ah!
+alice: Yo... lo siento.
+metro_worker: No pasa nada.
+metro_worker: Pero tienes que bajar. Es la terminal.
+alice: ¿La terminal...?
+metro_worker: Sí. Ya no sigue el tren.
+alice: Ah...
+alice: (mira alrededor, todavía adormilada)
+alice: Claro...
+metro_worker: Vamos, tengo que cerrar el vagón.
+alice: Sí. Sí, claro.
+alice: Perdón.
+metro_worker: No te preocupes.

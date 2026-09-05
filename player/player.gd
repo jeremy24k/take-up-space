@@ -68,7 +68,10 @@ func _physics_process(_delta: float) -> void:
 # =========================
 func _on_dialogic_started() -> void:
 	can_move = false
-	set_static_idle()
+	# A cutscene lock already owns the pose (e.g. sitting asleep); don't
+	# snap her to a generic idle just because a dialogue started.
+	if not is_control_locked:
+		set_static_idle()
 
 func _on_dialogic_ended() -> void:
 	# A cutscene lock outlives any dialogue played inside it.
@@ -80,6 +83,13 @@ func set_static_idle() -> void:
 	var direction_suffix: String = get_direction_suffix(last_direction)
 	player_animation.animation = "idle_" + direction_suffix
 	player_animation.stop()
+
+## Changes the facing direction and immediately applies the matching idle
+## pose, so it survives the next _physics_process() instead of being
+## overwritten by it a frame later.
+func face_direction(direction: Vector2) -> void:
+	last_direction = direction
+	set_static_idle()
 
 # =========================
 # Cutscene control lock
@@ -139,6 +149,13 @@ func play_animation(animation_name: String, fallback_name: String = "") -> void:
 		player_animation.play(animation_name)
 	elif fallback_name != "" and player_animation.sprite_frames.has_animation(fallback_name):
 		player_animation.play(fallback_name)
+
+## Same guard as play_animation(), but plays the animation in reverse.
+func play_animation_backwards(animation_name: String, fallback_name: String = "") -> void:
+	if player_animation.sprite_frames.has_animation(animation_name):
+		player_animation.play_backwards(animation_name)
+	elif fallback_name != "" and player_animation.sprite_frames.has_animation(fallback_name):
+		player_animation.play_backwards(fallback_name)
 
 # =========================
 # Direction and facing helper
