@@ -8,11 +8,12 @@ size = Vector2(14, 28)
 
 [node name="BaseNPC" type="CharacterBody2D" unique_id=1283702522]
 script = ExtResource("1_xvse1")
+animation_speed = 1.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2102186028]
 texture_filter = 1
 texture = ExtResource("2_55e2e")
-hframes = 10
+hframes = 30
 vframes = 10
 metadata/_aseprite_wizard_interface_config_ = {
 "animation_section": true,

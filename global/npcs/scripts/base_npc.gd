@@ -1,7 +1,7 @@
 @tool
 extends CharacterBody2D
 
-@export_range(0, 9) var column_npc: int = 0:
+@export_range(0, 29) var column_npc: int = 0:
 	set(value):
 		column_npc = value
 		if is_node_ready() and sprite:

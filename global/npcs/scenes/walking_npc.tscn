@@ -253,3 +253,8 @@ metadata/_aseprite_wizard_source_file_hash_ = "ae57cd46b9b0144edcc881d52efe9c1d"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1090796085]
 position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_default")
+
+[node name="ApproachPoint" type="Marker2D" parent="." unique_id=1932895539]
+visible = false
+position = Vector2(-30, 12)
+gizmo_extents = 0.0
