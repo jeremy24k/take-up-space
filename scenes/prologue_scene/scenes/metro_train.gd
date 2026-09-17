@@ -5,6 +5,9 @@ extends Node2D
 # =========================
 @export var arrival_time: float = 4.0
 @export var station_position_x: float = 0.0
+## Scene loaded once the train pulls away. Leave empty to just depart with
+## no follow-up (e.g. an already-boarded train leaving an arrival platform).
+@export_file("*.tscn") var next_scene_path: String = "res://scenes/prologue_scene/scenes/metro_train_interior.tscn"
 @onready var train_visual: Node2D = $Train
 @onready var interactive_areas: Node2D = $EnteredTrainArea
 signal train_arrived
@@ -70,8 +73,8 @@ func leave_station() -> void:
 
 	await tween.finished
 	train_leaving_station.emit()
-	
+
 	print("Train has left the station.")
 
-	# chage scene
-	FadeTransition.transition_to_scene("res://scenes/prologue_scene/scenes/metro_train_interior.tscn")
+	if next_scene_path != "":
+		FadeTransition.transition_to_scene(next_scene_path)

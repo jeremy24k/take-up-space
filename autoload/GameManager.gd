@@ -9,6 +9,9 @@ var target_door_id: int = 1
 # True after Alice checks the backpack.
 var prep_items_unlocked: bool = false
 
+# False once she realizes she left her phone on the train.
+var has_phone: bool = true
+
 @export var quest_step: int = 0
 var collected_items: Array[String] = []  # List of collected item IDs
 
@@ -45,6 +48,8 @@ func _on_dialogic_signal(argument: String) -> void:
 				set_quest_step(3)
 		"prep_items_unlocked":
 			prep_items_unlocked = true
+		"no_phone":
+			has_phone = false
 		"step_4":
 			if quest_step == 3 and has_all_prep_items():  # All required items collected
 				set_quest_step(4)

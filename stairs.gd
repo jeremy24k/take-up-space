@@ -18,6 +18,11 @@ extends Node2D
 @export var target_color: Color = Color(0.7, 0.7, 0.9, 1.0)
 @export var step_duration: float = 0.8
 
+@export_group("Scene Transition")
+## Scene loaded once the stairs animation finishes. Leave empty to only
+## play the animation with no scene change.
+@export_file("*.tscn") var next_scene_path: String = "res://scenes/prologue_scene/scenes/metro_stations.tscn"
+
 @onready var stair_area: Area2D = $Area2D
 
 # =========================
@@ -53,9 +58,9 @@ func _on_stairs_area_body_entered(body: Node2D) -> void:
 
 	# Play final idle animation
 	player.play_animation(final_anim)
-	
-	# Uncomment to change scene after stairs animation
-	FadeTransition.transition_to_scene("res://scenes/prologue_scene/scenes/metro_stations.tscn")
+
+	if next_scene_path != "":
+		FadeTransition.transition_to_scene(next_scene_path)
 
 # =========================
 # Stairs exit handling

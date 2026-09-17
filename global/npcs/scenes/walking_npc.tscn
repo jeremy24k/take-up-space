@@ -226,6 +226,7 @@ animations = [{
 size = Vector2(14, 28)
 
 [node name="WalkingNPC" type="CharacterBody2D" unique_id=15668528]
+collision_layer = 1
 script = ExtResource("1_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1544429594]
@@ -255,6 +256,5 @@ position = Vector2(0, 1)
 shape = SubResource("RectangleShape2D_default")
 
 [node name="ApproachPoint" type="Marker2D" parent="." unique_id=1932895539]
-visible = false
 position = Vector2(-30, 12)
 gizmo_extents = 0.0

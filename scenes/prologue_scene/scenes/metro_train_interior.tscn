@@ -571,6 +571,9 @@ metadata/_edit_group_ = true
 [node name="AnimatedSprite2D" parent="Train/NPCS/WorkerNPC" index="0" unique_id=1544429594]
 sprite_frames = ExtResource("8_ci765")
 
+[node name="ApproachPoint" parent="Train/NPCS/WorkerNPC" index="2" unique_id=1932895539]
+visible = false
+
 [node name="SpawnContainers" type="Node2D" parent="." unique_id=846825535]
 
 [node name="DoorSpawn_1" type="Marker2D" parent="SpawnContainers" unique_id=1319990567]
