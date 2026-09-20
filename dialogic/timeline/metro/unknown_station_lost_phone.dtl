@@ -1,12 +1,16 @@
 alice: (mira a su alrededor)
-alice: Esta... no es mi parada.
-alice: Nunca había visto esta estación.
+alice: ¿Eh...?
+alice: (observa la estación)
+alice: Esta no es mi parada...
+alice: ¿Dónde...?
 alice: (busca en sus bolsillos)
-alice: Un momento... ¿mi teléfono?
+alice: Mi teléfono...
 [signal arg="no_phone"]
-alice: ¡No, no, no!
-alice: Lo dejé en el asiento...
-alice: (voltea hacia las vías vacías)
+alice: No.
+alice: No, no, no...
+alice: (mira hacia las vías)
 alice: Se fue.
-alice: No tengo dinero, no tengo teléfono...
-alice: ¿Cómo se supone que voy a volver?
+alice: Lo dejé en el tren.
+alice: ...
+alice: Genial, Alice.
+alice: ¿Y ahora qué hago?

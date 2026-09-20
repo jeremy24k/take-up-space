@@ -1,14 +1,10 @@
-alice: (da un paso hacia el guardia)
+alice: (se acerca al trabajador)
 alice: Disculpe...
-metro_worker: (no responde)
-alice: Eh...
-alice: Disculpe.
-metro_worker: (sigue ocupado)
+[pausa]
+alice: Eh... disculpe.
+[el trabajador no responde]
 alice: ...
-alice: ¿Podría...?
-metro_worker: (nada)
-alice: (baja la mirada)
+alice: ¿Podría decirme...?
+[el trabajador continúa con lo suyo]
+alice: ...
 alice: Olvídalo.
-alice: Nadie va a ayudarme con esto.
-alice: No tengo dinero. No tengo teléfono. No sé dónde estoy.
-alice: Voy a tener que encontrar el camino de vuelta yo sola.

@@ -30,7 +30,7 @@ addons/        Dialogic, AsepriteWizard, TileMapDual
 ## 2. Flujo del juego
 
 ```
-apartment.tscn ──stairs.gd──►  metro_stations.tscn  ──metro_train.gd──►  metro_train_interior.tscn
+apartment.tscn ──global/stairs/stairs.gd──►  metro_stations.tscn  ──metro_train.gd──►  metro_train_interior.tscn
 (apartamento)                (andén)                                   (vagón)
                                                                             │
                                                             se sienta → se duerme
@@ -298,9 +298,10 @@ Todo se ajusta desde el inspector del nodo raíz: grupos **Falling Asleep** y
 
 ## 9. Cosas pendientes / a vigilar
 
-- **`metro stations.tscn`** (con espacio) es una copia vieja de
-  `metro_stations.tscn`. `stairs.gd` va a la buena, pero el `ExitDoorArea` del
-  vagón apunta a la **vieja**. Decidir cuál se queda y borrar la otra.
+- `metro_stations.tscn` es la escena activa del andén. La copia antigua con
+  espacio fue eliminada para evitar rutas ambiguas.
+- La escena reutilizable de escaleras vive en `global/stairs/` y conserva su
+  UID original para no romper las instancias existentes.
 - **`TrainAmbience`** no tiene sonido asignado; el código lo detecta y no falla.
 - La escena de la **estación desconocida** (tras el vagón) aún no existe.
 - `basic_door.gd::_is_player_body()` acepta cualquier `CharacterBody2D`, así que

@@ -826,7 +826,7 @@ metadata/_edit_lock_ = true
 [node name="ExitDoorArea" parent="." unique_id=2072911596 instance=ExtResource("10_interact")]
 position = Vector2(268, 35)
 script = ExtResource("11_exit")
-target_scene_path = "uid://b03pssfl5xa3i"
+target_scene_path = "uid://xrhjvw0pvpdb"
 fade_duration = 1.0
 prompt_text = "[Espacio] Salir al anden"
 

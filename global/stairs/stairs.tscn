@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://db538xhfu5yol"]
 
-[ext_resource type="Script" uid="uid://ewa33lxlcka6" path="res://stairs.gd" id="1_g0mii"]
+[ext_resource type="Script" uid="uid://ewa33lxlcka6" path="res://global/stairs/stairs.gd" id="1_g0mii"]
 [ext_resource type="Texture2D" uid="uid://dehidi0s65wkm" path="res://scenes/prologue_scene/assets/stairs.aseprite" id="1_l5oqe"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_8w0r3"]

@@ -4,9 +4,12 @@ extends Area2D
 # =========================
 # Interaction configuration
 # =========================
-@export var timeline_name: String = ""  # Timeline to execute if exists
-@export var prompt_text: String = ""    # Optional label text, set per instance
-@onready var label: Label = $Label      # Unified label name
+@export var timeline_name: String = ""        # Timeline to execute if exists
+@export var prompt_text: String = ""           # Optional label text, set per instance
+@export var one_time_interaction: bool = false  # If true, trigger only on the first interaction
+@onready var label: Label = $Label              # Unified label name
+
+var _interaction_enabled: bool = true
 
 # Emitted every time the player interacts with this area.
 signal interacted
@@ -25,11 +28,17 @@ func _ready() -> void:
 # Prompt visibility
 # =========================
 func _on_area_entered(_area: Area2D) -> void:
+	if not _interaction_enabled:
+		return
+
 	update_label_text()  # Calls child version if it exists
 	if label:
 		label.show()
 
 func _on_area_exited(_area: Area2D) -> void:
+	if not _interaction_enabled:
+		return
+
 	if label:
 		label.hide()
 
@@ -48,10 +57,17 @@ func _collect_item() -> void:
 # Interaction action
 # =========================
 func interact() -> void:
+	if not _interaction_enabled:
+		return
+
 	interacted.emit()
 
 	if label:
 		label.hide()
+
+	if one_time_interaction:
+		_interaction_enabled = false
+		set_deferred("monitoring", false)
 
 	# If there's a Dialogic timeline, start it.
 	if timeline_name != "":

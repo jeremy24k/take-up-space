@@ -3,7 +3,7 @@ extends Node2D
 @onready var metro_train: Node2D = $MiddleLayer/MetroTrain
 @onready var train_trigger_area: Area2D = $InteractableDetectors/TrainTriggerArea
 @onready var worker_interactable: InteractableArea = $MiddleLayer/NPCS/WorkerNPC/InteractableArea
-@export var wait_time_for_phone_missing: float = 1.0
+@export var wait_time_for_phone_missing: float = 1
 
 var train_has_left: bool = false
 var worker_dialogue_started: bool = false
@@ -51,11 +51,5 @@ func _on_worker_interacted() -> void:
 	if worker_dialogue_started:
 		return
 	worker_dialogue_started = true
-	_ask_worker_for_help()
-
-func _ask_worker_for_help() -> void:
-	# He never reacts - he just stays put, busy. She's the one who gives up
-	# and walks away, which is just the player moving her once Dialogic
-	# hands control back (Player already locks/unlocks on its own).
-	Dialogic.start("unknown_station_worker_dismissive")
-	await Dialogic.timeline_ended
+	# The timeline is launched by InteractableArea via timeline_name.
+	# The player retains control until Dialogic hands it back.

@@ -29,7 +29,7 @@
 [ext_resource type="PackedScene" uid="uid://dhgkdyn61b7bp" path="res://scenes/prologue_scene/scenes/outside_door.tscn" id="18_p2bbp"]
 [ext_resource type="Script" uid="uid://criaaywg2msi8" path="res://global/lamp_interactable.gd" id="19_7neww"]
 [ext_resource type="Script" uid="uid://v68qy83mv4sa" path="res://scenes/prologue_scene/scenes/outside_door.gd" id="19_eoq23"]
-[ext_resource type="PackedScene" uid="uid://db538xhfu5yol" path="res://stairs.tscn" id="22_o7fgy"]
+[ext_resource type="PackedScene" uid="uid://db538xhfu5yol" path="res://global/stairs/stairs.tscn" id="22_o7fgy"]
 [ext_resource type="Script" uid="uid://cf0avee3l6ary" path="res://scenes/prologue_scene/scenes/lights_container.gd" id="29_u0yrg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0oi55"]

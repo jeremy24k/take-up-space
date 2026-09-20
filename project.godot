@@ -57,7 +57,17 @@ directories/dtl_directory={
 "metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
 "metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
 "metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
+"unknown_station_bench": "res://dialogic/timeline/metro/unknown_station_bench.dtl",
+"unknown_station_guy_cap": "res://dialogic/timeline/metro/unknown_station_guy_cap.dtl",
+"unknown_station_listening_guy": "res://dialogic/timeline/metro/unknown_station_listening_guy.dtl",
 "unknown_station_lost_phone": "res://dialogic/timeline/metro/unknown_station_lost_phone.dtl",
+"unknown_station_map": "res://dialogic/timeline/metro/unknown_station_map.dtl",
+"unknown_station_normal_guy": "res://dialogic/timeline/metro/unknown_station_normal_guy.dtl",
+"unknown_station_sitting_boy": "res://dialogic/timeline/metro/unknown_station_sitting_boy.dtl",
+"unknown_station_sitting_girl": "res://dialogic/timeline/metro/unknown_station_sitting_girl.dtl",
+"unknown_station_tracks_a": "res://dialogic/timeline/metro/unknown_station_tracks_a.dtl",
+"unknown_station_tracks_b": "res://dialogic/timeline/metro/unknown_station_tracks_b.dtl",
+"unknown_station_vending_machine": "res://dialogic/timeline/metro/unknown_station_vending_machine.dtl",
 "unknown_station_worker": "res://dialogic/timeline/metro/unknown_station_worker.dtl",
 "unknown_station_worker_dismissive": "res://dialogic/timeline/metro/unknown_station_worker_dismissive.dtl"
 }

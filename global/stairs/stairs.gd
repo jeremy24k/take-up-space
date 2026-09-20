@@ -25,6 +25,8 @@ extends Node2D
 
 @onready var stair_area: Area2D = $Area2D
 
+var sequence_running: bool = false
+
 # =========================
 # Setup and signal connections
 # =========================
@@ -42,13 +44,14 @@ func _ready() -> void:
 # =========================
 func _on_stairs_area_body_entered(body: Node2D) -> void:
 	var player := body as Player
-	if not player:
+	if not player or sequence_running:
 		return
 
+	sequence_running = true
 	# Take control away from the player while she is on the stairs
 	player.lock_control()
 
-	var total_time = step_duration * 2.0
+	var total_time: float = step_duration * 2.0
 
 	# Apply continuous visual animations (scale + color tint)
 	_apply_visual_effects(player, total_time)
@@ -61,6 +64,8 @@ func _on_stairs_area_body_entered(body: Node2D) -> void:
 
 	if next_scene_path != "":
 		FadeTransition.transition_to_scene(next_scene_path)
+	else:
+		sequence_running = false
 
 # =========================
 # Stairs exit handling
