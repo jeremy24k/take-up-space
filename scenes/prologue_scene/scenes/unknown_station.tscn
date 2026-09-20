@@ -25,6 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://27cyc8vi7hms" path="res://scenes/prologue_scene/assets/dual_collisions.aseprite" id="13_0t0kd"]
 [ext_resource type="Script" uid="uid://cf0avee3l6ary" path="res://scenes/prologue_scene/scenes/lights_container.gd" id="14_k4ha0"]
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="15_ewlva"]
+[ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="26_16iif"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v12e0"]
 texture = ExtResource("1_jhnfj")
@@ -1557,6 +1558,9 @@ size = Vector2(58, 28)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xbto1"]
 size = Vector2(52, 32)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0t0kd"]
+size = Vector2(620, 20)
+
 [node name="Node2D" type="Node2D" unique_id=293224598]
 script = ExtResource("0_script")
 
@@ -1732,7 +1736,7 @@ position = Vector2(-15.5, -3.5)
 shape = SubResource("RectangleShape2D_8gtpx")
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("8_bqf6q")]
-position = Vector2(431, 615)
+position = Vector2(432, 624)
 metadata/_edit_group_ = true
 
 [node name="Camera2D" parent="MiddleLayer/Player" index="0" unique_id=1567288049]
@@ -1878,29 +1882,17 @@ metadata/_edit_group_ = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractableDetectors/TrainTriggerArea" unique_id=1071071965]
 shape = SubResource("RectangleShape2D_l7uo0")
 
-[node name="SittingBoy" parent="InteractableDetectors" unique_id=469917139 instance=ExtResource("15_ewlva")]
-position = Vector2(396, 440)
-timeline_name = "unknown_station_sitting_boy"
-
 [node name="SittingGirl" parent="InteractableDetectors" unique_id=1664604836 instance=ExtResource("15_ewlva")]
 position = Vector2(786, 565)
 timeline_name = "unknown_station_sitting_girl"
-
-[node name="GuyWithACap" parent="InteractableDetectors" unique_id=85068239 instance=ExtResource("15_ewlva")]
-position = Vector2(1105, 603)
-timeline_name = "unknown_station_guy_cap"
 
 [node name="ListeningGuy" parent="InteractableDetectors" unique_id=660232352 instance=ExtResource("15_ewlva")]
 position = Vector2(880, 184)
 timeline_name = "unknown_station_listening_guy"
 
-[node name="NormalGuy" parent="InteractableDetectors" unique_id=1487315366 instance=ExtResource("15_ewlva")]
-position = Vector2(938, 345)
-timeline_name = "unknown_station_normal_guy"
-
 [node name="Tracks" parent="InteractableDetectors" unique_id=731738913 instance=ExtResource("15_ewlva")]
 position = Vector2(237, 641)
-timeline_name = "unknown_station_tracks_a"
+timeline_name = "unknown_station_tracks"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/Tracks" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_bd6t2")
@@ -1955,6 +1947,17 @@ next_scene_path = "uid://ceojf7y7lc232"
 position = Vector2(2, 0)
 shape = SubResource("RectangleShape2D_xbto1")
 
+[node name="ThoughtTriggers" type="Node2D" parent="." unique_id=1592349393]
+
+[node name="Metro" parent="ThoughtTriggers" unique_id=175741016 instance=ExtResource("26_16iif")]
+position = Vector2(686, 459)
+thought_text = ""
+thought_lines = Array[String](["(mira a su alrededor)", "Todos están en lo suyo...", "Mejor así. "])
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" parent="ThoughtTriggers/Metro" index="0" unique_id=1377474002]
+shape = SubResource("RectangleShape2D_0t0kd")
+
 [editable path="MiddleLayer/NPCS/SittingBoyNPC"]
 [editable path="MiddleLayer/NPCS/SittingGirlNPC"]
 [editable path="MiddleLayer/NPCS/GuyWithACapNPC"]
@@ -1969,3 +1972,4 @@ shape = SubResource("RectangleShape2D_xbto1")
 [editable path="InteractableDetectors/StationMap"]
 [editable path="ExitAreas/ExitToStreet"]
 [editable path="ExitAreas/ExitToStreet2"]
+[editable path="ThoughtTriggers/Metro"]

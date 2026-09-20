@@ -2,7 +2,6 @@ alice: (mira a su alrededor)
 alice: ¿Eh...?
 alice: (observa la estación)
 alice: Esta no es mi parada...
-alice: ¿Dónde...?
 alice: (busca en sus bolsillos)
 alice: Mi teléfono...
 [signal arg="no_phone"]
