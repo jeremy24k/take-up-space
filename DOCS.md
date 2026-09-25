@@ -1,8 +1,11 @@
-# testing_dual — Referencia del proyecto
+# Take Up Space — Referencia del proyecto
 
 Juego 2D pixel art en **Godot 4.7**. Alice sale de su apartamento a comprar
 comida para su gato Wilson, coge el metro y se queda dormida.
 
+- **Nombre:** *Take Up Space* (`config/name` en `project.godot`). La carpeta y el
+  repo siguen llamándose `testing-dual`: renombrarlos no afecta al juego, las
+  rutas internas son `res://` y UIDs.
 - **Escena principal:** `scenes/prologue_scene/scenes/apartment.tscn` (el apartamento)
 - **Idioma:** código y comentarios en **inglés**; texto que ve el jugador en **español**
 
@@ -216,6 +219,11 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 
 - Personajes en `dialogic/characters/*.dch`, diálogos en `dialogic/timeline/**/*.dtl`
 - Se lanzan con `Dialogic.start("identificador")`
+- **Formato de línea:** siempre `personaje: texto`, con el identificador del
+  `.dch` (`alice`, `metro_worker`, `wilson`). Las acciones van igual, entre
+  paréntesis: `alice: (suspira)`. Sin los `:`, Dialogic muestra la línea entera
+  como narración (literalmente "alice (suspira)"); con un nombre que no existe
+  (`Guardia:`) se inventa un personaje temporal en vez de usar el real.
 
 > **⚠️ El identificador lo decide Dialogic, no tú.** Al reescanear, registra el
 > nombre del archivo pelado (`unknown_station_worker`) y solo añade el prefijo de
@@ -340,7 +348,8 @@ beats principales — **excepto** un pensamiento espontáneo puntual que sí usa
 _on_train_trigger_area_body_entered()   Alice camina unos pasos
         │
 _depart_train()      metro_train.leave_station() (sin await, corre de fondo)
-                      → pausa de 1.5s para que se sienta la desorientación
+                      → pausa de `wait_time_for_phone_missing` (1s) para que se
+                        sienta la desorientación
                       → Dialogic.start("unknown_station_lost_phone")
                         (incluye [signal arg="no_phone"] → GameManager.has_phone = false)
         │
@@ -349,11 +358,13 @@ _depart_train()      metro_train.leave_station() (sin await, corre de fondo)
 _on_worker_area_entered()     el InteractableArea del trabajador se dispara SOLO
                               (al entrar en rango, sin `[Espacio]`) — ver nota abajo
         │
-_ask_worker_for_help()        Dialogic.start("unknown_station_worker_dismissive")
-                               él nunca reacciona; ella se rinde y se va —
-                               "irse" es simplemente que el jugador recupera el
-                               control cuando el diálogo termina (Player ya
-                               hace lock/unlock solo con Dialogic.timeline_started/ended)
+InteractableArea.interact()   lanza su timeline_name ("unknown_station_worker_dismissive");
+                               one_time_interaction = true → solo ocurre una vez.
+                               Él apenas levanta la vista ("¿Qué?"); ella se
+                               avergüenza y se va — "irse" es simplemente que el
+                               jugador recupera el control cuando el diálogo
+                               termina (Player ya hace lock/unlock solo con
+                               Dialogic.timeline_started/ended)
         │
 [jugador camina solo hasta ExitToStreet/ExitToStreet2 → ExitArea]
 ```
@@ -377,7 +388,7 @@ func _on_worker_area_entered(area: Area2D) -> void:
 Mismo patrón que la estación de salida (`TicketStore`/`ImportantMan` en
 `metro_stations.tscn`): instancias sueltas de `interactable_area.tscn` con
 `timeline_name`, sin script propio. Cada uno es una línea o dos de Alice sola,
-tono bajo, nada de escena — actualmente: `SittingBoy`, `SittingGirl`,
+tono bajo, nada de escena — actualmente: `SittingGirl`,
 `ListeningGuy`, `Tracks`, `StationMap`, `Bench`, `VendingMachine`. Se han ido
 añadiendo y descartando por lotes; si faltan o sobran, es a propósito.
 

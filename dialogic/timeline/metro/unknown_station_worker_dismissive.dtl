@@ -1,10 +1,10 @@
 alice: (se acerca al trabajador)
-alice: (susurrando): Disculpe...
-(pausa)
+alice: (susurrando) Disculpe...
+alice: ...
 alice: Eh... disculpe.
-(el trabajador levanta la vista, confundido)
-Guardia: ¿Qué?
+metro_worker: (levanta la vista, confundido)
+metro_worker: ¿Qué?
 alice: Nada... perdón.
-(alice se aleja rápidamente)
-alice (suspira)
-alice (piensa) Qué vergüenza.
+alice: (se aleja rápidamente)
+alice: (suspira)
+alice: Qué vergüenza.
