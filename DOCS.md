@@ -161,6 +161,25 @@ El paso (`Tween` sobre `global_position`) **no se espera** (`await`) antes de
 lanzar el fundido — por eso el corte cae mientras Alice todavía se está moviendo,
 no cuando termina.
 
+### `BoundaryArea` (`global/boundary_area.gd` + `.tscn`)
+Límite del mapa. Hereda de `InteractableArea`, pero **se dispara al pisarla**,
+sin `[Espacio]` y sin mostrar etiqueta, como `ThoughtTrigger`. La escena la deja
+en `collision_layer = 0` y `collision_mask = 2`, así que solo la ve el cuerpo de
+Alice (`body_entered`) e ignora su `InteractionDetector`.
+
+1. `lock_control()` y lanza `timeline_name`, si tiene uno.
+2. Al terminar el diálogo, la hace caminar `push_distance` px en `push_direction`
+   (UP/DOWN/LEFT/RIGHT, siempre **hacia dentro** del mapa) con un `Tween`.
+3. La deja mirando hacia dentro y le devuelve el control. El empujón tiene que
+   sacar su cuerpo del área para que vuelva a dispararse la próxima vez.
+
+Se repite cada vez que vuelve al borde, salvo que `one_time_interaction` esté
+activo. Emite `interacted` al empezar y `pushed_back` al terminar, por si la
+escena quiere cambiar el `timeline_name` (por ejemplo, otro texto la segunda vez).
+Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
+`CollisionShape2D` y fijar `timeline_name` y `push_direction`. En la calle, el
+timeline genérico es `street_boundary`.
+
 ### `ThoughtTrigger`
 Burbuja de pensamiento sobre la cabeza de Alice. Se puede **esperar**:
 
@@ -402,7 +421,92 @@ correcta.
 
 ---
 
-## 10. Cosas pendientes / a vigilar
+## 10. La calle (`scenes/street_scenes/scenes/street_zone_1.tscn` + `.gd`)
+
+Escena en construcción. Todavía **no está conectada**: las salidas de la
+estación desconocida siguen apuntando al apartamento (ver pendientes).
+
+### Capas
+Mismo patrón que el metro:
+`InferiorLayer` (suelo, sombras) → `MiddleLayer` (y-sort: `Walls`,
+`Graffities`, `Addons`, `AddonsSuperior`, `Buildings2`, `Buildings`, `NPCS`,
+`Player`) → `SuperiorLayer` (`z_index` 2: `Rooftops` y `ColisonesDual`).
+
+- **`ColisonesDual`** solo bloquea la calzada, para que Alice cruce por los
+  pasos de cebra. Las colisiones de los objetos van en los tiles.
+- **Cada tile tiene `y_sort_origin` apuntando a la línea donde termina su
+  objeto**, no al borde del tile. Regla: la línea de orden tiene que quedar por
+  encima del punto más cercano al que Alice puede llegar. Las colisiones a
+  medida suelen dejarla pasar más allá del borde del tile, como en la torre de
+  vidrio o la puerta de la tienda.
+- Los objetos con **caras en diagonal** (el edificio gris, la torre) tienen sus
+  columnas laterales ordenadas más arriba que el centro.
+- Las paredes y rejas **verticales** no llevan `y_sort_origin`: se ordenan tile
+  por tile. Godot no guarda los valores 0, así que un tile "sin valor" puede
+  estar en 0 a propósito, como la punta del toldo del edificio gris.
+
+### Ambientación
+`LightsContainer/SunFilter` es un `CanvasModulate` cálido (`Color(1, 0.9, 0.76)`)
+que tiñe toda la escena como luz de sol de tarde. Es el equivalente al
+`DarkFilter` azulado del apartamento y el metro. No afecta a la UI ni a Dialogic,
+porque esos van en su propio `CanvasLayer`.
+
+### Límites del mapa (`MapBoundaries`)
+Cinco `BoundaryArea` en franjas pegadas al borde del mapa (1280×768), por
+dentro, todas con el timeline `street_boundary`: `BoundaryLeft`, `BoundaryRight`,
+`BoundaryTop`, `BoundaryBottomLeft` y `BoundaryBottomRight`. Las de abajo están
+separadas porque Alice se para en y=744 a la izquierda de la calzada y en y=760
+a la derecha. Cada franja cubre el punto donde se para Alice, para que su cuerpo
+la pise, y es más estrecha que el empujón de 24 px, para que el empujón la saque.
+Si se mueve un área, mantener las dos reglas.
+
+### NPCs
+- **Fijos:** instancias de `base_npc.tscn` en `MiddleLayer/NPCS`, como en el
+  metro, con su diálogo en `InteractableDetectors`. **En la calle el origen está
+  en los pies:** cada instancia sube el `Sprite2D` 16 px y usa una colisión de
+  pies de 14×8. Así se ordenan bien con bancos y faroles. `base_npc.tscn` no se
+  tocó, para no mover a los NPCs del metro.
+- **Peatones:** instancias de `walking_npc.tscn` con su `InteractableArea` como hija,
+  para que el diálogo se mueva con ellos. `street_zone_1.gd` los pasea de ida
+  y vuelta por los `Marker2D` de `PedestrianRoutes/<NombreDelPeatón>`, con una
+  pausa en cada extremo, en la que los gira de frente. Mientras Alice les habla los congela
+  (`PROCESS_MODE_DISABLED` también pausa su `Tween`) y los suelta en
+  `Dialogic.timeline_ended`.
+- **Arte de los peatones:** cada uno tiene su propio `.aseprite` en
+  `global/npcs/assets/`, por ejemplo `pedestrian_red_cap.aseprite`. Se importa con el
+  importador **"Aseprite SpriteFrames"** de AsepriteWizard, así que cada etiqueta
+  es una animación y el `AnimatedSprite2D` usa el archivo directo. Solo hacen
+  falta dos etiquetas: **`idle_front`** (los 3 cuadros de reposo de la hoja de
+  NPCs) y **`walk_side`** (mirando a la derecha). Como solo caminan en
+  horizontal, `flip_h` resuelve la izquierda. La caminata **sale del `walk_side` de
+  Alice** (`player/walk_animation.aseprite`), "vestida" por código con la paleta de
+  cada peatón y retocada a mano. La rubia parte del de gorra roja ya corregido.
+  Lo que generaba Sprite Fusion tenía demasiado detalle para este estilo.
+- `WalkingNPC.face_direction()` hacia el frente o la espalda **quita el
+  `flip_h`**. Antes, un NPC que venía caminando hacia la izquierda quedaba
+  espejado al girarse.
+- **Ojo:** `InteractableArea` reacciona a cualquier área de la capa 4, no solo
+  a Alice. Si la ruta de un peatón cruza el área de otro NPC, los carteles
+  "[Espacio]" se encienden solos. Mantén sus áreas separadas.
+- Diálogos en `dialogic/timeline/street/` (ids `street_*`). Son placeholders.
+
+### Pensamientos e interacciones
+Mismo patrón que la estación desconocida:
+- **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
+  al pasar: `Arrival` en el punto de inicio de Alice, `FirstCrossing`,
+  `Houses`, `GlassTower` y `Bakery`. El de `Bakery` es de una sola línea a
+  propósito, porque está al lado de la puerta y no debe tapar su diálogo.
+- **`InteractableDetectors`:** además de los diálogos de los NPCs fijos, objetos
+  clave para la historia (`Shop`, `BakeryDoor`, `ATM`, `Payphone`,
+  `SubwayEntrance`), cada uno con su `street_*.dtl`.
+- **Ojo al colocar un área de interacción:** el detector de Alice queda unos
+  16–21 px delante de ella, en la dirección en que mira. El área tiene que
+  cubrir ese punto cuando Alice está frenada contra el objeto, no solo el borde
+  del objeto. Si no, el cartel "[Espacio]" nunca aparece.
+
+---
+
+## 11. Cosas pendientes / a vigilar
 
 - **La salida de `unknown_station.tscn` es un placeholder deliberado.**
   `ExitToStreet`/`ExitToStreet2` apuntan a `apartment.tscn` porque la escena de
@@ -418,7 +522,10 @@ correcta.
   asumir que algo se ve como debería.
 - `basic_door.gd::_is_player_body()` acepta cualquier `CharacterBody2D`, así que
   Wilson y los NPCs también abren puertas. Puede ser intencionado.
-- **Nada más allá del prólogo existe todavía:** ni la calle, ni los encuentros
+- La cámara de Alice en la calle tiene `limit_top = 0`, pero el mapa sube
+  hasta y=-128, donde están la torre de vidrio y el edificio alto.
+- **Nada más allá del prólogo existe todavía**, salvo la calle en construcción
+  (sección 10): ni los encuentros
   con Leo/Lía/Clara/Rosa, ni inventario, sistema de confianza, guardado, menús
   o arte de retratos/cinemáticas. El prólogo en sí (apartamento → vagón →
   estación desconocida) es jugable de principio a fin.

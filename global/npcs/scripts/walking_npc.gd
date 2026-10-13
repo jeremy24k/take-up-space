@@ -58,6 +58,8 @@ func _direction_suffix(direction: Vector2) -> String:
 		sprite.flip_h = direction.x < 0
 		return "side"
 	else:
+		# Front/back art is drawn unflipped; clear any flip left by a side walk.
+		sprite.flip_h = false
 		return "back" if direction.y < 0 else "front"
 
 # =========================
