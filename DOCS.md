@@ -444,6 +444,13 @@ Mismo patrón que el metro:
 - Las paredes y rejas **verticales** no llevan `y_sort_origin`: se ordenan tile
   por tile. Godot no guarda los valores 0, así que un tile "sin valor" puede
   estar en 0 a propósito, como la punta del toldo del edificio gris.
+- **Al pintar un edificio nuevo, revisa que sus tiles tengan origen y
+  colisión.** Si no tienen, Alice atraviesa la fachada y lo que está detrás
+  (por ejemplo la reja) se dibuja encima. Los locales de 3×6 tiles (la
+  panadería en el atlas 12–14:6–11 y la tienda de vinilos en 16–18:22–27)
+  llevan los mismos valores. El origen va de 176 en la fila de arriba a 16 en
+  la base, bajando 32 por fila. Las 3 filas de abajo llevan colisión completa
+  de 32×32.
 
 ### Ambientación
 `LightsContainer/SunFilter` es un `CanvasModulate` cálido (`Color(1, 0.9, 0.76)`)
@@ -466,12 +473,35 @@ Si se mueve un área, mantener las dos reglas.
   en los pies:** cada instancia sube el `Sprite2D` 16 px y usa una colisión de
   pies de 14×8. Así se ordenan bien con bancos y faroles. `base_npc.tscn` no se
   tocó, para no mover a los NPCs del metro.
+- **Ambientales (solo visuales):** también son `base_npc.tscn`, pero no tienen
+  área en `InteractableDetectors`, así que no tienen diálogo.
+  - `BenchNewspaperNPC` (columna 0, lee el diario) está en la banca de frente
+    junto al teléfono. `BenchSittingNPC` (columna 9, sentado de costado
+    mirando a la derecha) está en la banca lateral del borde del parque.
+  - **Para sentar a uno, su origen va 1 px por debajo de la línea de orden de
+    la banca.** Si eso lo deja más abajo de lo que se ve bien, se compensa
+    subiendo el `offset` del `Sprite2D`. El NPC queda en el mismo lugar en
+    pantalla, pero se ordena en la línea correcta.
+    - **Banca de frente:** ordena en y=680, el NPC está en y=681 con offset -16.
+      Alice, a la que la banca frena en y≈683, queda delante de él.
+    - **Banca lateral:** ordena en y=320, que es el final del tile de abajo
+      (y=316) más su origen 4. El NPC está en y=321 con offset -23, para que se
+      vea igual que antes (pies en y=314). Con y=314 la banca lo tapaba.
+  - Los sentados tienen la colisión desactivada, porque ya bloquea la banca.
+  - `VinylWindowNPC` (columna 13, de espaldas con mochila) está parado mirando
+    la vidriera de vinilos, con la colisión de pies normal.
 - **Peatones:** instancias de `walking_npc.tscn` con su `InteractableArea` como hija,
   para que el diálogo se mueva con ellos. `street_zone_1.gd` los pasea de ida
   y vuelta por los `Marker2D` de `PedestrianRoutes/<NombreDelPeatón>`, con una
-  pausa en cada extremo, en la que los gira de frente. Mientras Alice les habla los congela
-  (`PROCESS_MODE_DISABLED` también pausa su `Tween`) y los suelta en
-  `Dialogic.timeline_ended`.
+  pausa en cada extremo, en la que los gira de frente.
+- **`WalkingNPC.stops_when_talked_to`** (grupo "Interaction" del inspector,
+  `true` por defecto) decide si el NPC se frena cuando Alice le habla. Si está
+  activado, `street_zone_1.gd` lo congela durante el diálogo
+  (`PROCESS_MODE_DISABLED` también pausa su `Tween`) y lo suelta en
+  `Dialogic.timeline_ended`. Los dos peatones de la calle lo tienen
+  **desactivado**: siguen caminando como si no notaran a Alice, y su
+  `InteractableArea` se va con ellos. Por eso el cartel "[Espacio]" solo
+  aparece mientras el peatón pasa cerca de Alice, y hay que hablarle al vuelo.
 - **Arte de los peatones:** cada uno tiene su propio `.aseprite` en
   `global/npcs/assets/`, por ejemplo `pedestrian_red_cap.aseprite`. Se importa con el
   importador **"Aseprite SpriteFrames"** de AsepriteWizard, así que cada etiqueta
@@ -480,7 +510,9 @@ Si se mueve un área, mantener las dos reglas.
   NPCs) y **`walk_side`** (mirando a la derecha). Como solo caminan en
   horizontal, `flip_h` resuelve la izquierda. La caminata **sale del `walk_side` de
   Alice** (`player/walk_animation.aseprite`), "vestida" por código con la paleta de
-  cada peatón y retocada a mano. La rubia parte del de gorra roja ya corregido.
+  cada peatón y retocada a mano. La rubia parte del de gorra roja ya corregido,
+  con flequillo, mechones, pestaña y más volumen en la nuca, retocados con el MCP
+  de Aseprite.
   Lo que generaba Sprite Fusion tenía demasiado detalle para este estilo.
 - `WalkingNPC.face_direction()` hacia el frente o la espalda **quita el
   `flip_h`**. Antes, un NPC que venía caminando hacia la izquierda quedaba
@@ -488,21 +520,60 @@ Si se mueve un área, mantener las dos reglas.
 - **Ojo:** `InteractableArea` reacciona a cualquier área de la capa 4, no solo
   a Alice. Si la ruta de un peatón cruza el área de otro NPC, los carteles
   "[Espacio]" se encienden solos. Mantén sus áreas separadas.
-- Diálogos en `dialogic/timeline/street/` (ids `street_*`). Son placeholders.
+- Diálogos en `dialogic/timeline/street/` (ids `street_*`). Ya están revisados,
+  no son placeholders. Ver "Tono de los diálogos" más abajo.
 
 ### Pensamientos e interacciones
 Mismo patrón que la estación desconocida:
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
   al pasar: `Arrival` en el punto de inicio de Alice, `FirstCrossing`,
-  `Houses`, `GlassTower` y `Bakery`. El de `Bakery` es de una sola línea a
-  propósito, porque está al lado de la puerta y no debe tapar su diálogo.
+  `Houses` y `ShoppingBlock`. `ShoppingBlock` está en la
+  vereda, a la izquierda de la panadería (x=944). Al entrar a la cuadra
+  comercial, Alice nota que es una zona de tiendas y piensa que "por aquí tiene
+  que haber algo". Es una pista hacia la tienda de Leo, sin nombrar la comida
+  de Wilson. El olor a pan quedó solo en el diálogo de la puerta
+  (`BakeryDoor`), así no se repite.
 - **`InteractableDetectors`:** además de los diálogos de los NPCs fijos, objetos
   clave para la historia (`Shop`, `BakeryDoor`, `ATM`, `Payphone`,
-  `SubwayEntrance`), cada uno con su `street_*.dtl`.
+  `SubwayEntrance`, `GlassTower`), cada uno con su `street_*.dtl`.
+- **La torre de vidrio es una interacción, no un pensamiento.** Antes era un
+  `ThoughtTrigger`, pero el jugador seguía caminando y el momento de
+  "admirarla" pasaba desapercibido. Ahora `GlassTower` está frente a la puerta
+  de vidrio y Alice la mira solo si el jugador se detiene y aprieta Espacio,
+  sin cortarle la caminata.
+- **La tienda de Leo** es la del rincón de arriba a la derecha. Tiene dos áreas:
+  `Shop` es el escaparate, donde Alice ve la comida para gatos
+  (`street_shop`), y `ShopDoor` es la puerta, un `SceneTransitionArea`
+  ("[Espacio] Entrar") que cambia de escena. **Por ahora apunta a
+  `apartment.tscn` como placeholder**, igual que las salidas de la estación
+  desconocida, hasta que exista la escena de la tienda.
+- La **tienda de vinilos**, al lado de la panadería, todavía no tiene
+  interacción.
 - **Ojo al colocar un área de interacción:** el detector de Alice queda unos
   16–21 px delante de ella, en la dirección en que mira. El área tiene que
   cubrir ese punto cuando Alice está frenada contra el objeto, no solo el borde
   del objeto. Si no, el cartel "[Espacio]" nunca aparece.
+
+### Tono de los diálogos
+Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
+- **Poco texto y nada de explicar lo que ya se ve.** El jugador ya sabe que
+  está perdida y sin teléfono. No hace falta repetir el objetivo (la comida de
+  Wilson) en cada diálogo. Ya lo dicen `Arrival`, la chica del teléfono, el de
+  gorra roja, la entrada del metro y el límite del mapa.
+- **Mostrar, no decir.** El teléfono público termina en "Ni siquiera el mío" en
+  vez de "estoy sola". La panadería cierra con "No. Es para Wilson." y nada más.
+- **Variar el cierre.** Su timidez aparece de varias formas: el oficinista se
+  echa atrás ("No. Mejor no."), la estudiante aparta la mirada, la rubia
+  intenta hablarle pero apenas se le oye. No todos los NPCs terminan con Alice
+  decidiendo no hablar.
+- **Las acotaciones van en minúscula, entre paréntesis y sin punto**
+  (`alice: (se acerca al escaparate)`). Si la acción es de Alice no se nombra. Si es
+  de otro personaje, sí: `(la chica levanta la vista un instante; Alice aparta
+  la mirada)`.
+- **Las acotaciones no pueden contradecir lo que pasa en pantalla.** Los
+  peatones siguen caminando mientras Alice les habla (ver
+  `stops_when_talked_to`). Si un peatón se configura para frenarse, nada de
+  "(la chica se aleja)".
 
 ---
 
@@ -512,6 +583,8 @@ Mismo patrón que la estación desconocida:
   `ExitToStreet`/`ExitToStreet2` apuntan a `apartment.tscn` porque la escena de
   la calle todavía no existe — no es un bug, es la decisión consciente de no
   dejar un `next_scene_path` vacío que no lleve a ningún sitio.
+- **`ShopDoor` en la calle también es un placeholder:** lleva a
+  `apartment.tscn` hasta que exista el interior de la tienda de Leo.
 - `metro_stations.tscn` es la escena activa del andén. La copia antigua con
   espacio fue eliminada para evitar rutas ambiguas.
 - La escena reutilizable de escaleras vive en `global/stairs/` y conserva su
@@ -522,8 +595,17 @@ Mismo patrón que la estación desconocida:
   asumir que algo se ve como debería.
 - `basic_door.gd::_is_player_body()` acepta cualquier `CharacterBody2D`, así que
   Wilson y los NPCs también abren puertas. Puede ser intencionado.
-- La cámara de Alice en la calle tiene `limit_top = 0`, pero el mapa sube
-  hasta y=-128, donde están la torre de vidrio y el edificio alto.
+- La cámara de Alice en la calle tiene **`limit_top = 0` a propósito**,
+  aunque la torre de vidrio y el edificio alto suben hasta y=-128. Solo esos
+  dos llegan tan arriba (x 0–192 y x 480–576). El resto del borde superior
+  termina entre y=-16 y y=-64, y las calles verticales (x≈224 y x≈832) no
+  tienen nada por encima de 0. Con un límite más alto se ve el color de fondo
+  gris en casi todo el ancho. Además no alcanzaría: la cámara sigue a Alice y
+  ve solo 128 px por encima de ella, así que desde la puerta de la torre lo
+  más alto que se ve es y≈-50. Si algún día se quiere mostrar la punta de la
+  torre, primero hay que pintar la franja de arriba alrededor de la torre (x
+  320–740, y -128 a 0). Después, mover la cámara durante la interacción
+  `GlassTower`.
 - **Nada más allá del prólogo existe todavía**, salvo la calle en construcción
   (sección 10): ni los encuentros
   con Leo/Lía/Clara/Rosa, ni inventario, sistema de confianza, guardado, menús

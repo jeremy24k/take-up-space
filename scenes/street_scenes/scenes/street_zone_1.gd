@@ -54,8 +54,11 @@ func _patrol(pedestrian: WalkingNPC, points: Array[Vector2]) -> void:
 # Talking to a pedestrian
 # =========================
 ## Freezes the pedestrian (and its walk tween, which is bound to it) while the
-## dialogue runs, so it does not walk away mid-conversation.
+## dialogue runs, so it does not walk away mid-conversation. Pedestrians with
+## stops_when_talked_to off keep walking, as if they never noticed Alice.
 func _on_pedestrian_interacted(pedestrian: WalkingNPC) -> void:
+	if not pedestrian.stops_when_talked_to:
+		return
 	pedestrian.process_mode = Node.PROCESS_MODE_DISABLED
 	Dialogic.timeline_ended.connect(func() -> void:
 		pedestrian.process_mode = Node.PROCESS_MODE_INHERIT, CONNECT_ONE_SHOT)

@@ -29,6 +29,14 @@ var facing: Vector2 = Vector2.DOWN
 @onready var approach_point: Marker2D = get_node_or_null("ApproachPoint")
 
 # =========================
+# Interaction configuration
+# =========================
+@export_group("Interaction")
+## When on, the owning scene freezes this NPC while Alice talks to it. Turn
+## it off for passers-by that should keep walking as if they never noticed her.
+@export var stops_when_talked_to: bool = true
+
+# =========================
 # Route configuration
 # =========================
 ## Waypoints walked in order (drag Marker2D nodes here, reorder freely) before

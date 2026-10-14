@@ -60,6 +60,7 @@ directories/dtl_directory={
 "street_atm": "res://dialogic/timeline/street/street_atm.dtl",
 "street_bakery": "res://dialogic/timeline/street/street_bakery.dtl",
 "street_boundary": "res://dialogic/timeline/street/street_boundary.dtl",
+"street_glass_tower": "res://dialogic/timeline/street/street_glass_tower.dtl",
 "street_headphones_guy": "res://dialogic/timeline/street/street_headphones_guy.dtl",
 "street_office_man": "res://dialogic/timeline/street/street_office_man.dtl",
 "street_payphone": "res://dialogic/timeline/street/street_payphone.dtl",
