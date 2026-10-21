@@ -131,6 +131,8 @@ func process_animation_state() -> void:
 			animate_sprite.animation = "walk_" + direction_suffix
 		
 		State.MEOWING:
+			# The "MEOW!" text is drawn in the frames, so it must never be mirrored.
+			animate_sprite.flip_h = false
 			animate_sprite.animation = "meowing"
 
 	animate_sprite.play(animate_sprite.animation)

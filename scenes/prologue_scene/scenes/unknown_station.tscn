@@ -1928,7 +1928,7 @@ walk_forward_distance = 170.0
 walk_forward_duration = 1.8
 fade_start_delay = 1.8
 fade_duration = 1.5
-next_scene_path = "uid://ceojf7y7lc232"
+next_scene_path = "uid://cjsrccohl7j4x"
 
 [node name="CollisionShape2D" parent="ExitAreas/ExitToStreet" index="0"]
 position = Vector2(-1, 0)
@@ -1941,7 +1941,7 @@ walk_forward_distance = 170.0
 walk_forward_duration = 1.8
 fade_start_delay = 1.8
 fade_duration = 1.5
-next_scene_path = "uid://ceojf7y7lc232"
+next_scene_path = "uid://cjsrccohl7j4x"
 
 [node name="CollisionShape2D" parent="ExitAreas/ExitToStreet2" index="0"]
 position = Vector2(2, 0)

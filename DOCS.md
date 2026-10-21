@@ -70,7 +70,7 @@ Estado que sobrevive entre escenas.
 | `quest_step` | Fase de la misión (0-4) |
 | `collected_items` | IDs de objetos recogidos |
 | `missing_prep_items` | Cartera, auriculares, zapatos |
-| `prep_items_unlocked` | Alice ya miró la mochila |
+| `prep_items_unlocked` | Alice ya miró la mochila. `apartment/alice_backpack` lo usa para no repetir el monólogo largo: las siguientes veces solo nombra lo que falta |
 | `target_door_id` | Por qué puerta subió al tren → dónde aparece dentro |
 | `has_phone` | Se pone en `false` vía `[signal arg="no_phone"]` en `unknown_station_lost_phone` |
 | `wilson` | Referencia al gato |
@@ -127,7 +127,7 @@ Para especializarla: `extends "res://global/interactable_area.gd"` y sobrescribe
 
 | Script | Qué hace |
 |---|---|
-| `pickable_item.gd` | Objeto recogible; se borra si ya está en `GameManager` |
+| `pickable_item.gd` | Objeto recogible; se borra si ya está en `GameManager`. La mochila solo muestra "[Recoger]" cuando ya están los otros tres objetos; antes muestra "[Espacio]" |
 | `lamp_interactable.gd` | Sincroniza un `PointLight2D` con `Dialogic.VAR.lamp_is_on` |
 | `seat_interactable.gd` | Sienta a Alice y emite `player_sat_down` |
 | `train_door_area.gd` | Secuencia de subir al tren |
@@ -190,6 +190,12 @@ await thought_trigger.show_thought(player)
 Con `monitoring = false` se dispara solo desde código; si no, al entrar en el área.
 Un pensamiento nuevo cancela el anterior (contador `active_sequence_id` compartido).
 
+El `Label` de la burbuja lleva `z_index = 10`, por encima de cualquier capa del
+mundo. Con `z_index = 1` lo tapaban las capas superiores de los niveles
+(`SuperiorLayer`, `WallBorders`, que llegan a z 3–5), y en la estación
+desconocida el "(mira a su alrededor)" se veía cortado contra la zona negra.
+No hace falta tocar la fuente ni la escala para esto.
+
 ### `LightsContainer`
 Parpadeo aleatorio de luces + `fade_out_lights(duración)` y `turn_off_lights()`.
 
@@ -231,6 +237,10 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 > mecanismo distinto (pathfinding, no un punto fijo). No lo fuerces dentro de
 > `WalkingNPC`; si aparece un tercer NPC con pathfinding, esa lógica se
 > extrae aparte, no aquí.
+>
+> La animación `meowing` de Wilson lleva el texto "MEOW!" dibujado en los
+> cuadros, así que `wilson.gd` pone `flip_h = false` al entrar en ese estado.
+> Si no, heredaba el volteo del último paso de lado y el texto salía espejado.
 
 ---
 

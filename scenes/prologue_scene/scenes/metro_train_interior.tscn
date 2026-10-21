@@ -828,7 +828,7 @@ position = Vector2(268, 35)
 script = ExtResource("11_exit")
 target_scene_path = "uid://xrhjvw0pvpdb"
 fade_duration = 1.0
-prompt_text = "[Espacio] Salir al anden"
+prompt_text = "[Espacio] Salir al andén"
 
 [node name="CollisionShape2D" parent="ExitDoorArea" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_exit")
