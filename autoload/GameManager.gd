@@ -23,6 +23,22 @@ var missing_prep_items: Array[String] = [  # Items needed before the quest can s
 
 var wilson: Wilson = null
 
+# =========================
+# Street clues
+# =========================
+# IDs of the clues about Leo's store Alice has already seen (e.g. "delivery").
+var found_clues: Array[String] = []
+
+func add_clue(clue_id: String) -> void:
+	if not found_clues.has(clue_id):
+		found_clues.append(clue_id)
+
+func has_any_clue(clue_ids: Array[String]) -> bool:
+	for clue_id in clue_ids:
+		if found_clues.has(clue_id):
+			return true
+	return false
+
 # Emitted every time the quest step changes.
 signal quest_step_changed(new_step: int)
 

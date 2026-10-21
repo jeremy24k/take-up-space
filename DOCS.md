@@ -450,7 +450,38 @@ Mismo patrón que el metro:
   panadería en el atlas 12–14:6–11 y la tienda de vinilos en 16–18:22–27)
   llevan los mismos valores. El origen va de 176 en la fila de arriba a 16 en
   la base, bajando 32 por fila. Las 3 filas de abajo llevan colisión completa
-  de 32×32.
+  de 32×32. Los dos locales de arriba de la panadería (atlas 7–9:21–26 y
+  10–12:21–26) usan los mismos orígenes.
+  - Las **casas de 3×7 tiles** (arriba a la derecha, atlas 1–3:14–20, 4–6:14–20,
+    26–28:0–6 y 7–9:15–20) van de 178 a -14, todas ordenadas en y=66. Llevan
+    colisión completa en las filas 4–6 y media colisión arriba en la planta
+    baja. La de techo oscuro no tiene la fila de la punta del techo, así que
+    empieza en 146.
+  - Si un edificio no tiene origen, cada fila se ordena por su cuenta y la
+    pared de ladrillo de atrás le pasa por encima.
+- **La torre de vidrio** (atlas 25–27:13–19) tiene colisión solo en las dos
+  filas de la base, con su forma diagonal. Su parte alta tapa la vereda de la
+  manzana de Leo, así que Alice puede pasar por detrás y queda oculta unos
+  100 px. Es a propósito: un edificio alto tapa a quien camina detrás.
+- **La colisión de un objeto no puede ser más ancha que su dibujo.** El cuerpo
+  de Alice mide 17×10, así que cada píxel de colisión invisible se nota. En el
+  segundo playtest, casi todos los movimientos perdidos fueron por chocar con
+  bordes de macetas, bancos, mesas y rejas. Muchos de esos tiles tenían la
+  colisión de 8×8 (o 16×16) completa, aunque el dibujo ocupa solo una mitad.
+  Se angostaron 70 tiles al ancho real del dibujo, conservando su alto:
+  - 44 en `street _addons_minies` (`TileSetAtlasSource_cmax7`);
+  - 26 en `street_addons` (`TileSetAtlasSource_6tevs`).
+  Las colisiones con forma a medida no se tocaron.
+- **Corrección de esquinas** (`Player._apply_corner_correction`). Si Alice
+  camina recto contra el borde de algo y hay lugar libre a menos de 8 px a un
+  costado, se desliza sola hacia ese lado. Así no hace falta alinearse al
+  píxel con los pasos de cebra: el cruce junto a `FirstCrossing` deja solo
+  14 px de margen para el centro de Alice. Tampoco hace falta para rodear
+  postes. Contra una pared larga no hace nada, porque no hay hueco cerca.
+- **Ojo con los empates.** Si un objeto y un edificio se ordenan en la misma
+  línea, gana el edificio. El farol de la esquina del edificio amarillo y el
+  edificio estaban los dos en y=96, y el farol quedaba detrás de la cara
+  lateral. La columna derecha del edificio (atlas 10:1–7) se bajó a y=88.
 
 ### Ambientación
 `LightsContainer/SunFilter` es un `CanvasModulate` cálido (`Color(1, 0.9, 0.76)`)
@@ -490,6 +521,11 @@ Si se mueve un área, mantener las dos reglas.
   - Los sentados tienen la colisión desactivada, porque ya bloquea la banca.
   - `VinylWindowNPC` (columna 13, de espaldas con mochila) está parado mirando
     la vidriera de vinilos, con la colisión de pies normal.
+  - **Columnas nuevas en `npcs_sprite_sheet.aseprite`**, todavía sin colocar en
+    ninguna escena: 14 repartidor con caja, 15 abuela con bastón, 16 guitarrista,
+    17 corredora, 18 chica con su perro, 19 niño con globo y 20 grandullón. Las
+    columnas 21–29 están libres. El perro y el globo están dentro de la celda de
+    32×32, así que la colisión de pies de 14×8 solo cubre a la persona.
 - **Peatones:** instancias de `walking_npc.tscn` con su `InteractableArea` como hija,
   para que el diálogo se mueva con ellos. `street_zone_1.gd` los pasea de ida
   y vuelta por los `Marker2D` de `PedestrianRoutes/<NombreDelPeatón>`, con una
@@ -527,11 +563,11 @@ Si se mueve un área, mantener las dos reglas.
 Mismo patrón que la estación desconocida:
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
   al pasar: `Arrival` en el punto de inicio de Alice, `FirstCrossing`,
-  `Houses` y `ShoppingBlock`. `ShoppingBlock` está en la
-  vereda, a la izquierda de la panadería (x=944). Al entrar a la cuadra
-  comercial, Alice nota que es una zona de tiendas y piensa que "por aquí tiene
-  que haber algo". Es una pista hacia la tienda de Leo, sin nombrar la comida
-  de Wilson. El olor a pan quedó solo en el diálogo de la puerta
+  `Houses` y `ShoppingBlock`. `ShoppingBlock` está en la vereda, junto a la
+  panadería, y cierra el desvío: "(mira las vidrieras) Una panadería,
+  discos... Nada para gatos.". Antes decía "Esto es una zona de tiendas. Por
+  aquí tiene que haber algo.", y en los dos playtests hizo creer que la tienda
+  estaba en esa manzana. El olor a pan quedó solo en el diálogo de la puerta
   (`BakeryDoor`), así no se repite.
 - **`InteractableDetectors`:** además de los diálogos de los NPCs fijos, objetos
   clave para la historia (`Shop`, `BakeryDoor`, `ATM`, `Payphone`,
@@ -544,21 +580,91 @@ Mismo patrón que la estación desconocida:
 - **La tienda de Leo** es la del rincón de arriba a la derecha. Tiene dos áreas:
   `Shop` es el escaparate, donde Alice ve la comida para gatos
   (`street_shop`), y `ShopDoor` es la puerta, un `SceneTransitionArea`
-  ("[Espacio] Entrar") que cambia de escena. **Por ahora apunta a
-  `apartment.tscn` como placeholder**, igual que las salidas de la estación
-  desconocida, hasta que exista la escena de la tienda.
+  ("[Espacio] Entrar") que lleva a `leo_store.tscn` (sección 11).
 - La **tienda de vinilos**, al lado de la panadería, todavía no tiene
   interacción.
-- **Ojo al colocar un área de interacción:** el detector de Alice queda unos
-  16–21 px delante de ella, en la dirección en que mira. El área tiene que
-  cubrir ese punto cuando Alice está frenada contra el objeto, no solo el borde
-  del objeto. Si no, el cartel "[Espacio]" nunca aparece.
+- **Ojo al colocar un área de interacción:** el detector de Alice es un
+  cuadrado de 8×8 que queda 16 px delante de ella, en la dirección en que mira
+  (y 5 px más arriba). El área tiene que cubrir ese punto **desde todos los
+  lados por los que Alice puede pegarse al objeto**, no solo de frente. En el
+  playtest a ciegas, la jugadora no encontró la cabina, el cajero, la
+  estudiante, el oficinista ni el volante: con áreas de 30×26 compartidas, la
+  mitad de las posiciones pegadas al objeto no activaban el cartel.
+  - Ahora cada área tiene su propio `RectangleShape2D_ia_<Nombre>`, del tamaño
+    justo para cubrir todas las posiciones donde Alice queda pegada al objeto
+    mirándolo, más 2 px. Se calculó con el recorrido de lo caminable.
+  - Los peatones usan `RectangleShape2D_ia_pedestrian` (40×34), que se mueve
+    con ellos.
+  - Las áreas no pueden pisarse entre sí, porque se encenderían dos carteles a
+    la vez. Si dos áreas quedan al lado (como `Shop`, el escaparate, y
+    `ShopDoor`, la puerta), tienen que dejar entre ellas un hueco más ancho que
+    el detector (8 px). Entre esas dos quedan 9 px.
+- **`InteractableArea` solo reacciona al detector de Alice** (`_is_player_detector`).
+  Antes mostraba y escondía su cartel con cualquier área de la capa 4: cuando
+  la rubia pasaba frente al oficinista, el cartel del oficinista se escondía
+  aunque Alice siguiera ahí. Además, ningún cartel queda visible durante un
+  diálogo, y al terminar vuelve a aparecer si Alice sigue en el área.
+- **Si el detector toca dos áreas, gana la más cercana** (`Player._try_to_interact`).
+  Antes ganaba la primera de la lista.
+- **Globito sobre los NPCs con diálogo** (`global/interaction_hint.tscn`):
+  - Es un `Sprite2D` con un "..." dibujado en `interaction_hint.aseprite`
+    (13×9). Flota 2 px arriba y abajo, redondeado a píxeles enteros, y se
+    esconde mientras haya cualquier diálogo en pantalla.
+  - Se pone como hijo del NPC, en (0, -38) sobre los pies. En la calle lo
+    tienen los 8 NPCs que hablan: oficinista, estudiante, chico de
+    auriculares, chica del teléfono, repartidor, abuela y los dos peatones.
+  - Sirve para que se distingan de la gente que es decorado. Un NPC nuevo con
+    diálogo tiene que llevarlo; uno de ambiente, no.
+
+### Pistas hacia la tienda de Leo
+La tienda de Leo no se ve desde el inicio. La idea es que el jugador la
+encuentre explorando y que **explorar le dé información**. Alice es tímida y
+no le pregunta nada a nadie: las pistas le llegan observando y escuchando
+("(alcanza a oír) ..."). Todas son opcionales y ninguna bloquea el camino.
+Las pistas buenas comparten un detalle para reconocer el lugar: **el cartel de
+frutas** del escaparate de Leo.
+
+| Área (`InteractableDetectors`) | Dónde | Tipo | Timeline |
+|---|---|---|---|
+| `PetsShopDoor` | Puerta de la tienda PETS, arriba de la panadería | Falsa: "Cerrado por reformas." | `street_pets_closed` |
+| `BrokenPayphone` | Segunda cabina, junto al señor del diario | Falsa: "(levanta el auricular) ... No hay tono." La otra cabina (`Payphone`) tiene el diálogo de "Ni siquiera el mío". | `street_payphone_broken` |
+| `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` |
+| `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | A medias: lleva latas de comida para gatos | `street_grandma` |
+| `BusStopMap` | Mapa de rutas de la parada | A medias: "Hay tiendas pasando la torre." | `street_bus_stop` |
+| `PhoneGirl` | Chica del teléfono (ya existía) | Buena e incompleta: oye "el almacén ese, el de la torre" | `street_phone_girl` |
+| `Delivery` | Repartidor (`DeliveryNPC`, col. 14), vereda este de la manzana central | Buena: caja de "Almacén" con frutas | `street_delivery` |
+| `AdColumn` | Columna de afiches de la manzana de Leo | Buena, la confirmación: volante con frutas | `street_ad_column` |
+
+- **Registro:** `street_zone_1.gd` (`CLUE_AREAS`) conecta el `interacted` de
+  cada pista buena o a medias con `GameManager.add_clue(id)`. Las falsas no se
+  registran. Las pistas viven en `GameManager.found_clues`.
+- **Lugares que reaccionan a lo que Alice ya sabe** (`CLUE_REACTIONS` en
+  `street_zone_1.gd`). Si Alice vio alguna de las pistas indicadas, el área
+  pasa a otro timeline. El cambio se hace en el `interacted` del área, que se
+  emite justo antes de que arranque el timeline. Sin esas pistas queda el
+  diálogo de siempre.
+
+  | Área | Pistas que la activan | Timeline nuevo |
+  |---|---|---|
+  | `Shop`, el escaparate de Leo | `delivery_box` o `store_flyer` | `street_shop_found`: "El cartel de frutas... Es aquí." |
+  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "El de la torre", decía. (mira a su alrededor) Aquí no hay ningún almacén... ¿Cruzando la calle, quizás? |
+
+- **Por qué existe la reacción de la torre:** en el playtest, la jugadora
+  escuchó "el de la torre", llegó a la base de la torre y se quedó sin saber
+  qué hacer. La tienda de Leo está detrás de la torre, al otro lado de la
+  calle, y desde la base no se ve. La pista sigue siendo sutil ("el de la
+  torre"): no dice dónde. Es la torre la que empuja un poco, sin dar la
+  respuesta. Se probó decir "detrás de la torre" en la pista, pero era
+  demasiado obvio.
+- **Una pista no puede depender de otra.** El jugador puede verlas en
+  cualquier orden, o ninguna, así que ningún texto debe nombrar una pista
+  anterior (por ejemplo "como en la caja del repartidor").
 
 ### Tono de los diálogos
 Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
 - **Poco texto y nada de explicar lo que ya se ve.** El jugador ya sabe que
   está perdida y sin teléfono. No hace falta repetir el objetivo (la comida de
-  Wilson) en cada diálogo. Ya lo dicen `Arrival`, la chica del teléfono, el de
+  Wilson) en cada diálogo. Ya lo dicen `Arrival`, el de
   gorra roja, la entrada del metro y el límite del mapa.
 - **Mostrar, no decir.** El teléfono público termina en "Ni siquiera el mío" en
   vez de "estoy sola". La panadería cierra con "No. Es para Wilson." y nada más.
@@ -577,14 +683,64 @@ Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
 
 ---
 
-## 11. Cosas pendientes / a vigilar
+## 11. La tienda de Leo (`scenes/leo_store_scene/scenes/leo_store.tscn`)
+Es el interior al que se entra por `ShopDoor` en la calle, y donde va a ir la
+primera conversación con Leo. Por ahora es **un local vacío y básico, para
+tener de dónde partir**. La estructura de capas y los tilesets están copiados
+de `apartment.tscn`.
+
+```
+LeoStore (Node2D, y_sort)
+├── InferiorLayer          piso de madera + pared de fondo (con colisión)
+├── MiddleLayer (y_sort)
+│   ├── AssetsLayerInferior   cosas planas sobre el piso (sin TileSet aún)
+│   ├── AssetsLayerSuperior   muebles y estantes (y_sort, sin TileSet aún)
+│   ├── NPCS (y_sort)         acá va Leo
+│   └── Player                Alice
+├── SuperiorLayer (z 1)
+│   └── WallBorders (z 1)  TileMapDual con borders.aseprite: el borde negro
+│       └── ColisonesDual  invisible, colisión de los lados y el fondo
+├── InteractableDetectors
+│   └── ExitToStreet       SceneTransitionArea a street_zone_1 ("[Espacio] Salir")
+└── ThoughtTriggers
+```
+- **Medidas, en celdas de 32 px:** el piso va de x 10 a 23 y de y 8 a 15
+  (14×8 tiles, en píxeles 320–768 × 256–512). La pared ocupa las filas 6 y 7.
+  `WallBorders` llena todo lo que no es local, con 3 celdas de margen.
+  `ColisonesDual` hace un anillo justo afuera del piso, en los lados y abajo.
+  Arriba frena la colisión de la pared.
+- **Alice** arranca en (544, 472), abajo al centro, y **`ExitToStreet`** está
+  justo debajo, en (544, 506). La cámara está limitada a 288–768 × 128–544.
+- **Tiles usados:**
+  - Piso: `Wood.aseprite` en (2, 1).
+  - Pared: `wall.aseprite`, (1, 1) arriba y (1, 2) abajo. La última columna
+    usa (2, 1)/(2, 2), que trae la sombra del borde derecho.
+  - Borde: `borders.aseprite`. Se pinta con (2, 1) y TileMapDual calcula los
+    bordes solo.
+- Las capas de assets todavía no tienen `TileSet`. Los muebles de la tienda van
+  en `scenes/leo_store_scene/assets/` como `.aseprite`. Las reglas de y-sort
+  son las mismas que en la calle (sección 10).
+- **Este primer tileado se generó con un script de Godot**, que no está en el
+  repo, y después se arregló a mano. Si se vuelve a guardar la escena desde
+  un script con `PackedScene.pack()`, hay que revisar que `ExitToStreet` siga
+  teniendo el script de `SceneTransitionArea`. Sin el autoload
+  `FadeTransition`, ese script no compila y se pierde, y lo mismo pasa con los
+  límites de la cámara.
+
+---
+
+## 12. Cosas pendientes / a vigilar
 
 - **La salida de `unknown_station.tscn` es un placeholder deliberado.**
   `ExitToStreet`/`ExitToStreet2` apuntan a `apartment.tscn` porque la escena de
   la calle todavía no existe — no es un bug, es la decisión consciente de no
   dejar un `next_scene_path` vacío que no lleve a ningún sitio.
-- **`ShopDoor` en la calle también es un placeholder:** lleva a
-  `apartment.tscn` hasta que exista el interior de la tienda de Leo.
+- **Al salir de la tienda de Leo, Alice aparece en el inicio de la calle**
+  (177, 613) y no frente a la puerta. Además los `ThoughtTriggers` de la calle
+  se vuelven a disparar, porque la escena se recarga desde cero. Para
+  arreglarlo hace falta un punto de aparición, como `SpawnContainers` en
+  `metro_train_interior.gd`, y guardar en `GameManager` qué pensamientos ya
+  salieron.
 - `metro_stations.tscn` es la escena activa del andén. La copia antigua con
   espacio fue eliminada para evitar rutas ambiguas.
 - La escena reutilizable de escaleras vive en `global/stairs/` y conserva su
@@ -595,19 +751,22 @@ Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
   asumir que algo se ve como debería.
 - `basic_door.gd::_is_player_body()` acepta cualquier `CharacterBody2D`, así que
   Wilson y los NPCs también abren puertas. Puede ser intencionado.
-- La cámara de Alice en la calle tiene **`limit_top = 0` a propósito**,
-  aunque la torre de vidrio y el edificio alto suben hasta y=-128. Solo esos
-  dos llegan tan arriba (x 0–192 y x 480–576). El resto del borde superior
-  termina entre y=-16 y y=-64, y las calles verticales (x≈224 y x≈832) no
-  tienen nada por encima de 0. Con un límite más alto se ve el color de fondo
-  gris en casi todo el ancho. Además no alcanzaría: la cámara sigue a Alice y
-  ve solo 128 px por encima de ella, así que desde la puerta de la torre lo
-  más alto que se ve es y≈-50. Si algún día se quiere mostrar la punta de la
-  torre, primero hay que pintar la franja de arriba alrededor de la torre (x
-  320–740, y -128 a 0). Después, mover la cámara durante la interacción
-  `GlassTower`.
+- **Toda la calle se bajó 12 filas (384 px)** para dejar sitio a más ciudad
+  arriba sin coordenadas negativas. La zona jugable va ahora de y=384 a
+  y=1152 (las coordenadas de esta sección y de "Límites del mapa" son
+  anteriores: súmales 384). La franja y=0–384 está vacía; los tejados más
+  altos (torre de vidrio y edificio alto) llegan hasta y=256.
+- La cámara de Alice en la calle tiene `limit_top = 0` y
+  `limit_bottom = 1152`. Antes del cambio, la torre de vidrio y el edificio alto subían hasta
+  y=-128 y quedaban cortados; con la franja nueva ya se pueden mostrar.
+- La franja de arriba ya tiene y-sort y colisiones: árboles grandes, macetas
+  con árbol, columna verde, jardineras y cartel del café, carrito de comida,
+  contenedores y columna bajo el muro de ladrillo, parquímetro, sillas del
+  patio, parada de bus y el edificio amarillo de la esquina (colisión en todo
+  su contorno). `BoundaryLeft`/`BoundaryRight` ahora miden 16×1152 y cubren
+  todo el alto del mapa.
 - **Nada más allá del prólogo existe todavía**, salvo la calle en construcción
-  (sección 10): ni los encuentros
+  (sección 10) y la estructura vacía de la tienda de Leo (sección 11): ni los encuentros
   con Leo/Lía/Clara/Rosa, ni inventario, sistema de confianza, guardado, menús
   o arte de retratos/cinemáticas. El prólogo en sí (apartamento → vagón →
   estación desconocida) es jugable de principio a fin.

@@ -11,11 +11,62 @@ const PEDESTRIAN_PAUSE: float = 2.5
 ## the Marker2D points that pedestrian walks through, in order, back and forth.
 @onready var npcs: Node2D = $MiddleLayer/NPCS
 @onready var pedestrian_routes: Node2D = $PedestrianRoutes
+@onready var interactables: Node2D = $InteractableDetectors
+
+# =========================
+# Clue configuration
+# =========================
+## InteractableDetectors child -> clue id saved in GameManager when Alice looks at it.
+const CLUE_AREAS := {
+	"BusStopMap": "bus_stop_map",
+	"BusStopGrandma": "grandma_cans",
+	"PhoneGirl": "overheard_store",
+	"Delivery": "delivery_box",
+	"AdColumn": "store_flyer",
+}
+## InteractableDetectors child -> [clues that unlock it, timeline to play instead].
+## Lets a place react to what Alice already learned (e.g. the shop window
+## recognises the fruit poster once she has seen it on the delivery box).
+const CLUE_REACTIONS := {
+	"Shop": [["delivery_box", "store_flyer"], "street_shop_found"],
+	"GlassTower": [["overheard_store"], "street_glass_tower_clue"],
+}
 
 # =========================
 # Lifecycle
 # =========================
 func _ready() -> void:
+	_connect_clues()
+	_start_pedestrians()
+
+# =========================
+# Clues about Leo's store
+# =========================
+func _connect_clues() -> void:
+	for area_name in CLUE_AREAS:
+		var area := interactables.get_node_or_null(NodePath(area_name))
+		if area == null:
+			push_warning("InteractableDetectors/%s not found for its clue" % area_name)
+			continue
+		area.interacted.connect(GameManager.add_clue.bind(CLUE_AREAS[area_name]))
+	# interacted fires right before the area starts its timeline, so a place
+	# can still switch to its "I know this" version here.
+	for area_name in CLUE_REACTIONS:
+		var area := interactables.get_node_or_null(NodePath(area_name))
+		if area == null:
+			push_warning("InteractableDetectors/%s not found for its clue reaction" % area_name)
+			continue
+		var required: Array[String] = []
+		required.assign(CLUE_REACTIONS[area_name][0])
+		var timeline: String = CLUE_REACTIONS[area_name][1]
+		area.interacted.connect(func() -> void:
+			if GameManager.has_any_clue(required):
+				area.timeline_name = timeline)
+
+# =========================
+# Pedestrian setup
+# =========================
+func _start_pedestrians() -> void:
 	for route in pedestrian_routes.get_children():
 		var pedestrian := npcs.get_node_or_null(NodePath(route.name)) as WalkingNPC
 		if pedestrian == null:

@@ -9,8 +9,12 @@ enum State {
 	WALKING
 }
 
-const SPEED: float = 100.0 
+const SPEED: float = 100.0
 const INTERACTION_DISTANCE: float = 16.0
+## Max pixels Alice is slid sideways to get past the edge of an obstacle (a
+## lamp post, the corner of a crosswalk) instead of stopping dead on it.
+const CORNER_CORRECTION: int = 8
+const CORNER_SLIDE_SPEED: float = 60.0
 
 @onready var player_animation: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interaction_detector: Area2D = $InteractionDetector
@@ -33,7 +37,7 @@ func _ready() -> void:
 # 2) Update state
 # 3) Update animation
 # =========================
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	
 	# Block movement while dialogue is active.
@@ -47,6 +51,7 @@ func _physics_process(_delta: float) -> void:
 		update_interaction_detector_position()
 
 	# Apply movement.
+	_apply_corner_correction(direction, delta)
 	velocity = direction * SPEED
 	move_and_slide()
 
@@ -63,6 +68,30 @@ func _physics_process(_delta: float) -> void:
 	# Refresh animation from current state + facing.
 	process_animation_state()
 	
+# =========================
+# Corner correction
+# =========================
+## Walking straight into an obstacle's edge: if there is room a few pixels to
+## one side, slide that way so Alice slips past (crosswalk corners, thin posts)
+## instead of having to line up pixel-perfect.
+func _apply_corner_correction(direction: Vector2, delta: float) -> void:
+	var is_straight := is_zero_approx(direction.x) != is_zero_approx(direction.y)
+	if not is_straight:
+		return
+	var motion := direction * SPEED * delta
+	if not test_move(global_transform, motion):
+		return
+	var side := Vector2(absf(direction.y), absf(direction.x)).sign()
+	for offset in range(1, CORNER_CORRECTION + 1):
+		for side_sign in [-1.0, 1.0]:
+			var shift: Vector2 = side * offset * side_sign
+			if test_move(global_transform, shift):
+				continue
+			if test_move(global_transform.translated(shift), motion):
+				continue
+			move_and_collide(side * side_sign * minf(offset, CORNER_SLIDE_SPEED * delta))
+			return
+
 # =========================
 # Dialogue movement lock
 # =========================
@@ -182,11 +211,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept"):
 		_try_to_interact()
 
+## When the detector touches more than one area (e.g. a shop window next to
+## its door), the one closest to the detector wins.
 func _try_to_interact() -> void:
-	var areas = interaction_detector.get_overlapping_areas()
-	for area in areas:
-		if area.has_method("interact"):
-			area.interact()
-			break
+	var closest: Area2D = null
+	var closest_distance := INF
+	for area in interaction_detector.get_overlapping_areas():
+		if not area.has_method("interact"):
+			continue
+		var distance := interaction_detector.global_position.distance_to(_area_center(area))
+		if distance < closest_distance:
+			closest = area
+			closest_distance = distance
+	if closest:
+		closest.interact()
+
+## Center of the area's first CollisionShape2D (areas often offset their shape).
+func _area_center(area: Area2D) -> Vector2:
+	for child in area.get_children():
+		if child is CollisionShape2D:
+			return child.global_position
+	return area.global_position
 			
 			
