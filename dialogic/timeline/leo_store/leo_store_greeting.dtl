@@ -1,0 +1,8 @@
+[signal arg="leo_wave"]
+leo: ¡Bienvenida!
+alice: (se queda paralizada en la entrada)
+alice: ...
+(Un chico de sonrisa fácil la mira desde el mostrador.)
+[signal arg="leo_wave_end"]
+alice: (siente que le arden las mejillas y se desvía hacia las góndolas)
+[signal arg="leo_greeted"]

@@ -39,6 +39,20 @@ func has_any_clue(clue_ids: Array[String]) -> bool:
 			return true
 	return false
 
+# =========================
+# Leo's store
+# =========================
+var leo_greeted: bool = false
+var leo_crush_thought_shown: bool = false
+var leo_has_tuna: bool = false
+var leo_talk_done: bool = false
+## Trust Alice builds with Leo through her choices. Saved for later scenes.
+var leo_confidence: int = 0
+## True if Alice asked for Leo's number herself instead of waiting for him.
+var leo_alice_took_initiative: bool = false
+## True if Alice gave Leo her own number.
+var leo_gave_number: bool = false
+
 # Emitted every time the quest step changes.
 signal quest_step_changed(new_step: int)
 
@@ -69,6 +83,22 @@ func _on_dialogic_signal(argument: String) -> void:
 		"step_4":
 			if quest_step == 3 and has_all_prep_items():  # All required items collected
 				set_quest_step(4)
+		"leo_greeted":
+			leo_greeted = true
+		"leo_tuna_taken":
+			leo_has_tuna = true
+		"leo_took_initiative":
+			leo_alice_took_initiative = true
+		"leo_number":
+			add_item("leo_number")
+		"leo_gave_number":
+			leo_gave_number = true
+		"leo_talk_done":
+			leo_talk_done = true
+		_:
+			# "leo_confidence:<amount>", e.g. "leo_confidence:-1".
+			if argument.begins_with("leo_confidence:"):
+				leo_confidence += int(argument.get_slice(":", 1))
 
 # =========================
 # Quest progression

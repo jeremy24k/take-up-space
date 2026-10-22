@@ -1,16 +1,11 @@
 metro_worker: Oye... te quedaste dormida.
 [signal arg="alice_wakes_up"]
-alice: (despierta sobresaltada)
-alice: ¡Ah!
+alice: (despierta sobresaltada) ¡Ah!
 alice: Yo... lo siento.
-metro_worker: No pasa nada.
-metro_worker: Pero tienes que bajar. Es la terminal.
+metro_worker: No pasa nada. Pero tienes que bajar. Es la terminal.
 alice: ¿La terminal...?
 metro_worker: Sí. Ya no sigue el tren.
-alice: Ah...
-alice: (mira alrededor, todavía adormilada)
-alice: Claro...
+alice: (mira alrededor, todavía adormilada) Ah... claro...
 metro_worker: Vamos, tengo que cerrar el vagón.
-alice: Sí. Sí, claro.
-alice: Perdón.
+alice: Sí. Sí, claro. Perdón.
 metro_worker: No te preocupes.

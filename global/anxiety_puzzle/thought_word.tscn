@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://global/anxiety_puzzle/thought_word.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_m3x6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_none"]
+
+[node name="ThoughtWord" type="Button"]
+texture_filter = 1
+focus_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 0.88, 0.54, 1)
+theme_override_colors/font_focus_color = Color(1, 0.88, 0.54, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.88, 0.54, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0.88, 0.54, 1)
+theme_override_colors/font_outline_color = Color(0.13, 0.05, 0.22, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_none")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_none")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_none")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_none")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_none")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_none")
+flat = true
+script = ExtResource("1_script")

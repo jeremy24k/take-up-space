@@ -180,6 +180,46 @@ Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
 `CollisionShape2D` y fijar `timeline_name` y `push_direction`. En la calle, el
 timeline genérico es `street_boundary`.
 
+### `AnxietyPuzzle` (`global/anxiety_puzzle/`) — el Rompecabezas de la Ansiedad
+Minijuego para los momentos en que Alice se bloquea: tiene que armar su
+respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
+
+- **Datos:** cada puzzle es un `AnxietyPuzzleData` (`.tres`): `phrases`
+  (clave del resultado → palabras en orden), `extra_words` (distractores que
+  no llevan a ningún lado), `prompt`, `time_limit` (20 s) y
+  `mistake_penalty` (1,5 s).
+- **Cómo se juega:** las palabras de todas las respuestas, los distractores y
+  "(...)" flotan mezclados (`ThoughtWord`: texto m3x6 sin caja, flota a su
+  ritmo y tiembla más cuanto menos tiempo queda; la que tiene el foco se
+  pinta amarilla y se queda quieta). Flechas para moverse, Espacio o clic
+  para elegir. Cada palabra elegida va a la frase de abajo. Si ninguna
+  respuesta empieza así, la frase tiembla en rojo, se desarma, todas las
+  palabras se vuelven a mezclar en sitios nuevos y se pierde
+  `mistake_penalty`. "(...)" o quedarse sin tiempo devuelven `"silence"`.
+- **Pistas** (con 12 s y sin ayuda era casi imposible adivinar la frase):
+  arriba se muestra `prompt`, un pensamiento de Alice que dice *qué* podría
+  decir pero no *cómo* ("¿Le digo la verdad... o que estoy bien?"). Y
+  después de cada error, la primera palabra de cada respuesta parpadea en
+  amarillo mientras las palabras se reacomodan.
+  Los bordes se cierran con una viñeta pixelada (`anxiety_vignette.gdshader`).
+- **Desde Dialogic:** la timeline emite `[signal arg="anxiety_puzzle:<id>"]`
+  y después ramifica con `if {anxiety_result} == "<clave>":`. La escena
+  (p. ej. `leo_store.gd::_play_anxiety_puzzle`) pone `Dialogic.paused =
+  true` dentro del handler de la señal: Dialogic no pasa al siguiente evento
+  hasta que vuelve a `false` (`DialogicGameHandler.handle_event` hace
+  `await dialogic_resumed`). Instancia el puzzle, hace `await
+  puzzle.run(data)`, guarda el resultado con
+  `Dialogic.VAR.set_variable("anxiety_result", ...)` y reanuda.
+  `anxiety_result` está declarada en las variables de Dialogic
+  (`project.godot`).
+- Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
+  1, así el clic no lo atrapa su capa de input) y por debajo del fundido.
+- **Cuándo usarlo** (regla de diseño): la primera interacción importante con
+  cada personaje, las confesiones (pedir un número, admitir que no sabe su
+  dirección) y la respuesta siguiente a un error social (si en un menú
+  normal eligió mentir o callarse). El resto son menús normales, para no
+  gastar la mecánica.
+
 ### `ThoughtTrigger`
 Burbuja de pensamiento sobre la cabeza de Alice. Se puede **esperar**:
 
@@ -190,11 +230,25 @@ await thought_trigger.show_thought(player)
 Con `monitoring = false` se dispara solo desde código; si no, al entrar en el área.
 Un pensamiento nuevo cancela el anterior (contador `active_sequence_id` compartido).
 
-El `Label` de la burbuja lleva `z_index = 10`, por encima de cualquier capa del
-mundo. Con `z_index = 1` lo tapaban las capas superiores de los niveles
-(`SuperiorLayer`, `WallBorders`, que llegan a z 3–5), y en la estación
-desconocida el "(mira a su alrededor)" se veía cortado contra la zona negra.
-No hace falta tocar la fuente ni la escala para esto.
+**La burbuja se dibuja en pantalla, no en el mundo.** Es una `CanvasLayer`
+(capa 1) llamada `ThoughtBubble`, hija de Alice, con el `Label` dentro. Cada
+frame se coloca sobre su cabeza con `get_global_transform_with_canvas()` y se
+mantiene dentro de los bordes de la pantalla (margen de 8 px). Así:
+- **El zoom ×3 de la cámara no multiplica la fuente.** Antes, en el mundo, el
+  tamaño solo podía subir de 3 en 3 px de pantalla (6 → 18 px, 8 → 24 px) y
+  cualquier fuente un poco mayor quedaba enorme. Ahora `font_size` y
+  `outline_size` del `Label` de `thought_trigger.tscn` están **en píxeles de
+  pantalla**. Fuente elegida: `m3x6.ttf` a 48 (×3), borde oscuro de 6,
+  `line_spacing = -6` y `max_width = 420`. Es más legible que `tiny.ttf` y
+  tiene minúsculas; Silkscreen se descartó porque es toda en mayúsculas y
+  parecía que Alice gritaba.
+- Para que una fuente pixel se vea nítida, usa un múltiplo entero de su tamaño
+  nativo: `tiny.ttf` 6 (12, 18, 24…), `m3x6.ttf` 16 (32, 48…), Silkscreen 8
+  (16, 24…).
+- Ninguna capa del mapa la tapa y no se corta contra el borde. Antes en la
+  estación desconocida el "(mira a su alrededor)" salía como "nira a su
+  alrededor)".
+- `max_width` (exportado, en px de pantalla) es el ancho de ajuste del texto.
 
 ### `LightsContainer`
 Parpadeo aleatorio de luces + `fade_out_lights(duración)` y `turn_off_lights()`.
@@ -253,6 +307,21 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
   paréntesis: `alice: (suspira)`. Sin los `:`, Dialogic muestra la línea entera
   como narración (literalmente "alice (suspira)"); con un nombre que no existe
   (`Guardia:`) se inventa un personaje temporal en vez de usar el real.
+- **Acotaciones de otros = narración.** Lo que hacen Wilson u otras personas no
+  lleva nombre: la línea va sin `personaje:`, entre paréntesis y con mayúscula,
+  `(Wilson maúlla, impaciente.)`. Dialogic la muestra sin la etiqueta de
+  nombre. Antes iban como `wilson: maúlla...` y parecía que hablaba el gato.
+  Ojo: en una línea de narración **no uses `:`**, porque Dialogic tomaría lo que
+  hay antes como nombre de un personaje temporal.
+- **Cada pulsación tiene que aportar algo.** Una acción de Alice no va sola en
+  su línea: va delante de lo que dice (`alice: (revisa el interior) Auriculares...
+  no están.`). Las pausas que importan se mantienen sin pedir otra pulsación,
+  con `[pause=0.8]` dentro de la línea (`alice: ...[pause=0.8] No. Mejor no.`).
+  Si el jugador pulsa durante la pausa, se salta como el resto del texto. Así el
+  ordenador pasó de 18 a 12 pulsaciones, la mochila de 13 a 8, y el resto en
+  proporción, sin perder ningún silencio con función.
+- Mantener Espacio pulsado no avanza más de una línea, porque Dialogic usa
+  `is_action_just_pressed`.
 
 > **⚠️ El identificador lo decide Dialogic, no tú.** Al reescanear, registra el
 > nombre del archivo pelado (`unknown_station_worker`) y solo añade el prefijo de
@@ -693,49 +762,142 @@ Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
 
 ---
 
-## 11. La tienda de Leo (`scenes/leo_store_scene/scenes/leo_store.tscn`)
-Es el interior al que se entra por `ShopDoor` en la calle, y donde va a ir la
-primera conversación con Leo. Por ahora es **un local vacío y básico, para
-tener de dónde partir**. La estructura de capas y los tilesets están copiados
-de `apartment.tscn`.
+## 11. La tienda de Leo (`scenes/leo_store_scene/scenes/leo_store.tscn` + `.gd`)
+Es el interior al que se entra por `ShopDoor` en la calle. Acá pasa **la
+primera conversación con Leo**, la escena "Escena Leo" del Twine
+(`Documents/Twine/Stories/Escena Leo.html`), adaptada a las reglas del juego.
 
 ```
-LeoStore (Node2D, y_sort)
-├── InferiorLayer          piso de madera + pared de fondo (con colisión)
-├── MiddleLayer (y_sort)
-│   ├── AssetsLayerInferior   cosas planas sobre el piso (sin TileSet aún)
-│   ├── AssetsLayerSuperior   muebles y estantes (y_sort, sin TileSet aún)
-│   ├── NPCS (y_sort)         acá va Leo
-│   └── Player                Alice
-├── SuperiorLayer (z 1)
-│   └── WallBorders (z 1)  TileMapDual con borders.aseprite: el borde negro
-│       └── ColisonesDual  invisible, colisión de los lados y el fondo
+LeoStore (Node2D, y_sort)               leo_store.gd
+├── InferiorLayer / MiddleLayer / SuperiorLayer   el tileado de la tienda
+│   └── MiddleLayer/NPCS/Leo   StaticBody2D: AnimatedSprite2D (leo_npc.aseprite)
+│                               + colisión en los pies + InteractionHint
+├── CounterCollision           StaticBody2D: bloque de las dos cajas y baranda
 ├── InteractableDetectors
-│   └── ExitToStreet       SceneTransitionArea a street_zone_1 ("[Espacio] Salir")
-└── ThoughtTriggers
+│   ├── LeoCounter             "[Espacio] Hablar", delante de la caja de arriba
+│   ├── TunaShelf              la góndola de arriba a la izquierda: ahí está el atún
+│   ├── DrinksShelf, PantryShelf, CannedShelf, SnacksShelf, CleaningShelf
+│   │                          las otras cinco góndolas: Alice busca y no encuentra
+│   ├── FruitCrates            "[Espacio] Mirar", las cajas de fruta (secundario)
+│   └── ExitToStreet           SceneTransitionArea a la calle
+└── ThoughtTriggers/CrushThought   franja de suelo: pensamiento "Es muy lindo"
 ```
-- **Medidas, en celdas de 32 px:** el piso va de x 10 a 23 y de y 8 a 15
-  (14×8 tiles, en píxeles 320–768 × 256–512). La pared ocupa las filas 6 y 7.
-  `WallBorders` llena todo lo que no es local, con 3 celdas de margen.
-  `ColisonesDual` hace un anillo justo afuera del piso, en los lados y abajo.
-  Arriba frena la colisión de la pared.
-- **Alice** arranca en (544, 472), abajo al centro, y **`ExitToStreet`** está
-  justo debajo, en (544, 506). La cámara está limitada a 288–768 × 128–544.
-- **Tiles usados:**
-  - Piso: `Wood.aseprite` en (2, 1).
-  - Pared: `wall.aseprite`, (1, 1) arriba y (1, 2) abajo. La última columna
-    usa (2, 1)/(2, 2), que trae la sombra del borde derecho.
-  - Borde: `borders.aseprite`. Se pinta con (2, 1) y TileMapDual calcula los
-    bordes solo.
-- Las capas de assets todavía no tienen `TileSet`. Los muebles de la tienda van
-  en `scenes/leo_store_scene/assets/` como `.aseprite`. Las reglas de y-sort
-  son las mismas que en la calle (sección 10).
-- **Este primer tileado se generó con un script de Godot**, que no está en el
-  repo, y después se arregló a mano. Si se vuelve a guardar la escena desde
-  un script con `PackedScene.pack()`, hay que revisar que `ExitToStreet` siga
-  teniendo el script de `SceneTransitionArea`. Sin el autoload
-  `FadeTransition`, ese script no compila y se pierde, y lo mismo pasa con los
-  límites de la cámara.
+
+### El flujo (los 11 pasos del guion)
+1. **Al entrar** (`_play_greeting`, tras 1 s de fundido): `leo_store_greeting`.
+   Leo saluda con la animación `wave` durante todo el diálogo de entrada, y
+   vuelve a `idle_side` justo cuando Alice se desvía a las góndolas (señales
+   `leo_wave` / `leo_wave_end`). Cuando cruza hacia los pasillos de la izquierda
+   pisa `CrushThought`, una franja de suelo vertical (12×190 en x≈572, de
+   y 280 a 470), y sale el globo: "Ese es el cajero...", "...es muy lindo.",
+   "¿Por qué pensé eso?". Si sube derecho por el pasillo del mostrador no la
+   cruza. Sale una sola vez en todo el juego
+   (`GameManager.leo_crush_thought_shown`), aunque Alice salga y vuelva.
+2. **Buscar la lata.** Las seis góndolas dicen lo mismo, "[Espacio] Buscar",
+   para que la del atún no se destaque. El atún está solo en `TunaShelf`, la
+   de arriba a la izquierda, lejos de la puerta. En las otras cinco Alice
+   busca y no encuentra (`leo_store_shelf_drinks`, `_pantry`, `_canned`,
+   `_snacks`, `_cleaning`, conectadas desde `SEARCH_SHELVES`); con la lata ya
+   encontrada todas dicen `leo_store_shelf_done`. En `TunaShelf`
+   (`leo_store_tuna`) por fin la encuentra y agarra una sin mirar.
+3. **El mostrador** cambia según el paso: sin lata, `leo_store_counter_early`
+   ("Primero... la comida de Wilson"); con lata, `leo_store_checkout`; después
+   de hablar, `leo_store_after`. Se elige en `_on_counter_interacted`, que
+   corre antes de que el área arranque su timeline (igual que en la calle).
+4. **`leo_store_checkout`** tiene las tres decisiones del Twine. Las dos
+   primeras son **Rompecabezas de la Ansiedad** (ver `AnxietyPuzzle`, sección
+   5); la tercera es un menú normal:
+   - "¿Estás bien?" (`puzzles/leo_are_you_ok.tres`): "La verdad... no. Me
+     perdí." → `truth` (+1), "N-no, estoy bien." → `lie` (0), "(...)" o
+     tiempo agotado → `silence` (−1). Las tres ramas terminan en que Alice se
+     perdió.
+   - El número (`puzzles/leo_number.tres`): "Oye, ¿me das tu número?" → `ask`
+     (+1, iniciativa); "Bueno... gracias." → `leave`; silencio → Leo se lo da
+     igual. En todos los casos Alice termina con el número (`leo_number`).
+   - Darle el suyo (menú): +2 si había pedido el de él, +1 si no; o no
+     dárselo (0).
+5. **La salida.** Al terminar la charla, `ExitToStreet` queda bloqueada
+   (`is_locked`). Al intentar salir, `blocked_interaction` dispara
+   `leo_store_farewell` ("Oye, Alice", dos variantes) y al cerrarse se pasa a
+   `scenes/demo_end/demo_end.tscn`.
+6. **`demo_end.tscn`**: pantalla negra con `leo_store_reflection` (dos
+   variantes según si le dio su número) y después "Continuará...", porque la
+   escena de Lía todavía no existe.
+
+### Estado en `GameManager`
+`leo_greeted`, `leo_has_tuna`, `leo_talk_done`, `leo_confidence` (la
+"confidence" del Twine, guardada para escenas futuras),
+`leo_alice_took_initiative`, `leo_gave_number` y el objeto `leo_number` en
+`collected_items`. Se actualizan con señales de Dialogic (`leo_greeted`,
+`leo_tuna_taken`, `leo_took_initiative`, `leo_number`, `leo_gave_number`,
+`leo_talk_done` y `leo_confidence:<n>`). Si Alice sale a la calle antes de
+hablar y vuelve, la escena sigue desde donde quedó y no repite el saludo.
+
+### Decisiones al adaptar el Twine
+- La prosa pasa a acotaciones: lo de Alice como `alice: (...)` y lo de los
+  demás como narración sin nombre (`(Leo no se ríe. Solo asiente.)`). Lo que
+  Alice piensa en el momento va en globo de pensamiento (paso 1).
+- El paso 4 es jugable: el mostrador no deja avanzar hasta tener la lata.
+- Español neutro en Leo: el guion traía "boli", "pues", "vale". Se usa
+  "bolígrafo" y tuteo, como el resto del juego.
+- Tres arreglos de continuidad: Alice escribe su número en **una esquina
+  arrancada** del ticket (en el Twine se lo daba entero y se quedaba sin el de
+  Leo); "sobre todo los lunes" pasó a "antes del primer café" (el oficinista
+  de la calle sugiere que es domingo); y Leo explica que **el metro de esa
+  calle es el de la línea que termina en la terminal**, y que la otra línea
+  pasa por la plaza (si no, no se entiende por qué Alice no vuelve por donde
+  vino). Se quitó "no tenía otra cosa que hacer hasta averiguar cómo volver":
+  Alice salió justamente a comprar la comida.
+
+### Medidas y colisiones
+- **Alice** arranca en (591, 504). **`ExitToStreet`** está en (593, 524) con
+  32×24: más abajo el detector de Alice ya no llega, porque la colisión de la
+  entrada la frena en y≈505.
+- La cámara está limitada a 314–774 × 185–552.
+- Leo está en (730, 466), detrás de la caja de abajo, y `LeoCounter` en
+  (703, 450).
+- **Los mostradores y la baranda no tienen colisión en el tileset** (las
+  góndolas sí). Por eso existe `CounterCollision`: sin él Alice atravesaba la
+  caja y quedaba encima de Leo. Si se pinta esa colisión en los tiles, se
+  puede borrar.
+- Las áreas de las góndolas cubren cada grupo de estantes con 6 px de margen
+  arriba y abajo, así se pueden usar desde los dos pasillos. Sus carteles
+  están subidos por encima del estante (offset ≈ −40): en el sitio por
+  defecto tapaban el pensamiento que sale después de agarrar la lata.
+- **Todas las áreas de esta escena tienen `[editable path]` en el `.tscn`.**
+  Sin eso, al guardar la escena desde el editor Godot descarta los cambios de
+  forma y de cartel de los hijos de cada instancia (ya pasó una vez con
+  `LeoCounter` y `TunaShelf`). Si agregas otra área instanciada, márcala con
+  "Hijos editables".
+
+### Y-sort de los muebles
+Góndolas, heladeras, frutas, freezers y la maceta están en
+`AssetsLayerInferior`, que ahora tiene `y_sort_enabled` (antes no, y Alice se
+dibujaba siempre encima). Cada tile tiene `y_sort_origin` apuntando a la base
+de su mueble: el final de su columna de tiles menos 4 px, que queda por
+encima del punto más cercano al que llega Alice desde abajo (p. ej. góndolas
+de abajo: base 428, Alice frena en 435). Los mostradores
+(`AssetsLayerSuperior`) usan la misma regla. Excepciones:
+- Las dos alfombras de las cajas tienen origen −64: son planas y Alice
+  siempre va encima.
+- Lo que está contra las paredes laterales (las columnas de estantes, las
+  rejillas y los cuadros de los costados) tiene origen −64, como las
+  alfombras: Alice nunca puede quedar detrás, así que siempre va delante. Con
+  origen 0 por tile, el estante de abajo le tapaba las piernas al pararse al
+  lado. La excepción es la maceta de abajo a la izquierda, que comparte tiles
+  con la de la puerta y se ordena por su base.
+- El poste bajo la caja de abajo va por tile (origen 0).
+Los valores se calcularon con un script en Godot que recorre las celdas de
+cada capa. Si se pintan muebles nuevos, hay que darles su `y_sort_origin`.
+
+### Sprite de Leo
+`global/npcs/assets/leo_npc.aseprite`, 32×32, basado en la ilustración de
+Leo: pelo castaño despeinado, ojos celestes, camisa naranja arremangada,
+delantal con el carrito, pantalón gris azulado y zapatillas grises. Tags:
+`idle_side` (mirando a la izquierda, hacia su mostrador; es su pose normal,
+`LEO_IDLE` en `leo_store.gd`), `idle_front` (con parpadeo; respaldo si falta
+`idle_side`) y `wave` (retocado a mano), que solo usa al saludar al entrar. Se importa como
+`SpriteFrames`, igual que `pedestrian_blonde`.
 
 ---
 
@@ -775,8 +937,17 @@ LeoStore (Node2D, y_sort)
   patio, parada de bus y el edificio amarillo de la esquina (colisión en todo
   su contorno). `BoundaryLeft`/`BoundaryRight` ahora miden 16×1152 y cubren
   todo el alto del mapa.
-- **Nada más allá del prólogo existe todavía**, salvo la calle en construcción
-  (sección 10) y la estructura vacía de la tienda de Leo (sección 11): ni los encuentros
-  con Leo/Lía/Clara/Rosa, ni inventario, sistema de confianza, guardado, menús
-  o arte de retratos/cinemáticas. El prólogo en sí (apartamento → vagón →
+- **Después del prólogo existen** la calle (sección 10) y la tienda de Leo con
+  su conversación completa (sección 11), que termina en "Continuará...". No
+  existen todavía los encuentros con Lía/Clara/Rosa, inventario, guardado,
+  menús ni arte de retratos/cinemáticas. La "confianza" con Leo ya se guarda
+  en `GameManager.leo_confidence`, pero nada la usa aún.
+- **`fonts/m3x6.ttf` está modificada**: la original no traía tildes, ñ ni ü,
+  y esas letras salían con la fuente de respaldo (más grandes y lisas). Se le
+  agregaron á é í ó ú ñ ü y sus mayúsculas con `fonttools`, dibujadas en su
+  misma grilla de píxeles (la tilde son dos píxeles en diagonal, una fila por
+  encima de la letra). La usan los carteles "[Espacio]", los pensamientos y
+  "Continuará...". Si se reemplaza el archivo por la versión original de
+  Daniel Linssen, vuelven a romperse las tildes. `tiny.ttf` y Silkscreen
+  siguen sin tildes, pero ya no se usan para textos en español. El prólogo en sí (apartamento → vagón →
   estación desconocida) es jugable de principio a fin.

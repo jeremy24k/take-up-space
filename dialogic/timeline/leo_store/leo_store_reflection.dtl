@@ -1,0 +1,13 @@
+(Afuera, la calle sigue siendo desconocida. Pero Alice sabe hacia dónde ir.)
+if {GameManager.leo_gave_number}:
+	alice: (aprieta el ticket con el número de Leo)
+	alice: Le di mi número. ¿Qué hice?
+	(Siente una mezcla de pánico y algo que no sabe nombrar. Pero sonríe. Nadie la ve, pero sonríe.)
+else:
+	alice: (mira el ticket con el número de Leo)
+	alice: No me atreví a darle el mío.
+	(Siente un pequeño peso en el pecho. Pero también siente que hizo algo que nunca había hecho antes.)
+	alice: La próxima vez.
+alice: (guarda el papel con cuidado en la mochila)
+(Alice camina hacia la plaza, como Leo le indicó. La lata de atún le golpea suavemente la espalda.)
+(Está un poco menos perdida que antes. Pero todavía no está en casa.)

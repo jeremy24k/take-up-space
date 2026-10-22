@@ -20,12 +20,12 @@ config/icon="res://icon.svg"
 Dialogic="*uid://ds2q0uclmolvu"
 GameManager="*uid://6hkqeuft1dyk"
 FadeTransition="*uid://cikuexy8o2qwo"
-McpBridge="*res://.mcp/godot-runtime/bridge/mcp_bridge.gd"
 
 [dialogic]
 
 directories/dch_directory={
 "alice": "res://dialogic/characters/alice.dch",
+"leo": "res://dialogic/characters/leo.dch",
 "metro_worker": "res://dialogic/characters/metro_worker.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
 }
@@ -52,6 +52,21 @@ directories/dtl_directory={
 "apartment/wilson_cushion": "res://dialogic/timeline/apartment/wilson_cushion.dtl",
 "apartment/wilson_plate": "res://dialogic/timeline/apartment/wilson_plate.dtl",
 "apartment/wilson_stay_home": "res://dialogic/timeline/apartment/wilson_stay_home.dtl",
+"leo_store_after": "res://dialogic/timeline/leo_store/leo_store_after.dtl",
+"leo_store_checkout": "res://dialogic/timeline/leo_store/leo_store_checkout.dtl",
+"leo_store_counter_early": "res://dialogic/timeline/leo_store/leo_store_counter_early.dtl",
+"leo_store_farewell": "res://dialogic/timeline/leo_store/leo_store_farewell.dtl",
+"leo_store_fruit": "res://dialogic/timeline/leo_store/leo_store_fruit.dtl",
+"leo_store_greeting": "res://dialogic/timeline/leo_store/leo_store_greeting.dtl",
+"leo_store_reflection": "res://dialogic/timeline/leo_store/leo_store_reflection.dtl",
+"leo_store_shelf_canned": "res://dialogic/timeline/leo_store/leo_store_shelf_canned.dtl",
+"leo_store_shelf_cleaning": "res://dialogic/timeline/leo_store/leo_store_shelf_cleaning.dtl",
+"leo_store_shelf_done": "res://dialogic/timeline/leo_store/leo_store_shelf_done.dtl",
+"leo_store_shelf_drinks": "res://dialogic/timeline/leo_store/leo_store_shelf_drinks.dtl",
+"leo_store_shelf_pantry": "res://dialogic/timeline/leo_store/leo_store_shelf_pantry.dtl",
+"leo_store_shelf_snacks": "res://dialogic/timeline/leo_store/leo_store_shelf_snacks.dtl",
+"leo_store_tuna": "res://dialogic/timeline/leo_store/leo_store_tuna.dtl",
+"leo_store_tuna_again": "res://dialogic/timeline/leo_store/leo_store_tuna_again.dtl",
 "metro/important_man": "res://dialogic/timeline/metro/important_man.dtl",
 "metro/metro_notice_board": "res://dialogic/timeline/metro/metro_notice_board.dtl",
 "metro/ticket_store": "res://dialogic/timeline/metro/ticket_store.dtl",
@@ -127,6 +142,7 @@ audio/channel_defaults={
 }
 glossary/default_case_sensitive=true
 variables={
+"anxiety_result": "",
 "elevator_interaction": 0,
 "lamp_is_on": true
 }

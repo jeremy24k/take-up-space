@@ -1,5 +1,3 @@
-alice: (una tienda de mascotas)
-alice: ¡Aquí!
-alice: (un cartel en la puerta) "Cerrado por reformas."
-alice: ...
-alice: Claro.
+alice: (ve una tienda de mascotas) ¡Aquí!
+(Un cartel en la puerta dice "Cerrado por reformas".)
+alice: ...[pause=0.6] Claro.

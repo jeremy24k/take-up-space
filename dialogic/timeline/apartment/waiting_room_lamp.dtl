@@ -1,7 +1,6 @@
 if {lamp_is_on} == true:
 	alice: La lámpara está encendida.
-	alice: (mira la luz, como si dudara)
-	alice: ¿Deberia apagarla?
+	alice: (mira la luz, como si dudara) ¿Debería apagarla?
 	- Sí, apágala.
 		alice: Mejor. No necesito tanta luz.
 		set {lamp_is_on} = false

@@ -1,7 +1,3 @@
-alice: (mira el teléfono público)
-alice: Podría llamar a alguien...
-alice: (se queda pensando)
-alice: ...
-alice: No me sé ningún número de memoria.
-alice: (baja la mirada)
-alice: Ni siquiera el mío.
+alice: (mira el teléfono público) Podría llamar a alguien...
+alice: (se queda pensando)[pause=0.8] ... No me sé ningún número de memoria.
+alice: (baja la mirada) Ni siquiera el mío.

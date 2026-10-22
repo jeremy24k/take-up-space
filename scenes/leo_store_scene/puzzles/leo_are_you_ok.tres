@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://c676xief6b0td"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"lie": PackedStringArray("N-no,", "estoy", "bien."),
+"truth": PackedStringArray("La", "verdad...", "no.", "Me", "perdí.")
+}
+prompt = "¿Le digo la verdad... o que estoy bien?"

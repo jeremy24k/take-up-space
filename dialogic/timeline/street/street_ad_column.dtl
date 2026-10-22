@@ -1,5 +1,3 @@
-alice: (un volante pegado en la columna)
+(Un volante pegado en la columna, con unas frutas dibujadas.)
 alice: "Almacén. Frutas, verduras... y mascotas."
-alice: (tiene unas frutas dibujadas)
-alice: ...
-alice: Tiene que estar cerca.
+alice: ...[pause=0.6] Tiene que estar cerca.

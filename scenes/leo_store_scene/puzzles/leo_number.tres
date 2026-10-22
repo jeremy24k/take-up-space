@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dx1xcsuvdrxjw"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Oye,", "¿me", "das", "tu", "número?"),
+"leave": PackedStringArray("Bueno...", "gracias.")
+}
+prompt = "¿Le pido su número... o me despido?"

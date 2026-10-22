@@ -1,6 +1,4 @@
-alice: (una chica escucha un audio en altavoz)
+(Una chica escucha un audio en altavoz.)
 alice: (alcanza a oír) "...sí, en el almacén ese, el de la torre..."
 alice: ¿Almacén?
-alice: (busca su teléfono por costumbre)
-alice: ...
-alice: Ah. Es verdad.
+alice: (busca su teléfono por costumbre)[pause=0.8] ... Ah. Es verdad.

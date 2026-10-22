@@ -1,0 +1,93 @@
+alice: (se acerca al mostrador y deja la lata)
+leo: Hola. Soy Leo. Te saludé hace un rato, pero creo que no me escuchaste.
+alice: (con un hilo de voz) E-eh... hola. Yo soy Alice.
+leo: ¿Estás bien? Te veo un poco nerviosa.
+[signal arg="anxiety_puzzle:leo_are_you_ok"]
+if {anxiety_result} == "truth":
+	alice: La verdad... no. Me perdí. Bajé del metro y ya no sé dónde estoy.
+	(Leo no se ríe. Solo asiente.)
+	leo: Ah, eso explica la cara de "¿qué hago aquí?". ¿Y viniste a comprar comida para gatos?
+	alice: (mira la lata de atún) Para mi gato. Wilson.
+	leo: Buen plan. Comida antes que orientación. Yo también tendría las prioridades así.
+	alice: (suelta una risa corta, nerviosa)
+	[signal arg="leo_confidence:1"]
+elif {anxiety_result} == "lie":
+	alice: N-no, estoy bien. Solo... no conocía esta tienda.
+	(Miente mal. Se le nota en la voz.)
+	leo: Ah, claro. Es que te vi entrar como si el edificio estuviera en llamas.
+	alice: (se queda en blanco)
+	leo: (se ríe suave) Es broma. Pero en serio, ¿necesitas algo más que atún?
+	alice: En realidad... me perdí. Y no sé bien cómo volver.
+	leo: Ahí está. Bueno, por algo se empieza.
+else:
+	alice: (abre la boca, pero no sale nada)
+	leo: ¿Se te escapó la voz?
+	alice: (asiente)
+	leo: Me pasa a veces. Sobre todo antes del primer café.
+	(Leo no está molesto. Solo espera.)
+	leo: (más suave) ¿Perdida?
+	alice: (vuelve a asentir)
+	leo: Bueno, lo primero es lo primero. Déjame cobrarte el atún.
+	[signal arg="leo_confidence:-1"]
+(Leo registra la compra con calma.)
+alice: (saca las monedas de la cartera y las cuenta dos veces)
+leo: Justo. Ni una moneda más.
+alice: (guarda la lata en la mochila)
+leo: Para volver... el metro de esta calle es de la línea que termina aquí, en la terminal.
+leo: Mejor camina derecho hasta la plaza. Ahí pasa la otra línea, la que va al centro. Desde ahí seguro te ubicas.
+alice: (siente un alivio enorme)
+leo: Aunque... ¿sabes bien la dirección? Por si necesitas algo más exacto.
+alice: Eh... es un edificio gris. Con un balcón chiquito. Hay un árbol enfrente...
+leo: (sonríe) ¿No sabes el nombre de tu calle?
+alice: (niega con la cabeza; quiere que se la trague la tierra)
+leo: Bueno, con el metro llegas igual.
+(La conversación se acaba. Pero algo en Alice no quiere irse todavía.)
+[signal arg="anxiety_puzzle:leo_number"]
+if {anxiety_result} == "ask":
+	alice: (con la voz temblorosa) Oye, Leo... ¿puedo...? ¿Me das tu número?
+	(Leo la mira sorprendido. Luego sonríe.)
+	leo: ¿Mi número?
+	alice: Por si... no sé. Por si me pierdo otra vez. O si Wilson se come toda la comida y necesito preguntarte si tienes más atún.
+	leo: (se ríe) Buena excusa. Dame tu teléfono.
+	alice: Lo perdí. En el metro.
+	(Leo ni se inmuta. Saca un bolígrafo y escribe en el dorso del ticket.)
+	leo: ¿Papel y bolígrafo te sirven?
+	[signal arg="leo_took_initiative"]
+	[signal arg="leo_confidence:1"]
+else:
+	if {anxiety_result} == "leave":
+		alice: Bueno... gracias.
+	else:
+		alice: (no dice nada)
+	(Leo la mira un momento, como si esperara algo.)
+	leo: Bueno...
+	(Leo saca un bolígrafo y escribe en el dorso del ticket.)
+	leo: Toma. Por si te pierdes otra vez y necesitas preguntarle a alguien que al menos sabe dónde queda esta tienda.
+	alice: (parpadea) ¿En serio?
+	leo: Para eso lo tengo. Pero si no quieres usarlo, no pasa nada.
+[signal arg="leo_number"]
+(Ahora Alice tiene el número de Leo. Podría darle el suyo.)
+- Darle su número
+	alice: (arranca una esquina del ticket y le pide el bolígrafo)
+	if {GameManager.leo_alice_took_initiative}:
+		alice: Yo... tampoco tengo teléfono ahora. Pero si algún día... no sé.
+		alice: (escribe su número en el papelito y se lo da)
+		(Leo mira el papel. Luego la mira a ella.)
+		leo: Alice-sin-nombre-de-calle, con número incluido. Me gusta.
+		(Leo guarda el papel con cuidado.)
+		[signal arg="leo_confidence:2"]
+	else:
+		alice: Yo... tampoco tengo teléfono ahora. Pero por si acaso...
+		alice: (escribe su número en el papelito y se lo da)
+		(Leo levanta una ceja, pero no dice nada. Guarda el papel.)
+		[signal arg="leo_confidence:1"]
+	[signal arg="leo_gave_number"]
+- No darle su número
+	alice: (guarda el ticket en la mochila) Gracias. En serio.
+	if {GameManager.leo_alice_took_initiative}:
+		leo: De nada.
+		(Leo la mira un momento, como si esperara algo más. Pero Alice ya está dando un paso atrás.)
+	else:
+		leo: De nada. Que encuentres el camino.
+		alice: (asiente y se gira hacia la puerta)
+[signal arg="leo_talk_done"]

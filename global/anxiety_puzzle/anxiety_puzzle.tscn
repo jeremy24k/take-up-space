@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://global/anxiety_puzzle/anxiety_puzzle.gd" id="1_script"]
+[ext_resource type="Shader" path="res://global/anxiety_puzzle/anxiety_vignette.gdshader" id="2_vignette"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="3_m3x6"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vignette"]
+shader = ExtResource("2_vignette")
+shader_parameter/pressure = 0.0
+shader_parameter/block_size = 6.0
+shader_parameter/tint = Color(0.05, 0, 0.08, 1)
+
+[node name="AnxietyPuzzle" type="CanvasLayer"]
+layer = 2
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0, 0.08, 0.72)
+
+[node name="Vignette" type="ColorRect" parent="Root"]
+material = SubResource("ShaderMaterial_vignette")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="WordCloud" type="Control" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Prompt" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 36.0
+offset_bottom = 84.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.82, 0.72, 1, 1)
+theme_override_colors/font_outline_color = Color(0.13, 0.05, 0.22, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("3_m3x6")
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SentenceLine" type="HBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 460.0
+offset_bottom = 520.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+alignment = 1

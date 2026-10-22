@@ -1,5 +1,2 @@
-alice: (se acerca al mapa de la estación)
-alice: (busca su parada)
-alice: No reconozco ninguno de estos nombres.
-alice: ...
-alice: (se aleja del mapa)
+alice: (se acerca al mapa de la estación, busca su parada) No reconozco ninguno de estos nombres.
+alice: ...[pause=0.6] (se aleja del mapa)

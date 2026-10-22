@@ -1,10 +1,5 @@
-alice: (ve a un hombre de corbata y maletín, quieto, moviendo el maletín)
-alice: Lleva mucho rato ahí.
-alice: ¿Estará esperando a alguien?
-alice: O quizá sabe algo que yo no sé.
-alice: (pausa)
-alice: Parece tranquilo.
-alice: (mira sus propios auriculares)
-alice: Yo también parezco tranquila.
-alice: Supongo.
-alice: Si no me miran demasiado.
+alice: (ve a un hombre de corbata y maletín, quieto, moviendo el maletín) Lleva mucho rato ahí.
+alice: ¿Estará esperando a alguien? O quizá sabe algo que yo no sé.
+alice: ...[pause=0.6] Parece tranquilo.
+alice: (mira sus propios auriculares) Yo también parezco tranquila.
+alice: Supongo.[pause=0.6] Si no me miran demasiado.

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://x3oe33hpvdf4"]
 
 [ext_resource type="Script" uid="uid://fpef0wt1i28a" path="res://global/thought_trigger.gd" id="1_fgf23"]
-[ext_resource type="FontFile" uid="uid://fgpgalktobnq" path="res://fonts/tiny.ttf" id="2_ra7qo"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_m3x6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
 
@@ -29,10 +29,10 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.42118663, 0.1612, 0.62, 1)
-theme_override_constants/line_spacing = 1
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("2_ra7qo")
-theme_override_font_sizes/font_size = 6
+theme_override_colors/font_outline_color = Color(0.13, 0.05, 0.22, 1)
+theme_override_constants/line_spacing = -6
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 48
 text = "Thinks goes Here"
 horizontal_alignment = 1

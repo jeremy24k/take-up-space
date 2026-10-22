@@ -1,0 +1,14 @@
+if {GameManager.leo_gave_number}:
+	alice: (camina hacia la puerta; el corazón le late más rápido)
+else:
+	alice: (camina hacia la puerta; quiere darse la vuelta, pero no se atreve)
+leo: Oye, Alice.
+alice: (se gira)
+if {GameManager.leo_gave_number}:
+	leo: Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia.
+	(Leo sonríe.)
+	alice: (asiente, con las mejillas ardiendo)
+else:
+	leo: Que encuentres el camino.
+	(Leo sonríe. No dice nada más.)
+	alice: (asiente)
