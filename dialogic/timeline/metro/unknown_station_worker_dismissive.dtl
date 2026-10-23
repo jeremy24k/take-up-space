@@ -1,6 +1,8 @@
 alice: (se acerca al trabajador, susurrando) Disculpe...
 alice: ...[pause=0.8] Eh... disculpe.
 metro_worker: (levanta la vista, confundido) ¿Qué?
+join alice (nervous) leftmost
 alice: Nada... perdón.
 alice: (se aleja rápidamente)
 alice: (suspira) Qué vergüenza.
+leave alice

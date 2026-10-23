@@ -1,4 +1,8 @@
-join alice 1
-alice: No puedo irme todavía. Siento que se me olvida algo importante...
-alice: (mira hacia el interior del apartamento) Wilson está bien. La casa también.
-alice: Solo voy a echar otro vistazo. Después salgo.
+if GameManager.has_all_prep_items():
+	alice: Auriculares, cartera, zapatos... ya tengo todo.
+	alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
+	alice: La mochila. Sigue en mi cuarto.
+else:
+	alice: No puedo irme todavía. Siento que se me olvida algo importante...
+	alice: (mira hacia el interior del apartamento) Wilson está bien. La casa también.
+	alice: Solo voy a echar otro vistazo. Después salgo.

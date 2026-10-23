@@ -26,6 +26,9 @@
 [ext_resource type="Script" uid="uid://cf0avee3l6ary" path="res://scenes/prologue_scene/scenes/lights_container.gd" id="14_k4ha0"]
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="15_ewlva"]
 [ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="26_16iif"]
+[ext_resource type="Resource" path="res://global/remarks/ambient_npc_pool.tres" id="ambient_npc_pool"]
+[ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
+[ext_resource type="PackedScene" path="res://global/remark_interactable.tscn" id="remark_interactable"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v12e0"]
 texture = ExtResource("1_jhnfj")
@@ -1552,8 +1555,23 @@ size = Vector2(967, 20)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bd6t2"]
 size = Vector2(89, 20)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_16iif"]
-size = Vector2(58, 28)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_map"]
+size = Vector2(58, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_vending"]
+size = Vector2(64, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_tickets"]
+size = Vector2(110, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_door"]
+size = Vector2(30, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_board"]
+size = Vector2(56, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ti_npc"]
+size = Vector2(40, 36)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xbto1"]
 size = Vector2(52, 32)
@@ -1561,7 +1579,7 @@ size = Vector2(52, 32)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0t0kd"]
 size = Vector2(620, 20)
 
-[node name="Node2D" type="Node2D" unique_id=293224598]
+[node name="Node2D2" type="Node2D" unique_id=293224598]
 script = ExtResource("0_script")
 
 [node name="InferiorLayer" type="TileMapLayer" parent="." unique_id=518829894]
@@ -1725,8 +1743,9 @@ autoplay = "idle_front"
 [node name="ApproachPoint" parent="MiddleLayer/NPCS/WorkerNPC" index="2" unique_id=1932895539]
 position = Vector2(0, 0)
 
-[node name="InteractableArea" parent="MiddleLayer/NPCS/WorkerNPC" unique_id=687754286 instance=ExtResource("15_ewlva")]
+[node name="InteractableArea" parent="MiddleLayer/NPCS/WorkerNPC" unique_id=687754286 instance=ExtResource("npc_talk_area")]
 position = Vector2(-1, 1)
+hint_position = Vector2(1, -22)
 timeline_name = "unknown_station_worker_dismissive"
 prompt_text = "[Espacio] Preguntar"
 one_time_interaction = true
@@ -1882,12 +1901,14 @@ metadata/_edit_group_ = true
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractableDetectors/TrainTriggerArea" unique_id=1071071965]
 shape = SubResource("RectangleShape2D_l7uo0")
 
-[node name="SittingGirl" parent="InteractableDetectors" unique_id=1664604836 instance=ExtResource("15_ewlva")]
+[node name="SittingGirl" parent="InteractableDetectors" unique_id=1664604836 instance=ExtResource("npc_talk_area")]
 position = Vector2(786, 565)
+hint_position = Vector2(0, -18)
 timeline_name = "unknown_station_sitting_girl"
 
-[node name="ListeningGuy" parent="InteractableDetectors" unique_id=660232352 instance=ExtResource("15_ewlva")]
+[node name="ListeningGuy" parent="InteractableDetectors" unique_id=660232352 instance=ExtResource("npc_talk_area")]
 position = Vector2(880, 184)
+hint_position = Vector2(0, -17)
 timeline_name = "unknown_station_listening_guy"
 
 [node name="Tracks" parent="InteractableDetectors" unique_id=731738913 instance=ExtResource("15_ewlva")]
@@ -1897,12 +1918,18 @@ timeline_name = "unknown_station_tracks"
 [node name="CollisionShape2D" parent="InteractableDetectors/Tracks" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_bd6t2")
 
-[node name="StationMap" parent="InteractableDetectors" unique_id=510127681 instance=ExtResource("15_ewlva")]
-position = Vector2(576, 550)
-timeline_name = "unknown_station_map"
+[node name="StationMap" parent="InteractableDetectors" unique_id=510127681 instance=ExtResource("remark_interactable")]
+position = Vector2(576, 548)
+lines = Array[String](["El mismo mapa. Nada me suena."])
+loop_lines = true
+pool = null
+group_id = "station_map"
+first_timeline = "unknown_station_map"
+first_line = ""
+speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/StationMap" index="0" unique_id=1198806918]
-shape = SubResource("RectangleShape2D_16iif")
+shape = SubResource("RectangleShape2D_ti_map")
 metadata/_edit_group_ = true
 
 [node name="Label" parent="InteractableDetectors/StationMap" index="1" unique_id=1384165053]
@@ -1911,13 +1938,148 @@ offset_top = -32.0
 offset_right = 45.0
 offset_bottom = -18.0
 
-[node name="Bench" parent="InteractableDetectors" unique_id=2140100784 instance=ExtResource("15_ewlva")]
-position = Vector2(568, 163)
-timeline_name = "unknown_station_bench"
+[node name="VendingMachine" parent="InteractableDetectors" unique_id=1776361098 instance=ExtResource("remark_interactable")]
+position = Vector2(479, 345)
+lines = Array[String](["Otra máquina. No, es para Wilson."])
+loop_lines = true
+pool = null
+group_id = "vending"
+first_timeline = "unknown_station_vending_machine"
+first_line = ""
+speaker = "alice"
 
-[node name="VendingMachine" parent="InteractableDetectors" unique_id=1776361098 instance=ExtResource("15_ewlva")]
-position = Vector2(464, 345)
-timeline_name = "unknown_station_vending_machine"
+[node name="CollisionShape2D" parent="InteractableDetectors/VendingMachine" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_vending")
+
+[node name="VendingMachine2" parent="InteractableDetectors" unique_id=1776361099 instance=ExtResource("remark_interactable")]
+position = Vector2(895, 346)
+lines = Array[String](["Otra máquina. No, es para Wilson."])
+loop_lines = true
+pool = null
+group_id = "vending"
+first_timeline = "unknown_station_vending_machine"
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/VendingMachine2" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_vending")
+
+[node name="TicketWindows" parent="InteractableDetectors" unique_id=1776361100 instance=ExtResource("remark_interactable")]
+position = Vector2(276, 557)
+lines = Array[String](["Ya tengo billete."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/TicketWindows" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_tickets")
+
+[node name="StaffDoorLeft" parent="InteractableDetectors" unique_id=1776361101 instance=ExtResource("remark_interactable")]
+position = Vector2(368, 556)
+lines = Array[String](["Cerrado.", "Solo personal."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/StaffDoorLeft" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_door")
+
+[node name="StaffDoorRight" parent="InteractableDetectors" unique_id=1776361102 instance=ExtResource("remark_interactable")]
+position = Vector2(1072, 556)
+lines = Array[String](["Cerrado.", "Solo personal."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/StaffDoorRight" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_door")
+
+[node name="NoticeBoards" parent="InteractableDetectors" unique_id=1776361103 instance=ExtResource("remark_interactable")]
+position = Vector2(1023, 555)
+lines = Array[String](["Anuncios... nada útil."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/NoticeBoards" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_board")
+
+[node name="OfficeWorker" parent="InteractableDetectors" unique_id=1776361104 instance=ExtResource("remark_interactable")]
+position = Vector2(493, 172)
+lines = Array[String](["Lleva maletín. Seguro va tarde."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/OfficeWorker" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_npc")
+
+[node name="VendingGuy" parent="InteractableDetectors" unique_id=1776361105 instance=ExtResource("remark_interactable")]
+position = Vector2(938, 345)
+lines = Array[String](["Está eligiendo algo. No miro."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/VendingGuy" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_npc")
+
+[node name="SittingBoy" parent="InteractableDetectors" unique_id=1776361106 instance=ExtResource("remark_interactable")]
+position = Vector2(396, 444)
+lines = Array[String]([])
+loop_lines = true
+pool = ExtResource("ambient_npc_pool")
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/SittingBoy" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_npc")
+
+[node name="LeaningBoy" parent="InteractableDetectors" unique_id=1776361107 instance=ExtResource("remark_interactable")]
+position = Vector2(618, 504)
+lines = Array[String]([])
+loop_lines = true
+pool = ExtResource("ambient_npc_pool")
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/LeaningBoy" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_npc")
+
+[node name="CapGuy" parent="InteractableDetectors" unique_id=1776361108 instance=ExtResource("remark_interactable")]
+position = Vector2(1103, 605)
+lines = Array[String]([])
+loop_lines = true
+pool = ExtResource("ambient_npc_pool")
+group_id = ""
+first_timeline = ""
+first_line = ""
+speaker = "alice"
+
+[node name="CollisionShape2D" parent="InteractableDetectors/CapGuy" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_ti_npc")
 
 [node name="ExitAreas" type="Node2D" parent="." unique_id=767179831]
 
@@ -1970,6 +2132,17 @@ shape = SubResource("RectangleShape2D_0t0kd")
 [editable path="MiddleLayer/Player"]
 [editable path="InteractableDetectors/Tracks"]
 [editable path="InteractableDetectors/StationMap"]
+[editable path="InteractableDetectors/VendingMachine"]
+[editable path="InteractableDetectors/VendingMachine2"]
+[editable path="InteractableDetectors/TicketWindows"]
+[editable path="InteractableDetectors/StaffDoorLeft"]
+[editable path="InteractableDetectors/StaffDoorRight"]
+[editable path="InteractableDetectors/NoticeBoards"]
+[editable path="InteractableDetectors/OfficeWorker"]
+[editable path="InteractableDetectors/VendingGuy"]
+[editable path="InteractableDetectors/SittingBoy"]
+[editable path="InteractableDetectors/LeaningBoy"]
+[editable path="InteractableDetectors/CapGuy"]
 [editable path="ExitAreas/ExitToStreet"]
 [editable path="ExitAreas/ExitToStreet2"]
 [editable path="ThoughtTriggers/Metro"]

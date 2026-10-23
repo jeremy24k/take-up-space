@@ -10,17 +10,53 @@ extends Sprite2D
 @export var bob_time: float = 0.6
 
 var _base_y: float = 0.0
+## Once retired (the NPC has nothing left to say) the bubble stays hidden,
+## even after the next dialogue ends.
+var _retired: bool = false
+## True while any dialogue is on screen.
+var _in_dialogue: bool = false
+## True while something else takes its place, e.g. the "[Espacio]" prompt.
+var _suppressed: bool = false
 
 # =========================
 # Lifecycle
 # =========================
 ## Floating "..." bubble placed over NPCs Alice can talk to, so they stand out
 ## from the decorative ones. It hides while any dialogue is on screen.
+## Usually it comes inside an NpcTalkArea instead of being placed by hand.
 func _ready() -> void:
 	_base_y = position.y
 	_start_bob()
-	Dialogic.timeline_started.connect(hide)
-	Dialogic.timeline_ended.connect(show)
+	Dialogic.timeline_started.connect(_on_dialogue_started)
+	Dialogic.timeline_ended.connect(_on_dialogue_ended)
+
+# =========================
+# Placement and state
+# =========================
+## Moves the bubble after _ready without breaking the bob around its base.
+func set_base_position(new_position: Vector2) -> void:
+	position = new_position
+	_base_y = new_position.y
+
+func retire() -> void:
+	_retired = true
+	_refresh()
+
+## Hides the bubble while something else stands for it (the area's prompt).
+func set_suppressed(value: bool) -> void:
+	_suppressed = value
+	_refresh()
+
+func _on_dialogue_started() -> void:
+	_in_dialogue = true
+	_refresh()
+
+func _on_dialogue_ended() -> void:
+	_in_dialogue = false
+	_refresh()
+
+func _refresh() -> void:
+	visible = not (_retired or _in_dialogue or _suppressed)
 
 # =========================
 # Bob animation

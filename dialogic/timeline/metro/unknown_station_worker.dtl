@@ -1,7 +1,9 @@
 metro_worker: Oye... te quedaste dormida.
 [signal arg="alice_wakes_up"]
+join alice (shocked) leftmost
 alice: (despierta sobresaltada) ¡Ah!
 alice: Yo... lo siento.
+leave alice
 metro_worker: No pasa nada. Pero tienes que bajar. Es la terminal.
 alice: ¿La terminal...?
 metro_worker: Sí. Ya no sigue el tren.

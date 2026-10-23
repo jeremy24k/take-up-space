@@ -35,6 +35,9 @@ var facing: Vector2 = Vector2.DOWN
 ## When on, the owning scene freezes this NPC while Alice talks to it. Turn
 ## it off for passers-by that should keep walking as if they never noticed her.
 @export var stops_when_talked_to: bool = true
+## Animation played while it is stopped for a dialogue (e.g. the street cat's
+## "meow"). Empty = it just freezes on its current frame.
+@export var talk_animation: String = ""
 
 # =========================
 # Route configuration

@@ -54,6 +54,13 @@ apartment.tscn ──global/stairs/stairs.gd──►  metro_stations.tscn  ─�
 a propósito, como placeholder: la escena de la calle todavía no existe. Cuando la crees,
 solo hay que cambiar `next_scene_path` en esos dos nodos.
 
+**La puerta del departamento** (`outside_door.gd`) solo se abre con
+`quest_step >= 4`, es decir, después de **volver a la mochila** con los tres
+objetos (la mochila emite `step_4`). Tener auriculares, cartera y zapatos no
+alcanza: si falta la mochila, `alice_cant_leave_yet` tiene una rama propia
+("La mochila. Sigue en mi cuarto."). Antes la puerta miraba
+`has_all_prep_items()` y se podía salir sin pasar por la mochila.
+
 Todos los cambios de escena pasan por **`FadeTransition.transition_to_scene()`**
 (directo, o vía `SceneTransitionArea`/`ExitArea`, que lo llaman por dentro).
 Nunca uses `get_tree().change_scene_to_file()` a mano: te saltas el fundido.
@@ -85,7 +92,19 @@ Escucha `Dialogic.signal_event` y avanza `quest_step` con las señales
 await FadeTransition.fade_out(1.0)
 await FadeTransition.fade_in(1.0)
 await FadeTransition.transition_to_scene("res://ruta.tscn")
+await FadeTransition.transition_with_interlude("res://ruta.tscn", ["Línea 1", "Línea 2"])
 ```
+
+`transition_with_interlude` muestra unas líneas (m3x6, centradas) con la
+pantalla en negro antes de cargar la escena; Espacio salta la línea actual. La
+narración sale en lila; lo que Alice piensa se escribe entre «» y sale en
+blanco (p. ej. «Le di mi número. ¿Qué hice?»). Es
+un puente entre dos lugares para que Alice no parezca teletransportarse. La
+escalera del edificio (`Staircase` en `apartment.tscn`, propiedad
+`interlude_lines` de `stairs.gd`) lo usa para ir al metro: "La calle estaba
+más ruidosa de lo que recordaba." / "Solo hasta el metro. Nada más." Antes se
+pasaba del edificio directo al andén y el tester creyó que Alice vivía dentro
+del metro.
 
 ---
 
@@ -167,8 +186,11 @@ sin `[Espacio]` y sin mostrar etiqueta, como `ThoughtTrigger`. La escena la deja
 en `collision_layer = 0` y `collision_mask = 2`, así que solo la ve el cuerpo de
 Alice (`body_entered`) e ignora su `InteractionDetector`.
 
-1. `lock_control()` y lanza `timeline_name`, si tiene uno.
-2. Al terminar el diálogo, la hace caminar `push_distance` px en `push_direction`
+1. `lock_control()`. Si tiene `timeline_name`, lanza ese diálogo y espera a
+   que termine. Si tiene `thought_lines`, muestra un **pensamiento flotante**
+   (`ThoughtTrigger` hijo) sin esperarlo: se dispara al caminar, así que por
+   la regla de la sección 6 no debe frenar con una caja de diálogo.
+2. La hace caminar `push_distance` px en `push_direction`
    (UP/DOWN/LEFT/RIGHT, siempre **hacia dentro** del mapa) con un `Tween`.
 3. La deja mirando hacia dentro y le devuelve el control. El empujón tiene que
    sacar su cuerpo del área para que vuelva a dispararse la próxima vez.
@@ -177,8 +199,74 @@ Se repite cada vez que vuelve al borde, salvo que `one_time_interaction` esté
 activo. Emite `interacted` al empezar y `pushed_back` al terminar, por si la
 escena quiere cambiar el `timeline_name` (por ejemplo, otro texto la segunda vez).
 Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
-`CollisionShape2D` y fijar `timeline_name` y `push_direction`. En la calle, el
-timeline genérico es `street_boundary`.
+`CollisionShape2D` y fijar `thought_lines` (o `timeline_name`) y
+`push_direction`. En la calle usan las líneas "(se detiene y mira hacia atrás)
+Mejor no me alejo más." / "No conozco esta zona. Primero, la comida de Wilson."
+(antes era el timeline `street_boundary`, que se borró).
+
+### `NpcTalkArea` (`global/npcs/scenes/npc_talk_area.tscn`)
+`InteractableArea` para **cualquier personaje con el que Alice puede hablar**.
+Es una escena heredada de `interactable_area.tscn` que ya trae el globito "..."
+(`InteractionHint`), así ningún NPC que habla se queda sin él y no hay que
+colocarlo a mano.
+
+- `hint_position`: dónde flota el globito, relativo al área. Casi siempre el
+  área está corrida respecto del NPC (está donde se para Alice para hablar),
+  así que se ajusta por instancia para que quede 2 px sobre la cabeza.
+- **El globito y el "[Espacio]" se turnan:** el globito avisa de lejos que se
+  puede hablar; cuando Alice se acerca y aparece el cartel, el globito se
+  esconde (`InteractionHint.set_suppressed`, conectado al
+  `visibility_changed` del `Label`) y vuelve al alejarse. Antes salían los dos,
+  uno encima del otro.
+- Si la charla es de una sola vez (`one_time_interaction`), al usarla el
+  globito se retira (`InteractionHint.retire()`) y no vuelve.
+- La usan: los 8 NPCs de la calle, Leo, el oficinista y los dos chicos del
+  metro, el trabajador, la chica sentada y el chico de auriculares de la
+  terminal, y Wilson. La ventanilla de tickets no, porque es un objeto.
+- Ojo con los `BaseNPC`: su sprite está centrado en el nodo (no en los pies),
+  así que la cabeza queda unos 15 px más arriba del origen, no 30.
+
+### `RemarkInteractable` (`global/remark_interactable.tscn`)
+Para lo que **parece interactivo pero tiene poco que contar**: NPCs
+ambientales, puertas cerradas, la segunda máquina expendedora. Usa el mismo
+"[Espacio]" de `InteractableArea`, y al pulsar abre la **caja de Dialogic con
+una sola línea** de Alice. La línea se escribe en la escena, sin `.dtl` propio
+(se arma con `DialogicTimeline.from_text`). Antes se llamaba
+`ThoughtInteractable` y mostraba un globo, pero mezclar globos y cajas al
+pulsar Espacio resultaba confuso (ver sección 6).
+**Una caja de una línea cuesta una sola pulsación**, la de interactuar:
+- **El texto sale entero** (`[lspeed=0!]`), sin efecto de máquina de escribir.
+- **Alice puede seguir caminando** y, **al moverse, la caja se cierra.** El
+  diálogo lleva el meta `remark`, y `Player._on_dialogic_started` no la frena
+  cuando lo ve.
+- **También se cierra con Espacio**, o sola después de 3 s + 0,05 s por letra.
+- El mismo Espacio que la cierra no la vuelve a abrir (250 ms de espera).
+- Ojo: `Dialogic.start()` tarda unos frames en fijar `current_timeline`, y
+  además corre una copia del recurso. Por eso la caja se reconoce por un token
+  en su meta, y se espera a que aparezca antes de vigilarla.
+- Los diálogos con contenido (`.dtl`, `first_timeline`, `timeline_name`)
+  funcionan como siempre: frenan a Alice y se avanza con Espacio.
+
+- `lines`: las líneas propias, en orden y en bucle. Con `loop_lines = false`
+  se queda en la última.
+- `pool`: un `RemarkPool` compartido (`global/remarks/ambient_npc_pool.tres`,
+  8 frases de los NPCs). Elige al azar y nunca repite la misma dos veces
+  seguidas. Si hay pool, `lines` se ignora.
+- `group_id` + `first_timeline`: **coherencia por tipo.** Objetos que se ven
+  iguales comparten id (`vending`, `station_map`, `ad_column`). El primero
+  que Alice prueba, sea cual sea y **en cualquier escena**, abre
+  `first_timeline` (o dice `first_line`); los demás dicen sus `lines`
+  ("Otra máquina..."). Lo recuerda `GameManager.seen_object_groups`.
+- `timeline_name` (heredado) sigue funcionando: si la escena lo pone desde
+  `interacted`, Espacio abre ese diálogo en vez de la línea.
+- `speaker`: quién dice la línea (id del `.dch`, por defecto `alice`).
+- **Los NPCs ambientales no llevan el globito "..."**: ese globito
+  (`NpcTalkArea`) significa "tiene diálogo de verdad".
+
+**Regla de coherencia:** si un tipo de objeto responde en algún lugar,
+responden todos los que se ven igual. Si un tipo no tiene contenido en ningún
+lado (bancos, papeleras, plantas, farolas, grafitis, buzones, hidrantes), no
+responde ninguno.
 
 ### `AnxietyPuzzle` (`global/anxiety_puzzle/`) — el Rompecabezas de la Ansiedad
 Minijuego para los momentos en que Alice se bloquea: tiene que armar su
@@ -201,6 +289,14 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   decir pero no *cómo* ("¿Le digo la verdad... o que estoy bien?"). Y
   después de cada error, la primera palabra de cada respuesta parpadea en
   amarillo mientras las palabras se reacomodan.
+- **El reloj espera** a la primera tecla o clic del jugador, y abajo hay una
+  línea fija con los controles ("Flechas: elegir · Espacio: decir · (...):
+  callarse"). En el tercer playtest el tiempo se acababa antes de entender
+  cómo se jugaba.
+- **Ojo con el editor:** al guardar los `.tres` de los puzzles desde Godot se
+  perdieron una vez los `extra_words` (y el commit los llevó así). Si en el
+  juego no aparecen los distractores, revisa que la línea siga en el
+  archivo.
   Los bordes se cierran con una viñeta pixelada (`anxiety_vignette.gdshader`).
 - **Desde Dialogic:** la timeline emite `[signal arg="anxiety_puzzle:<id>"]`
   y después ramifica con `if {anxiety_result} == "<clave>":`. La escena
@@ -229,6 +325,9 @@ await thought_trigger.show_thought(player)
 
 Con `monitoring = false` se dispara solo desde código; si no, al entrar en el área.
 Un pensamiento nuevo cancela el anterior (contador `active_sequence_id` compartido).
+Con **`wait_for_current = true`** espera a que termine el que está en pantalla
+(`is_playing`, también compartido) en vez de cortarlo. Úsalo cuando dos
+pensamientos quedan cerca en el camino y el primero no debe perderse.
 
 **La burbuja se dibuja en pantalla, no en el mundo.** Es una `CanvasLayer`
 (capa 1) llamada `ThoughtBubble`, hija de Alice, con el `Label` dentro. Cada
@@ -238,8 +337,8 @@ mantiene dentro de los bordes de la pantalla (margen de 8 px). Así:
   tamaño solo podía subir de 3 en 3 px de pantalla (6 → 18 px, 8 → 24 px) y
   cualquier fuente un poco mayor quedaba enorme. Ahora `font_size` y
   `outline_size` del `Label` de `thought_trigger.tscn` están **en píxeles de
-  pantalla**. Fuente elegida: `m3x6.ttf` a 48 (×3), borde oscuro de 6,
-  `line_spacing = -6` y `max_width = 420`. Es más legible que `tiny.ttf` y
+  pantalla**. Fuente elegida: `m3x6.ttf` a 32 (×2; antes 48, se veía grande), borde de 10 casi negro `(0.06, 0.02, 0.1)`,
+  `line_spacing = -4` y `max_width = 420`. Es más legible que `tiny.ttf` y
   tiene minúsculas; Silkscreen se descartó porque es toda en mayúsculas y
   parecía que Alice gritaba.
 - Para que una fuente pixel se vea nítida, usa un múltiplo entero de su tamaño
@@ -300,6 +399,23 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 
 ## 6. Diálogos (Dialogic)
 
+### ¿Caja o pensamiento?
+**Regla: lo que el jugador activa con Espacio abre la caja de Dialogic. Lo que
+pasa solo, al caminar, es un pensamiento flotante.** El jugador lo entiende sin
+pensarlo, y como los globos son escasos, mantienen su fuerza.
+- **En la caja, la longitud marca la importancia.** Una línea es un descarte
+  ("Cerrado.", "Mejor no molesto.", con `RemarkInteractable`); varias líneas
+  o una elección son contenido (un `.dtl` propio).
+- **Pensamientos flotantes** (`ThoughtTrigger`): solo lo espontáneo, como el
+  aviso del cruce, "¿Ese es el cajero?" o los bordes del mapa
+  (`BoundaryArea.thought_lines`). Nunca frenan al jugador.
+- **Interludio en negro** (`FadeTransition.transition_with_interlude`): solo
+  para saltos de lugar o de tiempo.
+- **Ilustraciones:** solo dentro de la caja, en los quiebres emocionales.
+- Se probó otra regla, la de "si aporta a la historia, caja; si es suelto,
+  globo", y se descartó: desde afuera parecía arbitrario que algunas cosas se
+  leyeran en un lugar y otras en otro, y los globos se leían peor.
+
 - Personajes en `dialogic/characters/*.dch`, diálogos en `dialogic/timeline/**/*.dtl`
 - Se lanzan con `Dialogic.start("identificador")`
 - **Formato de línea:** siempre `personaje: texto`, con el identificador del
@@ -327,6 +443,13 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 > nombre del archivo pelado (`unknown_station_worker`) y solo añade el prefijo de
 > carpeta si hay colisión (`metro/ticket_store`). Mira siempre `dtl_directory`
 > en `project.godot` para saber el nombre real.
+> Si borras un `.dtl` y lo vuelves a crear o restaurar, Dialogic lo registra
+> de nuevo **con el nombre corto** (`test_tv` en vez de `apartment/test_tv`), y
+> la escena que lo llamaba por el nombre viejo da "There was an error loading
+> this timeline". Después de restaurar, revisa `dtl_directory` y **cambia la
+> escena al nombre nuevo**. No corrijas `project.godot` a mano con el editor
+> abierto: el editor guarda su copia en memoria y lo vuelve a pisar. Así
+> quedaron `test_tv`, `rotten_food` y `elevator` en la casa.
 
 **Comunicación diálogo → juego:** el evento `[signal arg="lo_que_sea"]` llega a
 `Dialogic.signal_event`. `GameManager`, `pickable_item`, `lamp_interactable` y
@@ -335,6 +458,60 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 > **⚠️ `Dialogic.timeline_ended` es global**, no por diálogo. Conéctate siempre
 > con `CONNECT_ONE_SHOT` o comprobando cuál terminó, o cualquier diálogo
 > disparará tu callback.
+
+### Ilustraciones de Alice (retratos)
+
+Las ilustraciones de Alice son retratos de Dialogic en `alice.dch`. **Solo se
+muestran en momentos de quiebre emocional**, no en cada línea: como mucho una por
+escena y dos o tres cambios de expresión por conversación. Dentro de los
+pensamientos flotantes (`ThoughtTrigger`) y de los interludios en negro de
+`FadeTransition` no van.
+
+- **Archivos:** `dialogic/portraits/alice/alice_<expresión>.png`. Es la única
+  excepción a la regla "todo en `.aseprite`", porque son ilustraciones en alta
+  resolución, no pixel art. Los originales (2000×3000) no entran en el proyecto:
+  se recortan de la cabeza a un poco más arriba de las rodillas y se reducen a
+  **unos 640 px de alto**. La imagen queda casi a tamaño real en pantalla y el
+  filtro nearest del proyecto no la deforma.
+- **En `alice.dch`** cada retrato tiene `scale: 0.832` (640/768 de alto de
+  pantalla, porque el contenedor escala por altura) y `offset: (40, 0)`.
+- **En el timeline:** `join alice (nervous) leftmost` antes de la línea, y
+  `leave alice` cuando pasa el momento. Para cambiar de expresión sin salir,
+  usa `update alice (worried)`. Siempre en `leftmost`: en otras posiciones la
+  ilustración tapa el cuadro de texto. Un `join alice` sin expresión usa
+  `default_portrait` (`nervous`), así que no dejes joins sueltos.
+- **Expresiones** (archivo original → id): Nervious → `nervous`, Neutral →
+  `neutral`, Worried → `worried`, Scare → `scared`, Shocked → `shocked`,
+  Chill_Relax → `relaxed`.
+- **Dónde aparecen hoy:**
+
+  | Timeline | Momento | Expresión |
+  |---|---|---|
+  | `apartment/room_desk` (sin quest) | la mañana, el café | `relaxed` |
+  | `apartment/wilson_plate` (paso 0) | el plato vacío: molestia, no pánico | `worried` |
+  | `apartment/kitchen` (paso 1) | la nevera vacía | `nervous` |
+  | `apartment/room_desk` (paso 2) | no hay delivery → tiene que salir → "Por ti lo haré" | `shocked` → `worried` → `neutral` |
+  | `apartment/alice_backpack` | le faltan auriculares, cartera, zapatos | `nervous` |
+  | | ya tiene todo: "Ojalá me emocionara" → "Lo voy a hacer" | `worried` → `neutral` |
+  | `apartment/alice_headphones` | los encuentra | `neutral` |
+  | `apartment/alice_shoes` | "sonríe a pesar de todo" | `relaxed` |
+  | `apartment/bathroom_glass` | las ojeras → "Nadie va a mirarte tan de cerca" | `scared` → `nervous` |
+  | `apartment/bathtub` | el patito de hule | `relaxed` |
+  | `apartment/wilson_stay_home` | en la puerta, deja a Wilson | `worried` |
+  | `unknown_station_worker` | se despierta sobresaltada ("¡Ah!") | `shocked` |
+  | `unknown_station_lost_phone` | "Esta no es mi parada" → "No, no, no..." → "Genial, Alice" | `worried` → `scared` → `worried` |
+  | `unknown_station_worker_dismissive` | "Nada... perdón" / "Qué vergüenza" | `nervous` |
+  | `leo_store_greeting` | se queda paralizada en la puerta | `nervous` |
+  | `leo_store_checkout` | "E-eh... hola" (sale antes del rompecabezas) | `nervous` |
+  | | rama verdad: "Para mi gato. Wilson." | `neutral` |
+  | | rama mentira: "se queda en blanco" → "me perdí" | `shocked` → `nervous` |
+  | | alivio por el camino → "no sabe el nombre de su calle" | `relaxed` → `nervous` |
+  | | Leo le da el número sin que ella lo pida: "¿En serio?" | `shocked` |
+  | | le da su número habiéndolo pedido: "con número incluido. Me gusta." | `relaxed` |
+
+  Antes de cada `[signal arg="anxiety_puzzle:..."]` va un `leave alice`: el
+  rompecabezas es un `CanvasLayer` (capa 2) encima de Dialogic (capa 1), y la
+  ilustración quedaría debajo de la nube de palabras.
 
 ---
 
@@ -377,6 +554,14 @@ desaparecen con **Project → Reload Current Project**.
 
 `metro_train_interior.tscn` se usa **dos veces sin recargarse**: el mismo nodo se
 transforma en sitio, así Alice nunca se mueve del asiento.
+
+**Alice vive en `Train/NPCS`**, el contenedor con y-sort de los pasajeros y
+el trabajador, para ordenarse contra ellos. Antes era hija directa de la raíz,
+que no tiene y-sort, y como el tren se dibuja antes, el trabajador siempre
+quedaba debajo de ella aunque pasara por delante. `_empty_the_car()` salta a
+Alice igual que al trabajador. El trabajador llega con `approach_offset =
+(-26, 6)`: se frena un poco más allá de Alice (antes −14, se le encimaba) y
+6 px más abajo, en el pasillo, para dibujarse delante de ella sentada.
 
 ```
 _setup_boarding_mode()      tren en marcha, pasajeros, asientos activos,
@@ -486,9 +671,17 @@ func _on_worker_area_entered(area: Area2D) -> void:
 Mismo patrón que la estación de salida (`TicketStore`/`ImportantMan` en
 `metro_stations.tscn`): instancias sueltas de `interactable_area.tscn` con
 `timeline_name`, sin script propio. Cada uno es una línea o dos de Alice sola,
-tono bajo, nada de escena — actualmente: `SittingGirl`,
-`ListeningGuy`, `Tracks`, `StationMap`, `Bench`, `VendingMachine`. Se han ido
-añadiendo y descartando por lotes; si faltan o sobran, es a propósito.
+tono bajo, nada de escena. Con Dialogic: `SittingGirl`, `ListeningGuy` y
+`Tracks`. Con `RemarkInteractable` (ver sección 5):
+- **Máquinas** `VendingMachine` (roja y azul) y `VendingMachine2` (verde y
+  azul), grupo `vending`. **Mapas** `StationMap` y `StationMap2`, grupo
+  `station_map`. Las áreas de los mapas bajan hasta y≈592: el mapa está
+  encerrado por bancos y antes no se podía alcanzar.
+- `TicketWindows`, `StaffDoorLeft`/`StaffDoorRight` y `NoticeBoards`.
+- **NPCs sin diálogo:** `OfficeWorker` y `VendingGuy` con línea propia;
+  `SittingBoy`, `LeaningBoy` y `CapGuy` con el pool.
+- **Los bancos no responden**, en ninguna escena. Se quitó `Bench` y su
+  timeline `unknown_station_bench`.
 
 ### El `ThoughtTrigger` "Metro"
 Sigue existiendo un `ThoughtTrigger` en esta escena (grupo `ThoughtTriggers`),
@@ -570,7 +763,7 @@ porque esos van en su propio `CanvasLayer`.
 
 ### Límites del mapa (`MapBoundaries`)
 Cinco `BoundaryArea` en franjas pegadas al borde del mapa (1280×768), por
-dentro, todas con el timeline `street_boundary`: `BoundaryLeft`, `BoundaryRight`,
+dentro, todas con el mismo pensamiento (ver `BoundaryArea`): `BoundaryLeft`, `BoundaryRight`,
 `BoundaryTop`, `BoundaryBottomLeft` y `BoundaryBottomRight`. Las de abajo están
 separadas porque Alice se para en y=744 a la izquierda de la calzada y en y=760
 a la derecha. Cada franja cubre el punto donde se para Alice, para que su cuerpo
@@ -617,6 +810,22 @@ Si se mueve un área, mantener las dos reglas.
   **desactivado**: siguen caminando como si no notaran a Alice, y su
   `InteractableArea` se va con ellos. Por eso el cartel "[Espacio]" solo
   aparece mientras el peatón pasa cerca de Alice, y hay que hablarle al vuelo.
+- **`WalkingNPC.talk_animation`**: animación que se reproduce mientras está
+  frenado por un diálogo. El sprite pasa a `PROCESS_MODE_ALWAYS` para seguir
+  animándose aunque el NPC esté congelado, y al terminar vuelve a la
+  animación que tenía.
+- **El gato de la calle** (`MiddleLayer/NPCS/StreetCat`): un `WalkingNPC` que
+  va y viene por la vereda frente al edificio rojo, al lado de la salida del
+  metro (`PedestrianRoutes/StreetCat`, x 290–480, y 1014), así Alice lo cruza
+  enseguida. Se frena al hablarle y maúlla (`talk_animation = "meow"`).
+  `street_cat` le recuerda a Wilson ("Tienes la misma cara que pone Wilson
+  cuando quiere algo"); las veces siguientes, `street_cat_again`, una línea
+  corta (`_on_cat_interacted` en `street_zone_1.gd`). El sprite,
+  `global/npcs/assets/street_cat.aseprite`, se recortó de la hoja "cat 16x16
+  with text" del Free pack (celdas de 32×32 desde x=80): `idle_front` (cuadros
+  de frente de la fila de descanso, sin los que se da vuelta), `walk_side`
+  (fila "walk right", 8 cuadros) y `meow` (fila "meow sit"). El cuerpo del
+  gato termina en la fila 24 de la celda, por eso el `offset` es (0, −8).
 - **Arte de los peatones:** cada uno tiene su propio `.aseprite` en
   `global/npcs/assets/`, por ejemplo `pedestrian_red_cap.aseprite`. Se importa con el
   importador **"Aseprite SpriteFrames"** de AsepriteWizard, así que cada etiqueta
@@ -642,7 +851,16 @@ Si se mueve un área, mantener las dos reglas.
 Mismo patrón que la estación desconocida:
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
   al pasar: `Arrival` en el punto de inicio de Alice, `FirstCrossing`,
-  `Houses` y `ShoppingBlock`. `ShoppingBlock` está en la vereda, junto a la
+  `Houses` y `ShoppingBlock`.
+- **`FirstCrossing` explica la regla del mapa: solo se cruza por los pasos de
+  cebra** ("(mira la calle) Mejor cruzo solo por los pasos de cebra.", y
+  después "Hay muy poca gente..."). Está en x=540, en la columna del café, por
+  donde pasan todos los caminos hacia la primera esquina. Antes estaba en
+  x=777, pegado al borde, y aparecía cuando Alice ya había chocado con la calle.
+  Tiene `wait_for_current`, así que no corta `Arrival`. Para que el aviso salga
+  unos 2,5 s antes de la esquina caminando derecho (a 100 px/s), `Arrival` se
+  redujo a una sola línea (`display_duration` 3,0). Antes eran 4 líneas y unos
+  13 s, y tapaba todo el trayecto hasta la esquina. `ShoppingBlock` está en la vereda, junto a la
   panadería, y cierra el desvío: "(mira las vidrieras) Una panadería,
   discos... Nada para gatos.". Antes decía "Esto es una zona de tiendas. Por
   aquí tiene que haber algo.", y en los dos playtests hizo creer que la tienda
@@ -651,6 +869,20 @@ Mismo patrón que la estación desconocida:
 - **`InteractableDetectors`:** además de los diálogos de los NPCs fijos, objetos
   clave para la historia (`Shop`, `BakeryDoor`, `ATM`, `Payphone`,
   `SubwayEntrance`, `GlassTower`), cada uno con su `street_*.dtl`.
+- **`RemarkInteractable` en la calle** (ver sección 5):
+  - `VendingMachines` (grupo `vending`, compartido con la estación).
+  - `AdColumn` y `AdColumn2`, la que está junto a la tienda de Leo (grupo
+    `ad_column`).
+  - Puertas de tiendas sin contenido, "Aquí no venden comida para gatos.":
+    `PizzaDoor`, `VinylDoor`, `CafeDoor` (junto al inicio) y `CafeDoorNorth`
+    (junto a Leo).
+  - Casas y edificios, "No es mi casa.": `HouseDoorGreen`/`Grey`,
+    `HouseDoorNorth1`–`3`, `BuildingDoorNorthwest`, `BuildingDoorWest`.
+    `ATMBuildingDoor` dice "Cerrado.".
+  - NPCs sin diálogo: `NewspaperReader` y `VinylBrowser` con línea propia,
+    `BenchSitter` con el pool.
+  - Las dos bocas del metro ya las cubre la misma área `SubwayEntrance`
+    (89×109).
 - **La torre de vidrio es una interacción, no un pensamiento.** Antes era un
   `ThoughtTrigger`, pero el jugador seguía caminando y el momento de
   "admirarla" pasaba desapercibido. Ahora `GlassTower` está frente a la puerta
@@ -689,11 +921,11 @@ Mismo patrón que la estación desconocida:
   - Es un `Sprite2D` con un "..." dibujado en `interaction_hint.aseprite`
     (13×9). Flota 2 px arriba y abajo, redondeado a píxeles enteros, y se
     esconde mientras haya cualquier diálogo en pantalla.
-  - Se pone como hijo del NPC, en (0, -38) sobre los pies. En la calle lo
-    tienen los 8 NPCs que hablan: oficinista, estudiante, chico de
+  - Ya no se pone a mano: viene dentro de `NpcTalkArea` (sección 5). En la
+    calle lo tienen los 8 NPCs que hablan: oficinista, estudiante, chico de
     auriculares, chica del teléfono, repartidor, abuela y los dos peatones.
   - Sirve para que se distingan de la gente que es decorado. Un NPC nuevo con
-    diálogo tiene que llevarlo; uno de ambiente, no.
+    diálogo usa `NpcTalkArea`; uno de ambiente, no lleva área.
 
 ### Pistas hacia la tienda de Leo
 La tienda de Leo no se ve desde el inicio. La idea es que el jugador la
@@ -707,7 +939,7 @@ frutas** del escaparate de Leo.
 |---|---|---|---|
 | `PetsShopDoor` | Puerta de la tienda PETS, arriba de la panadería | Falsa: "Cerrado por reformas." | `street_pets_closed` |
 | `BrokenPayphone` | Segunda cabina, junto al señor del diario | Falsa: "(levanta el auricular) ... No hay tono." La otra cabina (`Payphone`) tiene el diálogo de "Ni siquiera el mío". | `street_payphone_broken` |
-| `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` |
+| `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` (grupo `vending`) |
 | `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | A medias: lleva latas de comida para gatos | `street_grandma` |
 | `BusStopMap` | Mapa de rutas de la parada | A medias: "Hay tiendas pasando la torre." | `street_bus_stop` |
 | `PhoneGirl` | Chica del teléfono (ya existía) | Buena e incompleta: oye "el almacén ese, el de la torre" | `street_phone_girl` |
@@ -771,10 +1003,10 @@ primera conversación con Leo**, la escena "Escena Leo" del Twine
 LeoStore (Node2D, y_sort)               leo_store.gd
 ├── InferiorLayer / MiddleLayer / SuperiorLayer   el tileado de la tienda
 │   └── MiddleLayer/NPCS/Leo   StaticBody2D: AnimatedSprite2D (leo_npc.aseprite)
-│                               + colisión en los pies + InteractionHint
+│                               + colisión en los pies
 ├── CounterCollision           StaticBody2D: bloque de las dos cajas y baranda
 ├── InteractableDetectors
-│   ├── LeoCounter             "[Espacio] Hablar", delante de la caja de arriba
+│   ├── LeoCounter             NpcTalkArea "[Espacio] Hablar" (su burbuja va sobre Leo)
 │   ├── TunaShelf              la góndola de arriba a la izquierda: ahí está el atún
 │   ├── DrinksShelf, PantryShelf, CannedShelf, SnacksShelf, CleaningShelf
 │   │                          las otras cinco góndolas: Alice busca y no encuentra
@@ -819,15 +1051,23 @@ LeoStore (Node2D, y_sort)               leo_store.gd
 5. **La salida.** Al terminar la charla, `ExitToStreet` queda bloqueada
    (`is_locked`). Al intentar salir, `blocked_interaction` dispara
    `leo_store_farewell` ("Oye, Alice", dos variantes) y al cerrarse se pasa a
-   `scenes/demo_end/demo_end.tscn`.
-6. **`demo_end.tscn`**: pantalla negra con `leo_store_reflection` (dos
-   variantes según si le dio su número) y después "Continuará...", porque la
-   escena de Lía todavía no existe.
+   `scenes/demo_end/demo_end.tscn`. Leo solo nombra a Wilson si Alice se lo
+   dijo (rama de la verdad o al pedirle el número, señal `leo_knows_wilson`);
+   si no, dice "tu gato".
+6. **La reflexión y `demo_end.tscn`**: al salir, `_leave_store` usa
+   `FadeTransition.transition_with_interlude` (la misma pieza que la escalera
+   al metro) para contar, con la pantalla en negro, cómo Alice sale a la calle.
+   Hay dos versiones según si le dio su número (`REFLECTION_GAVE_NUMBER` /
+   `REFLECTION_KEPT_NUMBER`) y un cierre común (`REFLECTION_END`). Antes era
+   una timeline de Dialogic (`leo_store_reflection`, borrada) con la caja de
+   diálogo sobre negro. `demo_end.tscn` solo muestra "Continuará..." y
+   "[Espacio] Salir", que cierra el juego (la salida se habilita cuando
+   termina de aparecer el título, para que un Espacio de más no lo cierre).
 
 ### Estado en `GameManager`
 `leo_greeted`, `leo_has_tuna`, `leo_talk_done`, `leo_confidence` (la
 "confidence" del Twine, guardada para escenas futuras),
-`leo_alice_took_initiative`, `leo_gave_number` y el objeto `leo_number` en
+`leo_alice_took_initiative`, `leo_gave_number`, `leo_knows_wilson` y el objeto `leo_number` en
 `collected_items`. Se actualizan con señales de Dialogic (`leo_greeted`,
 `leo_tuna_taken`, `leo_took_initiative`, `leo_number`, `leo_gave_number`,
 `leo_talk_done` y `leo_confidence:<n>`). Si Alice sale a la calle antes de
@@ -850,10 +1090,11 @@ hablar y vuelve, la escena sigue desde donde quedó y no repite el saludo.
   Alice salió justamente a comprar la comida.
 
 ### Medidas y colisiones
-- **Alice** arranca en (591, 504). **`ExitToStreet`** está en (593, 524) con
+- **Alice** arranca en (591, 504). La cámara baja hasta y=600 (antes 552)
+  para que, en la puerta, Alice quede por encima de la caja de diálogo. **`ExitToStreet`** está en (593, 524) con
   32×24: más abajo el detector de Alice ya no llega, porque la colisión de la
   entrada la frena en y≈505.
-- La cámara está limitada a 314–774 × 185–552.
+- La cámara está limitada a 314–774 × 185–600.
 - Leo está en (730, 466), detrás de la caja de abajo, y `LeoCounter` en
   (703, 450).
 - **Los mostradores y la baranda no tienen colisión en el tileset** (las
@@ -869,6 +1110,8 @@ hablar y vuelve, la escena sigue desde donde quedó y no repite el saludo.
   forma y de cartel de los hijos de cada instancia (ya pasó una vez con
   `LeoCounter` y `TunaShelf`). Si agregas otra área instanciada, márcala con
   "Hijos editables".
+- Los carteles "[Espacio] Buscar" van centrados sobre su góndola (offset
+  −7/7). Puestos encima del estante parecían de la góndola de arriba.
 
 ### Y-sort de los muebles
 Góndolas, heladeras, frutas, freezers y la maceta están en

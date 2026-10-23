@@ -16,8 +16,8 @@
 [ext_resource type="Texture2D" uid="uid://27cyc8vi7hms" path="res://scenes/prologue_scene/assets/dual_collisions.aseprite" id="11_j5itg"]
 [ext_resource type="Script" uid="uid://du2mvrlef050e" path="res://scenes/leo_store_scene/scenes/leo_store.gd" id="12_script"]
 [ext_resource type="SpriteFrames" uid="uid://cbrgrq860b71m" path="res://global/npcs/assets/leo_npc.aseprite" id="13_leo"]
-[ext_resource type="PackedScene" path="res://global/interaction_hint.tscn" id="14_hint"]
 [ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="15_thought"]
+[ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jw86w"]
 texture = ExtResource("1_a7ra0")
@@ -1558,8 +1558,6 @@ offset = Vector2(0, -16)
 position = Vector2(0, -3)
 shape = SubResource("RectangleShape2D_leo_body")
 
-[node name="InteractionHint" parent="MiddleLayer/NPCS/Leo" unique_id=1216094279 instance=ExtResource("14_hint")]
-
 [node name="Player" parent="MiddleLayer" unique_id=800475352 instance=ExtResource("1_player")]
 position = Vector2(592, 518)
 metadata/_edit_group_ = true
@@ -1568,7 +1566,7 @@ metadata/_edit_group_ = true
 limit_left = 314
 limit_top = 185
 limit_right = 774
-limit_bottom = 552
+limit_bottom = 600
 limit_smoothed = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/Player" index="1" unique_id=1954972618]
@@ -1619,8 +1617,9 @@ prompt_text = "[Espacio] Salir"
 [node name="CollisionShape2D" parent="InteractableDetectors/ExitToStreet" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_exit")
 
-[node name="LeoCounter" parent="InteractableDetectors" unique_id=1590630069 instance=ExtResource("2_interact")]
+[node name="LeoCounter" parent="InteractableDetectors" unique_id=1590630069 instance=ExtResource("npc_talk_area")]
 position = Vector2(703, 450)
+hint_position = Vector2(27, -21)
 timeline_name = "leo_store_counter_early"
 prompt_text = "[Espacio] Hablar"
 
@@ -1636,8 +1635,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_tuna_shelf")
 
 [node name="Label" parent="InteractableDetectors/TunaShelf" index="1" unique_id=1384165053]
-offset_top = -41.0
-offset_bottom = -27.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="DrinksShelf" parent="InteractableDetectors" unique_id=1210097407 instance=ExtResource("2_interact")]
 position = Vector2(504, 257)
@@ -1648,8 +1647,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_shelf_long")
 
 [node name="Label" parent="InteractableDetectors/DrinksShelf" index="1" unique_id=1384165053]
-offset_top = -41.0
-offset_bottom = -27.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="PantryShelf" parent="InteractableDetectors" unique_id=1956461158 instance=ExtResource("2_interact")]
 position = Vector2(408, 329)
@@ -1660,8 +1659,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_shelf_group")
 
 [node name="Label" parent="InteractableDetectors/PantryShelf" index="1" unique_id=1384165053]
-offset_top = -40.0
-offset_bottom = -26.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="CannedShelf" parent="InteractableDetectors" unique_id=594619662 instance=ExtResource("2_interact")]
 position = Vector2(528, 329)
@@ -1672,8 +1671,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_shelf_group")
 
 [node name="Label" parent="InteractableDetectors/CannedShelf" index="1" unique_id=1384165053]
-offset_top = -40.0
-offset_bottom = -26.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="SnacksShelf" parent="InteractableDetectors" unique_id=1140698036 instance=ExtResource("2_interact")]
 position = Vector2(408, 409)
@@ -1684,8 +1683,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_shelf_group")
 
 [node name="Label" parent="InteractableDetectors/SnacksShelf" index="1" unique_id=1384165053]
-offset_top = -40.0
-offset_bottom = -26.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="CleaningShelf" parent="InteractableDetectors" unique_id=869890339 instance=ExtResource("2_interact")]
 position = Vector2(536, 409)
@@ -1696,8 +1695,8 @@ prompt_text = "[Espacio] Buscar"
 shape = SubResource("RectangleShape2D_shelf_group")
 
 [node name="Label" parent="InteractableDetectors/CleaningShelf" index="1" unique_id=1384165053]
-offset_top = -40.0
-offset_bottom = -26.0
+offset_top = -28.0
+offset_bottom = -14.0
 
 [node name="FruitCrates" parent="InteractableDetectors" unique_id=1563820131 instance=ExtResource("2_interact")]
 position = Vector2(688, 269)
@@ -1721,6 +1720,7 @@ thought_lines = Array[String](["¿Ese es el cajero?...", "...es muy lindo.", "¿
 [node name="CollisionShape2D" parent="ThoughtTriggers/CrushThought" index="0" unique_id=1377474002]
 position = Vector2(0, 25.5)
 shape = SubResource("RectangleShape2D_crush_line")
+
 
 [editable path="MiddleLayer/Player"]
 [editable path="InteractableDetectors/ExitToStreet"]

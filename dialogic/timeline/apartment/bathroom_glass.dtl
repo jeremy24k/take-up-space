@@ -1,6 +1,9 @@
 alice: (se acerca al espejo del lavamanos, mira su reflejo) Hola, Alice.
+join alice (scared) leftmost
 alice: (se inclina un poco más, como si buscara algo en su rostro) Tienes ojeras.
 alice: Otra vez.
 alice: (se endereza y se arregla un mechón de pelo) No dormiste bien, ¿verdad?
+update alice (nervous)
 alice: (suspira) Bueno. Nadie va a mirarte tan de cerca hoy.
 alice: O al menos eso espero.
+leave alice

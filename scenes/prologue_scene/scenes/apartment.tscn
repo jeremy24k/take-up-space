@@ -2218,6 +2218,7 @@ rendering_quadrant_size = 8
 [node name="Staircase" parent="InferiorLayer" unique_id=922436665 instance=ExtResource("22_o7fgy")]
 position = Vector2(288, 288)
 first_step_vector = Vector2(-48, 0)
+interlude_lines = ["Alice cierra la puerta de su edificio.", "El aire de la mañana le golpea la cara. Hace frío.", "Camina rápido. No quiere cruzarse con nadie.", "Las escaleras del metro aparecen al final de la calle. "]
 
 [node name="MiddleLayer" type="TileMapLayer" parent="." unique_id=801410126]
 y_sort_enabled = true
@@ -2320,7 +2321,8 @@ position = Vector2(816, 624)
 script = ExtResource("19_eoq23")
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("13_558lm")]
-position = Vector2(915, 185)
+position = Vector2(916, 190)
+metadata/_edit_group_ = true
 
 [node name="Camera2D" parent="MiddleLayer/Player" index="0" unique_id=1567288049]
 limit_left = 122
@@ -2332,6 +2334,9 @@ limit_smoothed = true
 [node name="Wilson" parent="MiddleLayer" unique_id=114129672 node_paths=PackedStringArray("target") instance=ExtResource("13_5vslr")]
 position = Vector2(890, 237)
 target = NodePath("../Player")
+
+[node name="WilsonArea" parent="MiddleLayer/Wilson" index="3" unique_id=444772387]
+hint_position = Vector2(0, -22)
 
 [node name="SuperiorLayer" type="TileMapLayer" parent="." unique_id=1472274550]
 z_index = 1
@@ -2471,7 +2476,7 @@ metadata/_edit_lock_ = true
 [node name="InteractableDetectors" type="Node2D" parent="." unique_id=42133056]
 z_index = 3
 
-[node name="Fridge" parent="InteractableDetectors" unique_id=444772387 instance=ExtResource("14_04dmc")]
+[node name="Fridge" parent="InteractableDetectors" unique_id=1279733285 instance=ExtResource("14_04dmc")]
 position = Vector2(684, 416)
 timeline_name = "apartment/kitchen"
 
@@ -2494,7 +2499,7 @@ shape = SubResource("RectangleShape2D_4e15o")
 
 [node name="AreaTv" parent="InteractableDetectors" unique_id=1872889908 instance=ExtResource("14_04dmc")]
 position = Vector2(895, 366)
-timeline_name = "apartment/test_tv"
+timeline_name = "test_tv"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/AreaTv" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_04dmc")
@@ -2540,7 +2545,7 @@ shape = SubResource("RectangleShape2D_jfolc")
 
 [node name="RottenFood" parent="InteractableDetectors" unique_id=560218219 instance=ExtResource("14_04dmc")]
 position = Vector2(793, 448)
-timeline_name = "apartment/rotten_food"
+timeline_name = "rotten_food"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/RottenFood" index="0" unique_id=1198806918]
 position = Vector2(-1, 0.5)
@@ -2585,7 +2590,7 @@ shape = SubResource("RectangleShape2D_8qlxh")
 
 [node name="Elevator" parent="InteractableDetectors" unique_id=1282061172 instance=ExtResource("14_04dmc")]
 position = Vector2(224, 645)
-timeline_name = "apartment/elevator"
+timeline_name = "elevator"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/Elevator" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_i3bya")
@@ -2605,6 +2610,8 @@ carve_navigation_mesh = true
 [editable path="MiddleLayer/AssetsLayerSuperior/PickableItems/AliceHeadphones"]
 [editable path="MiddleLayer/AssetsLayerSuperior/PickableItems/AliceShoes"]
 [editable path="MiddleLayer/Player"]
+[editable path="MiddleLayer/Wilson"]
+[editable path="MiddleLayer/Wilson/WilsonArea"]
 [editable path="InteractableDetectors/ConsoleControl"]
 [editable path="InteractableDetectors/AreaLaptop"]
 [editable path="InteractableDetectors/AreaTv"]

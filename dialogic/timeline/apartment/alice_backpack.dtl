@@ -2,12 +2,14 @@ if {GameManager.quest_step} == 3.0:
 	if GameManager.has_all_prep_items() == false:
 		if GameManager.prep_items_unlocked == false:
 			alice: Mochila... lista.
+			join alice (nervous) leftmost
 			alice: (revisa el interior) Auriculares... no están.
 			alice: Cartera... no está.
 			alice: (mira sus pies descalzos) Zapatos... tampoco.
 			alice: Voy a tener que buscarlos.
 			alice: Los auriculares suelen estar en mi habitación... La cartera, por la cocina...
 			alice: Y los zapatos...[pause=0.8] Ahora que lo pienso... no sé dónde están.
+			leave alice
 			alice: Bueno. Empezaré a buscar.
 			[signal arg="prep_items_unlocked"]
 		else:
@@ -20,10 +22,13 @@ if {GameManager.quest_step} == 3.0:
 				alice: ...los zapatos.
 	else:
 		alice: Al fin tengo todo. Ok... es hora de irme.
+		join alice (worried) leftmost
 		alice: Ojalá me emocionara.
 		alice: Quizás, si espero un poco...
 		(Wilson maúlla, impaciente.)
+		update alice (neutral)
 		alice: No. Wilson me necesita. Lo voy a hacer.
+		leave alice
 		[signal arg="item_picked:alice_backpack"]
 		[signal arg="step_4"]
 else:

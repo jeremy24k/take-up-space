@@ -40,6 +40,21 @@ func has_any_clue(clue_ids: Array[String]) -> bool:
 	return false
 
 # =========================
+# Seen object types
+# =========================
+# RemarkInteractable group ids (e.g. "vending") Alice has already looked at,
+# in any scene. The first one of a type gets its full scene, the rest a
+# one-line remark ("Otra máquina...").
+var seen_object_groups: Array[String] = []
+
+func has_seen_group(group_id: String) -> bool:
+	return seen_object_groups.has(group_id)
+
+func mark_group_seen(group_id: String) -> void:
+	if not seen_object_groups.has(group_id):
+		seen_object_groups.append(group_id)
+
+# =========================
 # Leo's store
 # =========================
 var leo_greeted: bool = false
@@ -52,6 +67,8 @@ var leo_confidence: int = 0
 var leo_alice_took_initiative: bool = false
 ## True if Alice gave Leo her own number.
 var leo_gave_number: bool = false
+## True once Alice told Leo her cat is called Wilson.
+var leo_knows_wilson: bool = false
 
 # Emitted every time the quest step changes.
 signal quest_step_changed(new_step: int)
@@ -93,6 +110,8 @@ func _on_dialogic_signal(argument: String) -> void:
 			add_item("leo_number")
 		"leo_gave_number":
 			leo_gave_number = true
+		"leo_knows_wilson":
+			leo_knows_wilson = true
 		"leo_talk_done":
 			leo_talk_done = true
 		_:

@@ -5,6 +5,26 @@ extends Node2D
 # =========================
 ## Shown after Alice leaves the store at the end of the conversation.
 const DEMO_END_SCENE := "res://scenes/demo_end/demo_end.tscn"
+## Her walk out of the store, told on the black screen of the transition
+## (FadeTransition interlude; lines between «» are her thoughts).
+const REFLECTION_GAVE_NUMBER: PackedStringArray = [
+	"Afuera, la calle sigue siendo desconocida. Pero Alice sabe hacia dónde ir.",
+	"Aprieta el ticket con el número de Leo.",
+	"«Le di mi número. ¿Qué hice?»",
+	"Siente una mezcla de pánico y algo que no sabe nombrar.",
+	"Pero sonríe. Nadie la ve, pero sonríe.",
+]
+const REFLECTION_KEPT_NUMBER: PackedStringArray = [
+	"Afuera, la calle sigue siendo desconocida. Pero Alice sabe hacia dónde ir.",
+	"Mira el ticket con el número de Leo.",
+	"«No me atreví a darle el mío.»",
+	"Siente un pequeño peso en el pecho. Pero también que hizo algo que nunca había hecho antes.",
+	"«La próxima vez.»",
+]
+const REFLECTION_END: PackedStringArray = [
+	"Guarda el papel con cuidado en la mochila y camina hacia la plaza, como Leo le indicó.",
+	"Está un poco menos perdida que antes. Pero todavía no está en casa.",
+]
 ## Time to let the fade-in finish before Leo greets her.
 const GREETING_DELAY: float = 1.0
 ## Leo's normal pose: looking at his counter. He only faces the door to wave.
@@ -154,4 +174,6 @@ func _on_exit_blocked() -> void:
 
 func _leave_store() -> void:
 	player.lock_control()
-	FadeTransition.transition_to_scene(DEMO_END_SCENE, exit_to_street.fade_duration)
+	var reflection := REFLECTION_GAVE_NUMBER if GameManager.leo_gave_number else REFLECTION_KEPT_NUMBER
+	FadeTransition.transition_with_interlude(DEMO_END_SCENE, reflection + REFLECTION_END,
+		exit_to_street.fade_duration)

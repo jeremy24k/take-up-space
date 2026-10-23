@@ -1,9 +1,13 @@
 alice: (mira a su alrededor) ¿Eh...?
+join alice (worried) leftmost
 alice: (observa la estación) Esta no es mi parada...
 alice: (busca en sus bolsillos) Mi teléfono...
 [signal arg="no_phone"]
+update alice (scared)
 alice: No.[pause=0.5] No, no, no...
 alice: (mira hacia las vías) Se fue.
 alice: Lo dejé en el tren.
+update alice (worried)
 alice: ...[pause=0.8] Genial, Alice.
 alice: ¿Y ahora qué hago?
+leave alice

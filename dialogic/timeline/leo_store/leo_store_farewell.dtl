@@ -5,7 +5,10 @@ else:
 leo: Oye, Alice.
 alice: (se gira)
 if {GameManager.leo_gave_number}:
-	leo: Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia.
+	if {GameManager.leo_knows_wilson}:
+		leo: Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia.
+	else:
+		leo: Que no se te pierda el número, ¿sí? Por si tu gato tiene otra emergencia.
 	(Leo sonríe.)
 	alice: (asiente, con las mejillas ardiendo)
 else:

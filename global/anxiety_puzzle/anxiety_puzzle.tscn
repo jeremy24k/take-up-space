@@ -66,6 +66,22 @@ theme_override_font_sizes/font_size = 48
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Help" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 530.0
+offset_bottom = 562.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.62, 0.55, 0.75, 1)
+theme_override_colors/font_outline_color = Color(0.13, 0.05, 0.22, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_m3x6")
+theme_override_font_sizes/font_size = 32
+text = "Flechas: elegir     Espacio: decir     (...): callarse"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="SentenceLine" type="HBoxContainer" parent="Root"]
 layout_mode = 1
 anchors_preset = -1

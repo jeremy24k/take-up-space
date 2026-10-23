@@ -96,6 +96,10 @@ func _apply_corner_correction(direction: Vector2, delta: float) -> void:
 # Dialogue movement lock
 # =========================
 func _on_dialogic_started() -> void:
+	# One-line boxes (RemarkInteractable) don't stop her: walking away is how
+	# they close.
+	if Dialogic.current_timeline and Dialogic.current_timeline.has_meta(RemarkInteractable.REMARK_META):
+		return
 	can_move = false
 	# A cutscene lock already owns the pose (e.g. sitting asleep); don't
 	# snap her to a generic idle just because a dialogue started.

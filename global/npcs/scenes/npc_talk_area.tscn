@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="1_base"]
+[ext_resource type="Script" path="res://global/npcs/scripts/npc_talk_area.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://global/interaction_hint.tscn" id="3_hint"]
+
+[node name="NpcTalkArea" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+
+[node name="InteractionHint" parent="." instance=ExtResource("3_hint")]

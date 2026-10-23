@@ -7,6 +7,9 @@ extends Area2D
 @export var trigger_once: bool = true
 ## Bubble width in screen pixels.
 @export var max_width: float = 420.0
+## If another thought is still on screen, wait for it to end instead of
+## cutting it off (by default a new thought replaces the current one).
+@export var wait_for_current: bool = false
 
 ## The bubble is drawn on screen, not in the world, so the camera zoom does not
 ## multiply its font: sizes can sit between the world's 3x pixel steps, it never
@@ -20,6 +23,8 @@ const SCREEN_MARGIN: float = 8.0
 
 # Shared by every trigger, so a new thought can cancel the one still running.
 static var active_sequence_id: int = 0
+# True while some trigger's bubble is on screen (for wait_for_current).
+static var is_playing: bool = false
 
 func _ready() -> void:
 	label_template.hide()
@@ -43,12 +48,19 @@ func show_thought(player_node: Player) -> void:
 		lines.append(thought_text)
 	else:
 		lines = thought_lines
+	if wait_for_current:
+		var tree := player_node.get_tree()
+		while is_playing and is_instance_valid(player_node):
+			await tree.process_frame
+		if not is_instance_valid(player_node):
+			return
 	await _play_thought_sequence(player_node, lines)
 
 func _play_thought_sequence(player_node: Player, lines: Array[String]) -> void:
 	# 1. Take ownership: any sequence still running on Alice is now stale.
 	active_sequence_id += 1
 	var sequence_id: int = active_sequence_id
+	is_playing = true
 
 	# 2. Remove the thought bubble Alice may already be showing.
 	_clear_active_bubble(player_node)
@@ -91,11 +103,15 @@ func _play_thought_sequence(player_node: Player, lines: Array[String]) -> void:
 			await tree.process_frame
 			# A newer thought took over and already freed this bubble, or Alice
 			# left the scene. Leaving now avoids touching a dead instance.
-			if sequence_id != active_sequence_id or not is_instance_valid(new_label):
+			if sequence_id != active_sequence_id:
+				return
+			if not is_instance_valid(new_label):
+				is_playing = false
 				return
 			_follow_player(new_label, player_node)
 
 	bubble.queue_free()
+	is_playing = false
 
 # =========================
 # Bubble positioning

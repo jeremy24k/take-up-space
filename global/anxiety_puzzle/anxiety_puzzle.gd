@@ -35,6 +35,9 @@ var _time_left: float = 0.0
 var _cooldown: float = 0.0
 var _accepting: bool = false
 var _done: bool = false
+## The clock waits for the player's first key or click, so the first time
+## they can read the prompt and the controls before the panic starts.
+var _clock_started: bool = false
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -189,10 +192,18 @@ func _make_sentence_word(text: String) -> Label:
 # =========================
 # Time pressure
 # =========================
+func _input(event: InputEvent) -> void:
+	if not _accepting or _clock_started:
+		return
+	if (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
+		_clock_started = true
+
 func _process(delta: float) -> void:
 	if not _accepting:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
+	if not _clock_started:
+		return
 	_time_left -= delta
 	var pressure := clampf(1.0 - _time_left / _data.time_limit, 0.0, 1.0)
 	vignette.material.set_shader_parameter("pressure", pressure)

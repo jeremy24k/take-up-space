@@ -1,18 +1,14 @@
 set {elevator_interaction} += 1
 
 if {elevator_interaction} == 1:
-	join alice center
 	alice: Fuera de servicio.
 	alice: Otra vez...
 	alice: Supongo que hoy toca hacer un poco de ejercicio.
 
 elif {elevator_interaction} == 2:
-	join alice center
 	alice: Sigue sin funcionar.
 
 elif {elevator_interaction} == 3:
-	join alice center
 	alice: No va a arreglarse por mirarlo otra vez, Alice.
 else:
-	join alice center
 	alice: Las escaleras están al final del pasillo.

@@ -1,7 +1,9 @@
 if {GameManager.quest_step} == 0.0:
 	alice: El plato de Wilson...
+	join alice (worried) leftmost
 	alice: (lo ve vacío) Está vacío. Tengo que buscar algo en la cocina.
 	(Wilson la sigue y maúlla detrás de ella, como diciendo "ya lo sabía".)
+	leave alice
 	[signal arg="step_1"]
 	[signal arg="wilson_start_follow"]
 elif {GameManager.quest_step}  ==  1.0:

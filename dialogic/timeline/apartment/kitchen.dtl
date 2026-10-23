@@ -1,9 +1,11 @@
 if {GameManager.quest_step} == 1.0:
 	alice: No hay nada aquí...
+	join alice (nervous) leftmost
 	alice: (mirando la nevera vacía) Ni siquiera huevos. Ni leche. Ni una lata de sopa.
 	alice: ¿Cómo es posible que no tenga nada?
 	(Wilson maúlla desde la entrada de la cocina, como si la estuviera apurando.)
 	alice: Ya sé, ya sé.
+	leave alice
 	alice: (suspira) Vamos, Alice. No queda otra. Voy a tener que pedir a domicilio en la computadora.
 	[signal arg="step_2"]
 elif {GameManager.quest_step} == 2.0:

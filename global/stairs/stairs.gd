@@ -22,6 +22,9 @@ extends Node2D
 ## Scene loaded once the stairs animation finishes. Leave empty to only
 ## play the animation with no scene change.
 @export_file("*.tscn") var next_scene_path: String = "res://scenes/prologue_scene/scenes/metro_stations.tscn"
+## Lines shown on the black screen between both scenes (FadeTransition
+## interlude). Empty = a plain fade.
+@export var interlude_lines: PackedStringArray = []
 
 @onready var stair_area: Area2D = $Area2D
 
@@ -62,7 +65,9 @@ func _on_stairs_area_body_entered(body: Node2D) -> void:
 	# Play final idle animation
 	player.play_animation(final_anim)
 
-	if next_scene_path != "":
+	if next_scene_path != "" and not interlude_lines.is_empty():
+		FadeTransition.transition_with_interlude(next_scene_path, interlude_lines)
+	elif next_scene_path != "":
 		FadeTransition.transition_to_scene(next_scene_path)
 	else:
 		sequence_running = false

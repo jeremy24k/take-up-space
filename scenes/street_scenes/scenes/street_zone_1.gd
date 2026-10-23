@@ -12,6 +12,9 @@ const PEDESTRIAN_PAUSE: float = 2.5
 @onready var npcs: Node2D = $MiddleLayer/NPCS
 @onready var pedestrian_routes: Node2D = $PedestrianRoutes
 @onready var interactables: Node2D = $InteractableDetectors
+@onready var cat_talk_area: InteractableArea = $MiddleLayer/NPCS/StreetCat/InteractableArea
+
+var _cat_met: bool = false
 
 # =========================
 # Clue configuration
@@ -38,6 +41,7 @@ const CLUE_REACTIONS := {
 func _ready() -> void:
 	_connect_clues()
 	_start_pedestrians()
+	cat_talk_area.interacted.connect(_on_cat_interacted.bind(cat_talk_area))
 
 # =========================
 # Clues about Leo's store
@@ -110,6 +114,27 @@ func _patrol(pedestrian: WalkingNPC, points: Array[Vector2]) -> void:
 func _on_pedestrian_interacted(pedestrian: WalkingNPC) -> void:
 	if not pedestrian.stops_when_talked_to:
 		return
+	# The sprite keeps running while its NPC is frozen, so it can play a
+	# talk animation (the cat meows) and then go back to what it was doing.
+	var sprite: AnimatedSprite2D = pedestrian.sprite
+	var previous_animation := sprite.animation
+	var talks := sprite.sprite_frames.has_animation(pedestrian.talk_animation)
+	if talks:
+		sprite.process_mode = Node.PROCESS_MODE_ALWAYS
+		sprite.play(pedestrian.talk_animation)
 	pedestrian.process_mode = Node.PROCESS_MODE_DISABLED
 	Dialogic.timeline_ended.connect(func() -> void:
-		pedestrian.process_mode = Node.PROCESS_MODE_INHERIT, CONNECT_ONE_SHOT)
+		pedestrian.process_mode = Node.PROCESS_MODE_INHERIT
+		if talks:
+			sprite.process_mode = Node.PROCESS_MODE_INHERIT
+			sprite.play(previous_animation), CONNECT_ONE_SHOT)
+
+# =========================
+# Street cat
+# =========================
+## The first time Alice stops for the cat it reminds her of Wilson; after
+## that it only gets a short line.
+func _on_cat_interacted(talk_area: InteractableArea) -> void:
+	if _cat_met:
+		talk_area.timeline_name = "street_cat_again"
+	_cat_met = true

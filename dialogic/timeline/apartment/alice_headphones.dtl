@@ -1,8 +1,10 @@
 if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: (los ve encima de la cama) Ahí están.
+	join alice (neutral) leftmost
 	alice: (los toma, los mira un momento) Mis auriculares.
 	alice: No salgo sin ellos. Con ellos es más fácil.
 	alice: (se los cuelga al cuello) Bueno... no siempre. Pero casi.
+	leave alice
 	[signal arg="item_picked:alice_headphones"]
 else:
 	alice: Mis auriculares... todavía aquí.

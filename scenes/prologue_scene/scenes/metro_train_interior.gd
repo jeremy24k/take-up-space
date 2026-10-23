@@ -48,8 +48,10 @@ signal player_fell_asleep
 # Emitted once Alice is awake and back in control.
 signal player_woke_up
 
-@onready var camera: Camera2D = $Player/Camera2D
-@onready var player: Player = $Player
+## Alice lives in the y-sorted NPCS container, so she sorts against the
+## worker and the passengers instead of always drawing over them.
+@onready var camera: Camera2D = $Train/NPCS/Player/Camera2D
+@onready var player: Player = $Train/NPCS/Player
 @onready var thought_trigger: ThoughtTrigger = $ThoughtTriggers/InitialThoughtTrigger
 @onready var seat_thought_trigger: ThoughtTrigger = $ThoughtTriggers/SeatThoughtTrigger
 @onready var interactive_container: Node2D = $InteractiveContainer
@@ -204,11 +206,11 @@ func _wait_for_signal(expected_argument: String) -> void:
 # =========================
 # Passenger helpers
 # =========================
-## The worker shares the NPCS container with the passengers, so the car is
-## emptied one by one: hiding the container would take him down with it.
+## The worker and Alice share the NPCS container with the passengers, so the
+## car is emptied one by one: hiding the container would take them with it.
 func _empty_the_car() -> void:
 	for passenger in npcs.get_children():
-		if passenger == worker_npc:
+		if passenger == worker_npc or passenger == player:
 			continue
 
 		passenger.hide()
