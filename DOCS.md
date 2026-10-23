@@ -85,6 +85,76 @@ Estado que sobrevive entre escenas.
 Escucha `Dialogic.signal_event` y avanza `quest_step` con las señales
 `step_1`…`step_4`.
 
+### `ThoughtBox` (`autoload/ThoughtBox.gd`) — la mente de Alice
+El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
+
+| Style | Dónde | Para qué | Cómo se cierra |
+|---|---|---|---|
+| `dialogue` (`dialogic/styles/dialogue_style.tres`) | Caja abajo, con nombre, retrato y ▼ | Conversaciones y monólogos de los `.dtl` | Espacio. Frena a Alice |
+| `thought` (`dialogic/styles/thought_style.tres`) | Nube arriba, lila translúcida, sin nombre ni ▼ | Pensamientos: los del suelo, los bordes del mapa y las líneas de objetos inertes | Sola (auto-avance nativo), con Espacio, o al caminar si es de un objeto. No frena a Alice |
+
+- **`thought` hereda de `dialogue`**, que a su vez hereda del estilo VN de
+  Dialogic. Comparten raíz, así que cambiar de uno a otro solo reaplica
+  ajustes sobre la misma caja: no se reconstruye nada y no hay parpadeo.
+  `thought` solo cambia la capa `"13"` (textbox): tamaño 640×88, a 24 px del
+  borde de arriba (`box_margin_bottom` 656), color, texto centrado, sin ▼, sin
+  barra de auto-avance, sin sonido de tipeo y entrada tipo *pop*.
+- Están registrados en `dialogic/layout/style_list`, y `dialogue` es el
+  `default_style`. Se editan en la pestaña **Styles** de Dialogic.
+- **`ThoughtBox.say(lines, close_on_move, hold_base)`** es la única entrada
+  (se puede esperar con `await`). Arma un timeline en memoria que empieza con
+  `[style name="Thought"]`, más una línea de texto instantáneo por cada
+  pensamiento, sin hablante. Le pone el meta `thought` y activa el
+  **auto-avance nativo** de Dialogic (`auto_advance.enabled_forced`, con
+  `fixed_delay` = `hold_base`, 2 s por defecto, + 0,03 s por letra). Al
+  terminar, devuelve el auto-avance a como estaba, así que `dialogue` nunca lo
+  hereda.
+- **Por qué el estilo va dentro del timeline y no por código:**
+  `Dialogic.start()` borra el estilo base, y cada línea de texto vuelve al
+  estilo base si el actual es otro. Con el evento `[style]`, `thought` pasa a
+  ser el base mientras dura el pensamiento. La primera línea de la siguiente
+  conversación devuelve `dialogue` sola.
+- Si llega un pensamiento con una conversación en pantalla, espera a que
+  termine. Si ya había otro pensamiento, lo reemplaza.
+- `ThoughtBox.is_showing()` dice si lo que está en pantalla es un pensamiento.
+  El `Player` lo usa para no frenarse y para poder interactuar igual (Espacio
+  sigue siendo de las conversaciones, no de los pensamientos).
+- **Dialogic corre un solo timeline a la vez:** mientras hay una nube, ocupa
+  Dialogic. Por eso los pensamientos tienen que ser cortos.
+
+**El toque maestro (juice).** Todo con `Tween`, sin tocar `addons/dialogic`:
+- **Burbujitas desde la cabeza:** antes de la nube, 3 burbujas lila (radios
+  4, 6 y 9 px, borde claro, sin antialiasing) aparecen una tras otra
+  (0,06 s) en el camino de la cabeza de Alice a la nube (al 16 %, 36 % y
+  62 %). Se desvanecen cuando la nube terminó de entrar. Se dibujan en una
+  `CanvasLayer` propia de `ThoughtBox` (clase interna `ThoughtBubble`).
+- **Entrada con escala y deriva:** la nube (el nodo `Sizer` de la capa de
+  texto) entra desde 0,92 de escala, 4 px más abajo y transparente, en 0,22 s
+  con *ease out back*. Sube flotando, al revés que la caja de abajo, que
+  entra desde abajo. Por eso `thought_style.tres` pone las animaciones propias
+  de Dialogic en `NONE`.
+- **Salida hacia arriba:** cada pensamiento termina con
+  `[signal arg="thought_out"]` + `[wait time="0.22" hide_text="false"]`.
+  La señal dispara un fundido de 0,22 s mientras la nube sube 6 px, y el wait
+  le da tiempo en pantalla. Si se cierra al caminar, se anima igual antes de
+  terminar el timeline.
+- **El borde se evapora:** la nube usa su propio panel
+  (`dialogic/styles/thought_panel.tres`: fondo lila oscuro, borde 2 px lila
+  claro, esquinas de 10 px). Cada frame, el alfa del borde baja con
+  `auto_advance.get_progress()`, y vuelve entero con la línea siguiente. El
+  jugador ve cuánto le queda a la línea sin una barra.
+- **Los dos estilos comparten caja:** al terminar un pensamiento, y al
+  empezar cualquier conversación, `_reset_cloud()` devuelve escala, posición,
+  opacidad y borde a la normalidad.
+- **Retrato que se apaga:** `leave` usa por defecto la animación **"recede
+  out"** (`dialogic/animations/leave_default`). El retrato se enfría a gris,
+  se encoge al 96 % hacia sus pies, baja 6 px y se desvanece. Pasar de hablar
+  a pensar se siente como un cambio de foco, no un corte. Vive en
+  `addons/dialogic_additions/TakeUpSpace/` (la carpeta oficial de extensiones
+  de Dialogic, `index.gd` + `Animations/recede_out.gd`), que es **nuestra**,
+  no del addon.
+- Sin sonido por ahora: falta el `.wav` de respiro.
+
 ### `FadeTransition`
 `CanvasLayer` en la capa 100 con un `ColorRect` negro encima de todo.
 
@@ -187,8 +257,8 @@ en `collision_layer = 0` y `collision_mask = 2`, así que solo la ve el cuerpo d
 Alice (`body_entered`) e ignora su `InteractionDetector`.
 
 1. `lock_control()`. Si tiene `timeline_name`, lanza ese diálogo y espera a
-   que termine. Si tiene `thought_lines`, muestra un **pensamiento flotante**
-   (`ThoughtTrigger` hijo) sin esperarlo: se dispara al caminar, así que por
+   que termine. Si tiene `thought_lines`, muestra la **nube de pensamiento**
+   (`ThoughtBox.say`) sin esperarla: se dispara al caminar, así que por
    la regla de la sección 6 no debe frenar con una caja de diálogo.
 2. La hace caminar `push_distance` px en `push_direction`
    (UP/DOWN/LEFT/RIGHT, siempre **hacia dentro** del mapa) con un `Tween`.
@@ -229,23 +299,17 @@ colocarlo a mano.
 ### `RemarkInteractable` (`global/remark_interactable.tscn`)
 Para lo que **parece interactivo pero tiene poco que contar**: NPCs
 ambientales, puertas cerradas, la segunda máquina expendedora. Usa el mismo
-"[Espacio]" de `InteractableArea`, y al pulsar abre la **caja de Dialogic con
-una sola línea** de Alice. La línea se escribe en la escena, sin `.dtl` propio
-(se arma con `DialogicTimeline.from_text`). Antes se llamaba
-`ThoughtInteractable` y mostraba un globo, pero mezclar globos y cajas al
-pulsar Espacio resultaba confuso (ver sección 6).
-**Una caja de una línea cuesta una sola pulsación**, la de interactuar:
-- **El texto sale entero** (`[lspeed=0!]`), sin efecto de máquina de escribir.
-- **Alice puede seguir caminando** y, **al moverse, la caja se cierra.** El
-  diálogo lleva el meta `remark`, y `Player._on_dialogic_started` no la frena
-  cuando lo ve.
-- **También se cierra con Espacio**, o sola después de 3 s + 0,05 s por letra.
+"[Espacio]" de `InteractableArea`, y al pulsar muestra **una línea de Alice en
+la nube de pensamiento** (`ThoughtBox.say(..., close_on_move = true)`). La
+línea se escribe en la escena, sin `.dtl` propio.
+- Cuesta una sola pulsación: el texto sale entero, Alice sigue caminando, y la
+  nube se va sola, con Espacio, o en cuanto ella camina.
 - El mismo Espacio que la cierra no la vuelve a abrir (250 ms de espera).
-- Ojo: `Dialogic.start()` tarda unos frames en fijar `current_timeline`, y
-  además corre una copia del recurso. Por eso la caja se reconoce por un token
-  en su meta, y se espera a que aparezca antes de vigilarla.
-- Los diálogos con contenido (`.dtl`, `first_timeline`, `timeline_name`)
-  funcionan como siempre: frenan a Alice y se avanza con Espacio.
+- Lo que tiene contenido de verdad (`first_timeline`, `timeline_name`) abre la
+  caja de abajo, como cualquier `.dtl`.
+- Historia: antes se llamaba `ThoughtInteractable` y mostraba el globo sobre
+  la cabeza. Después usó la caja de abajo "aligerada" en tiempo real. Ambas
+  versiones se reemplazaron por la nube (`ThoughtBox`).
 
 - `lines`: las líneas propias, en orden y en bucle. Con `loop_lines = false`
   se queda en la última.
@@ -317,37 +381,21 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   gastar la mecánica.
 
 ### `ThoughtTrigger`
-Burbuja de pensamiento sobre la cabeza de Alice. Se puede **esperar**:
+Pensamiento espontáneo de Alice. Se dispara al pisar el área, o desde código
+con `show_thought(player)`, que se puede esperar:
 
 ```gdscript
 await thought_trigger.show_thought(player)
 ```
 
-Con `monitoring = false` se dispara solo desde código; si no, al entrar en el área.
-Un pensamiento nuevo cancela el anterior (contador `active_sequence_id` compartido).
-Con **`wait_for_current = true`** espera a que termine el que está en pantalla
-(`is_playing`, también compartido) en vez de cortarlo. Úsalo cuando dos
-pensamientos quedan cerca en el camino y el primero no debe perderse.
-
-**La burbuja se dibuja en pantalla, no en el mundo.** Es una `CanvasLayer`
-(capa 1) llamada `ThoughtBubble`, hija de Alice, con el `Label` dentro. Cada
-frame se coloca sobre su cabeza con `get_global_transform_with_canvas()` y se
-mantiene dentro de los bordes de la pantalla (margen de 8 px). Así:
-- **El zoom ×3 de la cámara no multiplica la fuente.** Antes, en el mundo, el
-  tamaño solo podía subir de 3 en 3 px de pantalla (6 → 18 px, 8 → 24 px) y
-  cualquier fuente un poco mayor quedaba enorme. Ahora `font_size` y
-  `outline_size` del `Label` de `thought_trigger.tscn` están **en píxeles de
-  pantalla**. Fuente elegida: `m3x6.ttf` a 32 (×2; antes 48, se veía grande), borde de 10 casi negro `(0.06, 0.02, 0.1)`,
-  `line_spacing = -4` y `max_width = 420`. Es más legible que `tiny.ttf` y
-  tiene minúsculas; Silkscreen se descartó porque es toda en mayúsculas y
-  parecía que Alice gritaba.
-- Para que una fuente pixel se vea nítida, usa un múltiplo entero de su tamaño
-  nativo: `tiny.ttf` 6 (12, 18, 24…), `m3x6.ttf` 16 (32, 48…), Silkscreen 8
-  (16, 24…).
-- Ninguna capa del mapa la tapa y no se corta contra el borde. Antes en la
-  estación desconocida el "(mira a su alrededor)" salía como "nira a su
-  alrededor)".
-- `max_width` (exportado, en px de pantalla) es el ancho de ajuste del texto.
+Muestra sus líneas (`thought_lines`, o `thought_text` si no hay) en la **nube
+de arriba**, con `ThoughtBox.say`. `display_duration` es la base en segundos de
+cada línea, a la que se suma un poco por letra. Con `monitoring = false` solo
+se dispara desde código. Con `wait_for_current` espera a que termine la nube
+que esté en pantalla, en vez de reemplazarla.
+- Antes dibujaba un globo de texto sobre la cabeza de Alice, en una
+  `CanvasLayer` propia. Se quitó para que el juego tenga solo dos lenguajes:
+  abajo conversación, arriba mente.
 
 ### `LightsContainer`
 Parpadeo aleatorio de luces + `fade_out_lights(duración)` y `turn_off_lights()`.
@@ -399,22 +447,24 @@ comportamiento extra, haz `extends "res://global/npcs/scripts/walking_npc.gd"`
 
 ## 6. Diálogos (Dialogic)
 
-### ¿Caja o pensamiento?
-**Regla: lo que el jugador activa con Espacio abre la caja de Dialogic. Lo que
-pasa solo, al caminar, es un pensamiento flotante.** El jugador lo entiende sin
-pensarlo, y como los globos son escasos, mantienen su fuerza.
-- **En la caja, la longitud marca la importancia.** Una línea es un descarte
-  ("Cerrado.", "Mejor no molesto.", con `RemarkInteractable`); varias líneas
-  o una elección son contenido (un `.dtl` propio).
-- **Pensamientos flotantes** (`ThoughtTrigger`): solo lo espontáneo, como el
-  aviso del cruce, "¿Ese es el cajero?" o los bordes del mapa
-  (`BoundaryArea.thought_lines`). Nunca frenan al jugador.
+### ¿Caja o nube?
+**Abajo, conversación; arriba, la mente de Alice.**
+- **Caja de abajo** (style `dialogue`): todo lo que viene de un `.dtl`, es
+  decir conversaciones y monólogos (los íntimos, sin retrato). Frena a Alice y
+  pide Espacio. Las ilustraciones aparecen solo acá.
+- **Nube de arriba** (style `thought`, `ThoughtBox`): los pensamientos del
+  suelo (`ThoughtTrigger`), los bordes del mapa (`BoundaryArea`) y las líneas
+  de objetos inertes y NPCs de fondo (`RemarkInteractable`). Nunca frena y se
+  va sola.
 - **Interludio en negro** (`FadeTransition.transition_with_interlude`): solo
   para saltos de lugar o de tiempo.
-- **Ilustraciones:** solo dentro de la caja, en los quiebres emocionales.
-- Se probó otra regla, la de "si aporta a la historia, caja; si es suelto,
-  globo", y se descartó: desde afuera parecía arbitrario que algunas cosas se
-  leyeran en un lugar y otras en otro, y los globos se leían peor.
+- No se cambia de layout a mitad de una conversación: un pensamiento de Alice
+  dentro de una escena va en la caja de abajo, como monólogo. Si alguna vez
+  hace falta, en un `.dtl` existe `[style name="Thought"]` ...
+  `[style name="Dialogue"]`.
+- Reglas descartadas, para no repetirlas: "si aporta a la historia, caja; si
+  es suelto, globo" (parecía arbitrario y el globo se leía peor) y "todo lo de
+  Espacio en la caja de abajo" (demasiadas pulsaciones para objetos inertes).
 
 - Personajes en `dialogic/characters/*.dch`, diálogos en `dialogic/timeline/**/*.dtl`
 - Se lanzan con `Dialogic.start("identificador")`
@@ -464,7 +514,7 @@ pensarlo, y como los globos son escasos, mantienen su fuerza.
 Las ilustraciones de Alice son retratos de Dialogic en `alice.dch`. **Solo se
 muestran en momentos de quiebre emocional**, no en cada línea: como mucho una por
 escena y dos o tres cambios de expresión por conversación. Dentro de los
-pensamientos flotantes (`ThoughtTrigger`) y de los interludios en negro de
+pensamientos (la nube de arriba, `ThoughtBox`) y de los interludios en negro de
 `FadeTransition` no van.
 
 - **Archivos:** `dialogic/portraits/alice/alice_<expresión>.png`. Es la única
@@ -1021,7 +1071,7 @@ LeoStore (Node2D, y_sort)               leo_store.gd
    vuelve a `idle_side` justo cuando Alice se desvía a las góndolas (señales
    `leo_wave` / `leo_wave_end`). Cuando cruza hacia los pasillos de la izquierda
    pisa `CrushThought`, una franja de suelo vertical (12×190 en x≈572, de
-   y 280 a 470), y sale el globo: "Ese es el cajero...", "...es muy lindo.",
+   y 280 a 470), y sale la nube de pensamiento: "Ese es el cajero...", "...es muy lindo.",
    "¿Por qué pensé eso?". Si sube derecho por el pasillo del mostrador no la
    cruza. Sale una sola vez en todo el juego
    (`GameManager.leo_crush_thought_shown`), aunque Alice salga y vuelva.
@@ -1076,7 +1126,7 @@ hablar y vuelve, la escena sigue desde donde quedó y no repite el saludo.
 ### Decisiones al adaptar el Twine
 - La prosa pasa a acotaciones: lo de Alice como `alice: (...)` y lo de los
   demás como narración sin nombre (`(Leo no se ríe. Solo asiente.)`). Lo que
-  Alice piensa en el momento va en globo de pensamiento (paso 1).
+  Alice piensa en el momento va en la nube de pensamiento (paso 1).
 - El paso 4 es jugable: el mostrador no deja avanzar hasta tener la lata.
 - Español neutro en Leo: el guion traía "boli", "pues", "vale". Se usa
   "bolígrafo" y tuteo, como el resto del juego.

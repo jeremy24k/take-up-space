@@ -1926,7 +1926,6 @@ pool = null
 group_id = "station_map"
 first_timeline = "unknown_station_map"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/StationMap" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_map")
@@ -1946,7 +1945,6 @@ pool = null
 group_id = "vending"
 first_timeline = "unknown_station_vending_machine"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VendingMachine" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_vending")
@@ -1959,7 +1957,6 @@ pool = null
 group_id = "vending"
 first_timeline = "unknown_station_vending_machine"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VendingMachine2" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_vending")
@@ -1972,7 +1969,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/TicketWindows" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_tickets")
@@ -1985,7 +1981,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/StaffDoorLeft" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -1998,7 +1993,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/StaffDoorRight" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -2011,7 +2005,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/NoticeBoards" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_board")
@@ -2024,7 +2017,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/OfficeWorker" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -2037,7 +2029,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VendingGuy" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -2050,7 +2041,6 @@ pool = ExtResource("ambient_npc_pool")
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/SittingBoy" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -2063,7 +2053,6 @@ pool = ExtResource("ambient_npc_pool")
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/LeaningBoy" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -2076,7 +2065,6 @@ pool = ExtResource("ambient_npc_pool")
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/CapGuy" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -2113,7 +2101,6 @@ shape = SubResource("RectangleShape2D_xbto1")
 
 [node name="Metro" parent="ThoughtTriggers" unique_id=175741016 instance=ExtResource("26_16iif")]
 position = Vector2(686, 459)
-thought_text = ""
 thought_lines = Array[String](["(mira a su alrededor)", "Todos están en lo suyo...", "Mejor así. "])
 metadata/_edit_group_ = true
 

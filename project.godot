@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 Dialogic="*uid://ds2q0uclmolvu"
 GameManager="*uid://6hkqeuft1dyk"
 FadeTransition="*uid://cikuexy8o2qwo"
+ThoughtBox="*res://autoload/ThoughtBox.gd"
 
 [dialogic]
 
@@ -104,9 +105,13 @@ directories/dtl_directory={
 "unknown_station_worker": "res://dialogic/timeline/metro/unknown_station_worker.dtl",
 "unknown_station_worker_dismissive": "res://dialogic/timeline/metro/unknown_station_worker_dismissive.dtl"
 }
-layout/style_directory={}
-layout/style_list=[]
-layout/default_style=""
+layout/style_directory={
+"": "res://dialogic/styles/dialogue_style.tres",
+"Dialogue": "res://dialogic/styles/dialogue_style.tres",
+"Thought": "res://dialogic/styles/thought_style.tres"
+}
+layout/style_list=["res://dialogic/styles/dialogue_style.tres", "res://dialogic/styles/thought_style.tres"]
+layout/default_style="res://dialogic/styles/dialogue_style.tres"
 text/letter_speed=0.01
 text/initial_text_reveal_skippable=true
 text/text_reveal_skip_delay=0.1
@@ -145,6 +150,7 @@ variables={
 "elevator_interaction": 0,
 "lamp_is_on": true
 }
+animations/leave_default="recede out"
 
 [display]
 

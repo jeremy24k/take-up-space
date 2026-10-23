@@ -2,22 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="1_base"]
 [ext_resource type="Script" path="res://global/boundary_area.gd" id="2_script"]
-[ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="3_thought"]
 
 [node name="BoundaryArea" instance=ExtResource("1_base")]
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("2_script")
-
-[node name="ThoughtTrigger" parent="." instance=ExtResource("3_thought")]
-monitoring = false
-monitorable = false
-thought_text = ""
-
-[node name="CollisionShape2D" parent="ThoughtTrigger" index="0"]
-disabled = true
-
-[node name="Label" parent="ThoughtTrigger" index="1"]
-visible = false
-
-[editable path="ThoughtTrigger"]

@@ -10,11 +10,10 @@ enum PushDirection { UP, DOWN, LEFT, RIGHT }
 @export var push_direction: PushDirection = PushDirection.DOWN
 @export var push_distance: float = 24.0
 @export var push_duration: float = 0.4
-## What Alice thinks while she turns back (floating bubble, she is not stopped
-## by a dialogue box). If timeline_name is set instead, that dialogue plays.
+## What Alice thinks while she turns back (the thought cloud, ThoughtBox: she
+## is not stopped by a dialogue box). If timeline_name is set instead, that
+## dialogue plays.
 @export var thought_lines: Array[String] = []
-
-@onready var thought: ThoughtTrigger = $ThoughtTrigger
 
 var _is_pushing_back: bool = false
 
@@ -72,9 +71,8 @@ func _push_back(player: Player) -> void:
 		Dialogic.start(timeline_name)
 		await Dialogic.timeline_ended
 	elif not thought_lines.is_empty():
-		# Not awaited: the bubble keeps going while she walks back.
-		thought.thought_lines = thought_lines
-		thought.show_thought(player)
+		# Not awaited: the cloud keeps going while she walks back.
+		ThoughtBox.say(thought_lines)
 
 	var direction := _direction_vector()
 	var suffix := player.get_direction_suffix(direction)

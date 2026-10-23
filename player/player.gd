@@ -96,9 +96,8 @@ func _apply_corner_correction(direction: Vector2, delta: float) -> void:
 # Dialogue movement lock
 # =========================
 func _on_dialogic_started() -> void:
-	# One-line boxes (RemarkInteractable) don't stop her: walking away is how
-	# they close.
-	if Dialogic.current_timeline and Dialogic.current_timeline.has_meta(RemarkInteractable.REMARK_META):
+	# Thoughts (the cloud at the top, ThoughtBox) never stop her.
+	if ThoughtBox.is_showing():
 		return
 	can_move = false
 	# A cutscene lock already owns the pose (e.g. sitting asleep); don't
@@ -209,9 +208,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not can_move:
 		return
 
-	if Dialogic.current_timeline != null:
+	# A conversation owns Space; a thought does not, so she can still use what
+	# is in front of her while one is on screen.
+	if Dialogic.current_timeline != null and not ThoughtBox.is_showing():
 		return
-		
+
 	if event.is_action_pressed("ui_accept"):
 		_try_to_interact()
 

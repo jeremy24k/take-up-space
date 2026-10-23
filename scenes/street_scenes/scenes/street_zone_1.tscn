@@ -4977,7 +4977,6 @@ pool = null
 group_id = "vending"
 first_timeline = "street_vending"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VendingMachines" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ia_VendingMachines")
@@ -4990,7 +4989,6 @@ pool = null
 group_id = "ad_column"
 first_timeline = "street_ad_column"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/AdColumn" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ia_AdColumn")
@@ -5011,7 +5009,6 @@ pool = null
 group_id = "ad_column"
 first_timeline = "street_ad_column"
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/AdColumn2" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ia_AdColumn")
@@ -5024,7 +5021,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/PizzaDoor" index="0" unique_id=1198806918]
 position = Vector2(0, -10.5)
@@ -5042,7 +5038,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VinylDoor" index="0" unique_id=1198806918]
 position = Vector2(0, -7)
@@ -5060,7 +5055,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/CafeDoor" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5073,7 +5067,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/CafeDoorNorth" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5086,7 +5079,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/HouseDoorGreen" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5099,7 +5091,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/HouseDoorGrey" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5112,7 +5103,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/HouseDoorNorth1" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5125,7 +5115,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/HouseDoorNorth2" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5138,7 +5127,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/HouseDoorNorth3" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5151,7 +5139,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/BuildingDoorNorthwest" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5164,7 +5151,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/BuildingDoorWest" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5177,7 +5163,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/ATMBuildingDoor" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_door")
@@ -5190,7 +5175,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/NewspaperReader" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -5203,7 +5187,6 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/VinylBrowser" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -5216,7 +5199,6 @@ pool = ExtResource("ambient_npc_pool")
 group_id = ""
 first_timeline = ""
 first_line = ""
-speaker = "alice"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/BenchSitter" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_ti_npc")
@@ -5305,9 +5287,7 @@ position = Vector2(21, 176)
 [editable path="MiddleLayer/NPCS/StreetCat"]
 [editable path="MiddleLayer/NPCS/StreetCat/InteractableArea"]
 [editable path="MapBoundaries/BoundaryLeft"]
-[editable path="MapBoundaries/BoundaryLeft/ThoughtTrigger"]
 [editable path="MapBoundaries/BoundaryRight"]
-[editable path="MapBoundaries/BoundaryRight/ThoughtTrigger"]
 [editable path="InteractableDetectors/OfficeMan"]
 [editable path="InteractableDetectors/Student"]
 [editable path="InteractableDetectors/HeadphonesGuy"]

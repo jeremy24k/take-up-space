@@ -5,10 +5,9 @@ extends "res://global/interactable_area.gd"
 # Remark configuration
 # =========================
 ## Something that looks interactive but has little to say: an ambient NPC, a
-## locked door, a second vending machine. Pressing Space opens the dialogue box
-## with a single line of Alice's, written here instead of in its own .dtl.
-## Everything the player triggers with Space uses the box; one line means "a
-## dead end", several lines or a choice mean real content.
+## locked door, a second vending machine. Pressing Space shows a single line
+## of Alice's in the thought cloud, written here instead of in its own .dtl.
+## Real content (first_timeline, timeline_name) opens the dialogue box.
 ## Used in order, looping. Ignored when a pool is set.
 @export var lines: Array[String] = []
 ## Off: once the last line is reached it repeats instead of starting over.
@@ -21,25 +20,18 @@ extends "res://global/interactable_area.gd"
 @export var group_id: String = ""
 @export var first_timeline: String = ""
 @export var first_line: String = ""
-## Who says the line (a .dch id).
-@export var speaker: String = "alice"
 
 # =========================
-# One-line box behavior
+# Remark behavior
 # =========================
-## A one-line box gets out of the way: the text shows all at once, Alice can
-## keep walking, and the box closes when she moves, when Space is pressed, or
-## on its own after a while. One press (to interact) is all it costs.
-const HOLD_BASE: float = 3.0
-const HOLD_PER_CHAR: float = 0.05
-## The Space that closes a box must not open the same one again.
+## The line shows in the thought cloud (ThoughtBox): text at once, Alice keeps
+## walking, and the cloud goes away by itself, on Space, or when she walks
+## off. One press (to interact) is all it costs.
+## The Space that closes a cloud must not open the same one again.
 const REOPEN_COOLDOWN_MSEC: int = 250
-## Set on the timeline so the Player knows not to stop her.
-const REMARK_META := &"remark"
 
 var _next_line: int = 0
 var _closed_at_msec: int = -REOPEN_COOLDOWN_MSEC
-var _remark_token: int = 0
 
 # =========================
 # Interaction
@@ -71,39 +63,10 @@ func interact() -> void:
 
 	_say(line)
 
-## [lspeed=0!] shows the whole line at once: no press to finish the typing.
 func _say(line: String) -> void:
-	var timeline := DialogicTimeline.new()
-	timeline.from_text("%s: [lspeed=0!]%s" % [speaker, line])
-	# Dialogic may run a copy of the resource, so the box is recognised by
-	# this token in its meta, not by identity.
-	_remark_token += 1
-	var token := "%d:%d" % [get_instance_id(), _remark_token]
-	timeline.set_meta(REMARK_META, token)
-	_start_dialogue(timeline)
-
-	# Dialogic.start() can take a few frames to set the timeline (it may build
-	# the layout first), so wait for the box before watching it.
-	var tree := get_tree()
-	var start_wait := 1.0
-	while not _is_showing(token) and start_wait > 0.0:
-		await tree.process_frame
-		start_wait -= get_process_delta_time()
-
-	var time_left := HOLD_BASE + line.length() * HOLD_PER_CHAR
-	while _is_showing(token):
-		await tree.process_frame
-		time_left -= get_process_delta_time()
-		var walking := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") != Vector2.ZERO
-		if walking or time_left <= 0.0:
-			if _is_showing(token):
-				Dialogic.end_timeline()
-			break
+	var remark_lines: Array[String] = [line]
+	await ThoughtBox.say(remark_lines, true)
 	_closed_at_msec = Time.get_ticks_msec()
-
-func _is_showing(token: String) -> bool:
-	var current: DialogicTimeline = Dialogic.current_timeline
-	return current != null and current.get_meta(REMARK_META, "") == token
 
 ## Same as InteractableArea.interact() for a timeline, without emitting
 ## `interacted` a second time.
