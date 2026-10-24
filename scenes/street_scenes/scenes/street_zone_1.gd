@@ -54,7 +54,7 @@ const LOST_LINES: Array[String] = [
 	"Podría fijarme mejor en los carteles. O en lo que dice la gente.",
 ]
 ## Once she overheard the phone girl, the reminder points at the tower.
-const LOST_TOWER_LINE := "Un minimercado junto a la torre de cristal... Tiene que estar cerca."
+const LOST_TOWER_LINE := "Un minimercado junto a la torre de cristal... Quizá al otro lado de la avenida."
 const TOWER_CLUE := "overheard_store"
 
 var _lost_time: float = 0.0

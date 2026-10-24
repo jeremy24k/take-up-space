@@ -17,6 +17,9 @@ var _retired: bool = false
 var _in_dialogue: bool = false
 ## True while something else takes its place, e.g. the "[Espacio]" prompt.
 var _suppressed: bool = false
+## In depth-sorted mode the bubble sits at its owner's feet (so the y-sort
+## treats it like the owner) and is only drawn over the head, through offset.
+var _bob_on_offset: bool = false
 
 # =========================
 # Lifecycle
@@ -37,6 +40,19 @@ func _ready() -> void:
 func set_base_position(new_position: Vector2) -> void:
 	position = new_position
 	_base_y = new_position.y
+
+## For characters that walk through a y-sorted scene (Wilson, pedestrians).
+## By default the bubble has z_index 10 and floats over everything, so when
+## its owner walks behind a wall the bubble stays visible on its own. Here it
+## drops to the owner's depth: it sorts at the owner's feet and is drawn over
+## the head, so whatever hides the owner hides the bubble too.
+## The parent must have y_sort_enabled for this to take effect.
+func use_depth_sorting(head_offset: Vector2) -> void:
+	z_index = 0
+	position = Vector2(head_offset.x, 0.0)
+	offset = Vector2(0.0, head_offset.y)
+	_base_y = head_offset.y
+	_bob_on_offset = true
 
 func retire() -> void:
 	_retired = true
@@ -71,4 +87,7 @@ func _start_bob() -> void:
 
 ## Snaps to whole pixels so the pixel art never renders half a pixel off.
 func _set_bob(amount: float) -> void:
-	position.y = _base_y - roundf(amount)
+	if _bob_on_offset:
+		offset.y = _base_y - roundf(amount)
+	else:
+		position.y = _base_y - roundf(amount)

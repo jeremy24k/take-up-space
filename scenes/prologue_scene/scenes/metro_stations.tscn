@@ -1073,6 +1073,9 @@ size = Vector2(20, 13)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
 size = Vector2(967, 20)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(960, 125)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7lswf"]
 size = Vector2(202, 20)
 
@@ -1346,6 +1349,14 @@ metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TrainTriggerArea" unique_id=1909033634]
 shape = SubResource("RectangleShape2D_8w0r3")
+
+[node name="PlatformArea" type="Area2D" parent="." unique_id=1880322101]
+position = Vector2(640, 288)
+collision_mask = 3
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformArea" unique_id=1880322102]
+shape = SubResource("RectangleShape2D_platform")
 
 [node name="ThoughtTriggers" type="Node2D" parent="." unique_id=1252145260]
 

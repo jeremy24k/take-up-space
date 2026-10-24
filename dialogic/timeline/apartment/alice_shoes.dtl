@@ -6,9 +6,12 @@ if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	(Wilson la mira desde la puerta, con una expresión de "no me arrepiento".)
 	join alice (relaxed) leftmost
 	alice: (sonríe a pesar de todo) Bueno. Al menos los encontré.
-	alice: Listo. Ahora sí.
 	leave alice
 	[signal arg="item_picked:alice_shoes"]
+	if GameManager.has_all_prep_items():
+		alice: Auriculares, cartera, zapatos... ya está todo.
+		alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
+		alice: Solo falta la mochila. Sigue en mi cuarto.
 else:
 	alice: (ve los zapatos en el baño) Mis zapatos... ¿por qué están aquí?
 	alice: (piensa un momento) Ah, Wilson.

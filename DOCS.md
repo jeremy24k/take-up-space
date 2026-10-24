@@ -61,6 +61,14 @@ alcanza: si falta la mochila, `alice_cant_leave_yet` tiene una rama propia
 ("La mochila. Sigue en mi cuarto."). Antes la puerta miraba
 `has_all_prep_items()` y se podía salir sin pasar por la mochila.
 
+Para que el jugador no tenga que descubrirlo en la puerta, **el tercer objeto
+que recoge avisa**: `alice_wallet`, `alice_headphones` y `alice_shoes` llevan,
+justo después de su `item_picked`, una rama `if
+GameManager.has_all_prep_items()` donde Alice dice "Solo falta la mochila.
+Sigue en mi cuarto.". Como la señal se procesa antes que la condición, solo
+la dice el último objeto, sea cual sea el orden. Por eso los zapatos ya no
+cierran con "Listo. Ahora sí.", que mandaba al jugador a la puerta.
+
 Todos los cambios de escena pasan por **`FadeTransition.transition_to_scene()`**
 (directo, o vía `SceneTransitionArea`/`ExitArea`, que lo llaman por dentro).
 Nunca uses `get_tree().change_scene_to_file()` a mano: te saltas el fundido.
@@ -84,6 +92,12 @@ Estado que sobrevive entre escenas.
 
 Escucha `Dialogic.signal_event` y avanza `quest_step` con las señales
 `step_1`…`step_4`.
+
+### `AppExit` (`autoload/AppExit.gd`) — cerrar el juego
+`AppExit.quit_game()` es la única forma de cerrar el juego desde código. En
+macOS se salta el cierre normal de Godot para evitar un crash del addon
+TileMapDual, y también atiende Cmd+Q y el botón de cerrar la ventana. Detalles
+en "Cosas pendientes".
 
 ### `ThoughtBox` (`autoload/ThoughtBox.gd`) — la mente de Alice
 El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
@@ -323,6 +337,15 @@ colocarlo a mano.
   uno encima del otro.
 - Si la charla es de una sola vez (`one_time_interaction`), al usarla el
   globito se retira (`InteractionHint.retire()`) y no vuelve.
+- **Personajes que se mueven:** si el área es hija de un nodo con
+  `y_sort_enabled` (Wilson, el trabajador de la terminal, el gato de la
+  calle), el globito entra en ese y-sort (`InteractionHint.use_depth_sorting`):
+  baja a `z_index` 0, se ordena a la altura de los pies del personaje y se
+  dibuja sobre su cabeza con `offset`. Así, si una pared o un árbol tapa al
+  personaje, también tapa el globito. Antes tenía `z_index` 10 siempre y
+  flotaba solo cuando Wilson pasaba por detrás de algo (en el baño, por
+  ejemplo). Los NPCs quietos, cuya área cuelga de `InteractableDetectors`,
+  siguen con el globito por encima de todo.
 - La usan: los 8 NPCs de la calle, Leo, el oficinista y los dos chicos del
   metro, el trabajador, la chica sentada y el chico de auriculares de la
   terminal, y Wilson. La ventanilla de tickets no, porque es un objeto.
@@ -700,6 +723,19 @@ desaparecen con **Project → Reload Current Project**.
 
 ## 8. El vagón del metro (la escena más compleja)
 
+### Antes de subir: la llegada del tren (`metro_stations.gd`)
+El tren entra en la estación por dos caminos, el primero que ocurra
+(`_call_train()` solo actúa una vez):
+- **`TrainTriggerArea`**: la franja de 20 px junto a las vías. Si Alice se
+  acerca al borde, el tren llega en el acto.
+- **`PlatformArea`**: cubre todo el andén. Al entrar, el tren llega a los
+  `platform_wait` segundos (5 por defecto), aunque Alice no se mueva. Antes
+  solo existía la franja, y un jugador que esperaba quieto en el andén se
+  quedaba sin tren.
+
+Si en ese momento hay un diálogo abierto, `metro_is_entering_station`
+espera a que termine en vez de cortarlo.
+
 `metro_train_interior.tscn` se usa **dos veces sin recargarse**: el mismo nodo se
 transforma en sitio, así Alice nunca se mueve del asiento.
 
@@ -777,10 +813,12 @@ beats principales — **excepto** un pensamiento espontáneo puntual que sí usa
 
 ```
 _on_train_trigger_area_body_entered()   Alice camina unos pasos
-        │
+  o _depart_after_fallback()            o pasan `departure_fallback_time` (3 s) sin moverse
+        │                               (lo primero que ocurra; `_start_departure()` lo hace una vez)
 _depart_train()      metro_train.leave_station() (sin await, corre de fondo)
                       → pausa de `wait_time_for_phone_missing` (1s) para que se
                         sienta la desorientación
+                      → si hay un diálogo abierto, espera a que termine
                       → Dialogic.start("unknown_station_lost_phone")
                         (incluye [signal arg="no_phone"] → GameManager.has_phone = false)
         │
@@ -1033,8 +1071,8 @@ Mismo patrón que la estación desconocida:
   menos de 220 px de la tienda, sale en la nube: "Quizá alguien por aquí sepa
   dónde hay un minimercado..." y, la segunda vez, "Podría fijarme mejor en los
   carteles. O en lo que dice la gente.". Si ya oyó a la chica del teléfono,
-  apunta a la torre: "Un minimercado junto a la torre de cristal... Tiene que
-  estar cerca.". Como máximo 2 recordatorios, y ninguno después de entrar a la
+  apunta a la torre: "Un minimercado detrás de la torre de cristal, cruzando
+  la avenida... Tiene que estar cerca.". Como máximo 2 recordatorios, y ninguno después de entrar a la
   tienda de Leo.
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
   al pasar: `FirstCrossing`, `Houses` y `ShoppingBlock`.
@@ -1141,22 +1179,36 @@ frutas** del escaparate de Leo.
   | Área | Pistas que la activan | Timeline nuevo |
   |---|---|---|
   | `Shop`, el escaparate de Leo | `delivery_box` o `store_flyer` | `street_shop_found`: "El cartel de frutas... Es aquí." |
-  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "Junto a la torre de cristal", decía. (mira a su alrededor) Aquí no hay ningún minimercado... ¿Cruzando la calle, quizás? |
+  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "Junto a la torre de cristal", decía. Aquí delante no hay ningún minimercado... (mira por encima de la torre) ¿Al otro lado de la avenida? |
 
 - **Por qué existe la reacción de la torre:** en el playtest, la jugadora
   escuchó "el de la torre", llegó a la base de la torre y se quedó sin saber
   qué hacer. La tienda de Leo está detrás de la torre, al otro lado de la
-  calle, y desde la base no se ve. La pista sigue siendo sutil ("el de la
-  torre"): no dice dónde. Es la torre la que empuja un poco, sin dar la
-  respuesta. Se probó decir "detrás de la torre" en la pista, pero era
-  demasiado obvio.
-- **De vaga a precisa (2026-10-23).** Las pistas tienen que coincidir entre
-  sí: la chica dice "junto a la torre de cristal", la torre cita eso mismo y
-  el recordatorio de "perdida" también. La **única** que dice "detrás de la
-  torre" es la anciana, y es la única vez en la calle que Alice le pregunta
-  algo a alguien: la respuesta clara es el premio por atreverse a hablar.
-  (No es un Rompecabezas de la Ansiedad a propósito, para no saturar: el de
-  la estación y los dos de Leo alcanzan.)
+  avenida, y desde la base no se ve. Ahí la torre repite la pista y deduce
+  la avenida.
+- **De vaga a precisa (2026-10-23), en capas.** Cada jugador recibe solo la
+  ayuda que necesita, y las citas coinciden entre sí:
+  1. **La chica** da el punto de referencia, vago: "junto a la torre de
+     cristal". No dice el camino.
+  2. **La torre**, si Alice llega a su base habiendo oído a la chica, cita
+     esa misma frase y deduce el resto: "¿Al otro lado de la avenida?". La
+     dirección es un premio por haber ido, no algo que se regala.
+  3. **La anciana** es la **única** que dice "justo detrás de la torre de
+     cristal", y es la única vez en la calle que Alice le pregunta algo a
+     alguien: la respuesta clara es el premio por atreverse a hablar. (No es
+     un Rompecabezas de la Ansiedad a propósito, para no saturar: el de la
+     estación y los dos de Leo alcanzan.)
+  4. **El recordatorio** (`LOST_TOWER_LINE`), solo tras 150 s sin avanzar:
+     "Un minimercado junto a la torre de cristal... Quizá al otro lado de la
+     avenida." Es la red de seguridad; quien va bien nunca lo ve.
+  Se probó poner "cruzas la avenida y lo ves" en la pista de la chica, pero
+  se lo daba todo hecho al jugador. Las cifras del playtest 6 (6–8 min
+  perdido) están infladas por la latencia del tester.
+- **Las citas tienen que coincidir.** La torre y el recordatorio repiten
+  "junto a la torre de cristal", como la chica; lo de la avenida es deducción
+  de Alice, no una cita, y "detrás" queda solo para la anciana. **Si se
+  cambia una frase, hay que cambiar las otras:** el jugador nota cuando Alice
+  "recuerda" una frase que nadie dijo.
 - **"Minimercado", no "almacén".** "Almacén" puede ser un depósito o muchas
   otras cosas; "minimercado" es español neutro y se entiende como una tienda
   chica de comida. Se usa en el volante, la caja del repartidor, la chica del
@@ -1356,6 +1408,26 @@ delantal con el carrito, pantalón gris azulado y zapatillas grises. Tags:
 ---
 
 ## 12. Cosas pendientes / a vigilar
+
+- **Crash al cerrar el juego en macOS (Godot 4.7).** Cerrar el juego después de
+  haber cargado cualquier escena con `TileMapDual` termina con
+  `Program crashed with signal 11` dentro de `NSApplication terminate`
+  (MoltenVK). Pasa al pulsar "[Espacio] Salir" en `demo_end`, pero también con
+  Cmd+Q desde cualquier escena jugable. Comprobado aislando el nodo: un
+  `TileMapDual` solo crashea al cerrar, y la escena sin ese nodo cierra limpio.
+  Sigue pasando aunque se libere el nodo antes de salir, y no lo causan el
+  shader fantasma ni las conexiones de sus *watchers* al `TileSet`. Es un fallo
+  del addon (v5.0.2) o del motor, no del juego.
+  **Rodeo actual: el autoload `AppExit`** (`autoload/AppExit.gd`). En macOS,
+  todas las salidas terminan el proceso directamente (`OS.kill` del propio
+  proceso), sin pasar por el cierre normal de Godot: "[Espacio] Salir" de
+  `demo_end` llama a `AppExit.quit_game()`, y Cmd+Q o el botón de cerrar
+  llegan como `NOTIFICATION_WM_CLOSE_REQUEST`, que `AppExit` atiende con
+  `auto_accept_quit = false`. En otros sistemas cierra con `get_tree().quit()`.
+  No hay partidas guardadas, así que no se pierde nada. **Para cerrar el juego
+  desde código, usa siempre `AppExit.quit_game()`, nunca `get_tree().quit()`.**
+  Si una versión nueva del addon o de Godot arregla el crash, este rodeo se
+  puede quitar.
 
 - **La salida de `unknown_station.tscn` es un placeholder deliberado.**
   `ExitToStreet`/`ExitToStreet2` apuntan a `apartment.tscn` porque la escena de

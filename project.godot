@@ -21,6 +21,7 @@ Dialogic="*uid://ds2q0uclmolvu"
 GameManager="*uid://6hkqeuft1dyk"
 FadeTransition="*uid://cikuexy8o2qwo"
 ThoughtBox="*res://autoload/ThoughtBox.gd"
+AppExit="*res://autoload/AppExit.gd"
 
 [dialogic]
 

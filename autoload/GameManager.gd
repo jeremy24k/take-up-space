@@ -142,7 +142,6 @@ func add_item(item_id: String) -> void:
 	if not collected_items.has(item_id):
 		collected_items.append(item_id)
 		print("Item added to GameManager: ", item_id)
-		get_missing_items_count()
 		print("Missing items: ", get_missing_items_count())
 
 func is_item_collected(item_id: String) -> bool:
@@ -160,5 +159,11 @@ func has_all_prep_items() -> bool:
 			return false
 	return true
 
+## Counts only the prep items still missing. The backpack (and any other item)
+## also lands in collected_items, so subtracting sizes went negative.
 func get_missing_items_count() -> int:
-	return missing_prep_items.size() - collected_items.size()
+	var missing: int = 0
+	for item_id in missing_prep_items:
+		if not is_item_collected(item_id):
+			missing += 1
+	return missing

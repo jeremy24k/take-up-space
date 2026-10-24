@@ -18,7 +18,7 @@ var _can_exit: bool = false
 ## Black screen after Leo's store. Alice's reflection already played on the
 ## way here (FadeTransition interlude from leo_store.gd), so this only shows
 ## "Continuará...": Lía's scene is next and does not exist yet. There is
-## nothing after it, so Space closes the game.
+## nothing after it, so Space closes the game (through AppExit, see there).
 func _ready() -> void:
 	to_be_continued.modulate.a = 0.0
 	exit_hint.modulate.a = 0.0
@@ -34,4 +34,4 @@ func _ready() -> void:
 # =========================
 func _unhandled_input(event: InputEvent) -> void:
 	if _can_exit and event.is_action_pressed("ui_accept"):
-		get_tree().quit()
+		AppExit.quit_game()

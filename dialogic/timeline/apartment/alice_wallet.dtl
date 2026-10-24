@@ -4,6 +4,10 @@ if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: No puedo perderlo. No puedo gastarlo en otra cosa.
 	alice: (se la guarda en el bolsillo) Solo lo justo para la comida de Wilson.
 	[signal arg="item_picked:alice_wallet"]
+	if GameManager.has_all_prep_items():
+		alice: Auriculares, cartera, zapatos... ya está todo.
+		alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
+		alice: Solo falta la mochila. Sigue en mi cuarto.
 else:
 	alice: (ve la cartera sobre la mesa) Ahí está mi cartera.
 	alice: El dinero justo... como siempre.

@@ -19,7 +19,15 @@ extends "res://global/interactable_area.gd"
 ## one, and it goes away together with the interaction.
 func _ready() -> void:
 	super._ready()
-	hint.set_base_position(hint_position)
+	# Inside a character that walks through a y-sorted scene (Wilson, the
+	# street pedestrians), the bubble joins that y-sort so walls and trees can
+	# hide it together with the character. Static NPCs keep it on top.
+	var owner_item := get_parent() as CanvasItem
+	if owner_item and owner_item.y_sort_enabled:
+		y_sort_enabled = true
+		hint.use_depth_sorting(hint_position)
+	else:
+		hint.set_base_position(hint_position)
 	# Bubble and "[Espacio]" take turns: the bubble says "you can talk to this
 	# one" from afar, the prompt replaces it once Alice is close enough.
 	if label:

@@ -6,6 +6,10 @@ if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: (se los cuelga al cuello) Bueno... no siempre. Pero casi.
 	leave alice
 	[signal arg="item_picked:alice_headphones"]
+	if GameManager.has_all_prep_items():
+		alice: Auriculares, cartera, zapatos... ya está todo.
+		alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
+		alice: Solo falta la mochila. Sigue en mi cuarto.
 else:
 	alice: Mis auriculares... todavía aquí.
 	alice: Menos mal que no los perdí.
