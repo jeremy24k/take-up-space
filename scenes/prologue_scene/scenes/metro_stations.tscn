@@ -1175,9 +1175,9 @@ metadata/_edit_group_ = true
 
 [node name="Camera2D" parent="MiddleLayer/Player" index="0" unique_id=1567288049]
 limit_left = 152
-limit_top = -41
+limit_top = -38
 limit_right = 1127
-limit_bottom = 776
+limit_bottom = 825
 limit_smoothed = true
 
 [node name="MetroTrain" parent="MiddleLayer" unique_id=2072911588 instance=ExtResource("8_rb574")]

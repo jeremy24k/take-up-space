@@ -21,7 +21,7 @@ if {GameManager.quest_step} == 3.0:
 			if GameManager.is_item_collected("alice_shoes") == false:
 				alice: ...los zapatos.
 	else:
-		alice: Al fin tengo todo. Ok... es hora de irme.
+		alice: (se cuelga la mochila) Al fin tengo todo. Ok... es hora de irme.
 		join alice (worried) leftmost
 		alice: Ojalá me emocionara.
 		alice: Quizás, si espero un poco...

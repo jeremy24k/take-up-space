@@ -10,10 +10,10 @@ const SILENCE_WORD := "(...)"
 const SCENE_PATH := "res://global/anxiety_puzzle/anxiety_puzzle.tscn"
 const WORD_SCENE := preload("res://global/anxiety_puzzle/thought_word.tscn")
 const FONT := preload("res://fonts/m3x6.ttf")
-## Screen area the words float in: below the prompt, above Dialogic's text box.
-const CLOUD_RECT := Rect2(170, 110, 940, 320)
+## Screen area the words float in: below the prompt, above the sentence line.
+const CLOUD_RECT := Rect2(120, 100, 1040, 340)
 ## Minimum empty space around each word when scattering them.
-const WORD_GAP: float = 18.0
+const WORD_GAP: float = 16.0
 const PLACEMENT_TRIES: int = 80
 const FADE_TIME: float = 0.35
 ## Holding Space must not pick several words in a row.
@@ -22,6 +22,11 @@ const STUMBLE_COLOR := Color(1, 0.45, 0.45)
 ## After a mistake the first word of every answer blinks this color, as a hint.
 const HINT_COLOR := Color(1, 0.88, 0.54)
 const HINT_BLINKS: int = 3
+## Words of the sentence line, same look as thought_word.tscn: 4x the m3x6
+## pixel font, with a thick near-black outline, readable over any scene.
+const WORD_FONT_SIZE: int = 64
+const WORD_OUTLINE_SIZE: int = 10
+const WORD_OUTLINE_COLOR := Color(0.04, 0.01, 0.07)
 
 @onready var root: Control = $Root
 @onready var vignette: ColorRect = $Root/Vignette
@@ -201,9 +206,9 @@ func _make_sentence_word(text: String) -> Label:
 	var label := Label.new()
 	label.text = text
 	label.add_theme_font_override("font", FONT)
-	label.add_theme_font_size_override("font_size", 48)
-	label.add_theme_color_override("font_outline_color", Color(0.13, 0.05, 0.22))
-	label.add_theme_constant_override("outline_size", 6)
+	label.add_theme_font_size_override("font_size", WORD_FONT_SIZE)
+	label.add_theme_color_override("font_outline_color", WORD_OUTLINE_COLOR)
+	label.add_theme_constant_override("outline_size", WORD_OUTLINE_SIZE)
 	return label
 
 # =========================

@@ -2,7 +2,7 @@ if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	alice: (la ve sobre la mesa) La cartera.
 	alice: (la abre, mira el dinero) El dinero justo.
 	alice: No puedo perderlo. No puedo gastarlo en otra cosa.
-	alice: (la guarda en la mochila) Solo lo justo para la comida de Wilson.
+	alice: (se la guarda en el bolsillo) Solo lo justo para la comida de Wilson.
 	[signal arg="item_picked:alice_wallet"]
 else:
 	alice: (ve la cartera sobre la mesa) Ahí está mi cartera.
