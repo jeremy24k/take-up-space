@@ -31,7 +31,6 @@ const GREETING_DELAY: float = 1.0
 const LEO_IDLE := "idle_side"
 ## "Rompecabezas de la Ansiedad" played from the timelines with
 ## [signal arg="anxiety_puzzle:<id>"]. The result goes to {anxiety_result}.
-const ANXIETY_PUZZLE_SCENE := preload("res://global/anxiety_puzzle/anxiety_puzzle.tscn")
 const ANXIETY_PUZZLES := {
 	"leo_are_you_ok": preload("res://scenes/leo_store_scene/puzzles/leo_are_you_ok.tres"),
 	"leo_number": preload("res://scenes/leo_store_scene/puzzles/leo_number.tres"),
@@ -147,19 +146,12 @@ func _on_dialogic_signal(argument: String) -> void:
 # =========================
 # Anxiety puzzle
 # =========================
-## Pausing Dialogic here, inside the signal event, keeps it from running the
-## next event (the if on {anxiety_result}) until the puzzle has an answer.
 func _play_anxiety_puzzle(puzzle_id: String) -> void:
 	var data: AnxietyPuzzleData = ANXIETY_PUZZLES.get(puzzle_id)
 	if data == null:
 		push_warning("Unknown anxiety puzzle '%s'" % puzzle_id)
 		return
-	Dialogic.paused = true
-	var puzzle := ANXIETY_PUZZLE_SCENE.instantiate() as AnxietyPuzzle
-	add_child(puzzle)
-	var result := await puzzle.run(data)
-	Dialogic.VAR.set_variable("anxiety_result", result)
-	Dialogic.paused = false
+	AnxietyPuzzle.play_from_dialogic(self, data)
 
 func _on_crush_line_crossed(body: Node2D) -> void:
 	if body is Player:

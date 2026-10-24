@@ -444,13 +444,18 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   archivo.
   Los bordes se cierran con una viñeta pixelada (`anxiety_vignette.gdshader`).
 - **Desde Dialogic:** la timeline emite `[signal arg="anxiety_puzzle:<id>"]`
-  y después ramifica con `if {anxiety_result} == "<clave>":`. La escena
-  (p. ej. `leo_store.gd::_play_anxiety_puzzle`) pone `Dialogic.paused =
-  true` dentro del handler de la señal: Dialogic no pasa al siguiente evento
-  hasta que vuelve a `false` (`DialogicGameHandler.handle_event` hace
-  `await dialogic_resumed`). Instancia el puzzle, hace `await
+  y después ramifica con `if {anxiety_result} == "<clave>":`. La escena decide
+  qué puzzle es cada id (un diccionario `ANXIETY_PUZZLES` en `leo_store.gd` y
+  en `unknown_station.gd`) y llama a
+  `AnxietyPuzzle.play_from_dialogic(self, data)`. Esa función pone
+  `Dialogic.paused = true` dentro del handler de la señal: Dialogic no pasa al
+  siguiente evento hasta que vuelve a `false` (`DialogicGameHandler.handle_event`
+  hace `await dialogic_resumed`). Instancia el puzzle, hace `await
   puzzle.run(data)`, guarda el resultado con
   `Dialogic.VAR.set_variable("anxiety_result", ...)` y reanuda.
+- **`hint_from_start`** (tutorial): la primera palabra de cada respuesta
+  parpadea apenas abre el puzzle, no solo después de un error. Lo usa el
+  primero del juego, el del trabajador de la estación.
   `anxiety_result` está declarada en las variables de Dialogic
   (`project.godot`).
 - Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
@@ -643,7 +648,7 @@ pensamientos (la nube de arriba, `ThoughtBox`) y de los interludios en negro de
   | `apartment/wilson_stay_home` | en la puerta, deja a Wilson | `worried` |
   | `unknown_station_worker` | se despierta sobresaltada ("¡Ah!") | `shocked` |
   | `unknown_station_lost_phone` | "Esta no es mi parada" → "No, no, no..." → "Genial, Alice" | `worried` → `scared` → `worried` |
-  | `unknown_station_worker_dismissive` | "Nada... perdón" / "Qué vergüenza" | `nervous` |
+  | `unknown_station_worker_dismissive` | rama `ask`: "Lo dije. Le pregunté a alguien." / si no: "Qué vergüenza" | `relaxed` / `nervous` |
   | `leo_store_greeting` | se queda paralizada en la puerta | `nervous` |
   | `leo_store_checkout` | "E-eh... hola" (sale antes del rompecabezas) | `nervous` |
   | | rama verdad: "Para mi gato. Wilson." | `neutral` |
@@ -786,11 +791,11 @@ _on_worker_area_entered()     el InteractableArea del trabajador se dispara SOLO
         │
 InteractableArea.interact()   lanza su timeline_name ("unknown_station_worker_dismissive");
                                one_time_interaction = true → solo ocurre una vez.
-                               Él apenas levanta la vista ("¿Qué?"); ella se
-                               avergüenza y se va — "irse" es simplemente que el
-                               jugador recupera el control cuando el diálogo
-                               termina (Player ya hace lock/unlock solo con
-                               Dialogic.timeline_started/ended)
+                               Él levanta la vista ("¿Sí?") y sale el primer
+                               Rompecabezas de la Ansiedad del juego (ver abajo).
+                               "Irse" es simplemente que el jugador recupera el
+                               control cuando el diálogo termina (Player ya hace
+                               lock/unlock solo con Dialogic.timeline_started/ended)
         │
 [jugador camina solo hasta ExitToStreet/ExitToStreet2 → ExitArea]
 ```
@@ -809,6 +814,21 @@ func _on_worker_area_entered(area: Area2D) -> void:
     if area.get_parent() is Player:
         worker_interactable.interact()
 ```
+
+### El primer Rompecabezas de la Ansiedad (el trabajador)
+Es el **primer contacto de Alice con un desconocido** (regla 1 del puzzle) y
+hace de preámbulo y tutorial para los dos de Leo. Por eso es fácil:
+`scenes/prologue_scene/puzzles/station_worker.tres`.
+- Pista: "¿Le pregunto dónde estoy... o lo dejo estar?"
+- Respuestas: `ask` = "¿Qué estación es esta?" y `leave` = "Nada... perdón.",
+  más dos distractores ("tren", "casa") y "(...)".
+- 25 s (los de Leo tienen 20) y `hint_from_start`: "¿Qué" y "Nada..."
+  parpadean desde el principio.
+- `ask`: él contesta sin dejar sus papeles ("Terminal. Fin de línea." / "La
+  salida, por las escaleras.") y ella, aliviada (`relaxed`): "Lo dije. Le
+  pregunté a alguien." `leave` o silencio: el final de siempre, "Qué
+  vergüenza" (`nervous`). Con silencio, ella abre la boca y no le sale nada.
+- Lo conecta `unknown_station.gd` (`ANXIETY_PUZZLES` + `_on_dialogic_signal`).
 
 ### Interactuables ambientales (`InteractableDetectors`)
 Mismo patrón que la estación de salida (`TicketStore`/`ImportantMan` en
@@ -1222,10 +1242,14 @@ LeoStore (Node2D, y_sort)               leo_store.gd
    - "¿Estás bien?" (`puzzles/leo_are_you_ok.tres`): "La verdad... no. Me
      perdí." → `truth` (+1), "N-no, estoy bien." → `lie` (0), "(...)" o
      tiempo agotado → `silence` (−1). Las tres ramas terminan en que Alice se
-     perdió.
+     perdió. Distractores: "Sí...", "metro", "Wilson".
    - El número (`puzzles/leo_number.tres`): "Oye, ¿me das tu número?" → `ask`
      (+1, iniciativa); "Bueno... gracias." → `leave`; silencio → Leo se lo da
      igual. En todos los casos Alice termina con el número (`leo_number`).
+     Distractores: "teléfono", "atún", "adiós".
+   - Tienen tres distractores cada uno; el de la estación, que es el
+     tutorial, solo dos. (Hasta el 2026-10-23 los de Leo no tenían ninguno:
+     se habían perdido al guardar desde el editor.)
    - Darle el suyo (menú): +2 si había pedido el de él, +1 si no; o no
      dárselo (0).
 5. **La salida.** Al terminar la charla, `ExitToStreet` queda bloqueada

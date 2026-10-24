@@ -18,3 +18,6 @@ extends Resource
 @export var time_limit: float = 20.0
 ## Seconds lost when a word comes in the wrong order.
 @export var mistake_penalty: float = 1.5
+## Tutorial: the first word of every answer blinks as soon as the puzzle
+## opens, not only after a mistake. For the first puzzle of the game.
+@export var hint_from_start: bool = false

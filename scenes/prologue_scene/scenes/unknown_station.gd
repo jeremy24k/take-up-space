@@ -5,6 +5,13 @@ extends Node2D
 @onready var worker_interactable: InteractableArea = $MiddleLayer/NPCS/WorkerNPC/InteractableArea
 @export var wait_time_for_phone_missing: float = 1
 
+## "Rompecabezas de la Ansiedad" played from the timelines with
+## [signal arg="anxiety_puzzle:<id>"]. The worker's is the first one of the
+## game, an easy one that doubles as the tutorial before Leo's.
+const ANXIETY_PUZZLES := {
+	"station_worker": preload("res://scenes/prologue_scene/puzzles/station_worker.tres"),
+}
+
 var train_has_left: bool = false
 var worker_dialogue_started: bool = false
 
@@ -15,6 +22,7 @@ func _ready() -> void:
 	train_trigger_area.body_entered.connect(_on_train_trigger_area_body_entered)
 	worker_interactable.interacted.connect(_on_worker_interacted)
 	worker_interactable.area_entered.connect(_on_worker_area_entered)
+	Dialogic.signal_event.connect(_on_dialogic_signal)
 
 # =========================
 # Train departure sequence
@@ -37,6 +45,18 @@ func _depart_train() -> void:
 
 	Dialogic.start("unknown_station_lost_phone")
 	await Dialogic.timeline_ended
+
+# =========================
+# Anxiety puzzle
+# =========================
+func _on_dialogic_signal(argument: Variant) -> void:
+	if not (argument is String and argument.begins_with("anxiety_puzzle:")):
+		return
+	var data: AnxietyPuzzleData = ANXIETY_PUZZLES.get(argument.get_slice(":", 1))
+	if data == null:
+		push_warning("Unknown anxiety puzzle '%s'" % argument)
+		return
+	AnxietyPuzzle.play_from_dialogic(self, data)
 
 # =========================
 # Worker conversation

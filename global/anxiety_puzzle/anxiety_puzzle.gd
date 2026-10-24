@@ -7,6 +7,7 @@ extends CanvasLayer
 ## Returned when Alice says nothing: the "(...)" word, or the time ran out.
 const SILENCE := "silence"
 const SILENCE_WORD := "(...)"
+const SCENE_PATH := "res://global/anxiety_puzzle/anxiety_puzzle.tscn"
 const WORD_SCENE := preload("res://global/anxiety_puzzle/thought_word.tscn")
 const FONT := preload("res://fonts/m3x6.ttf")
 ## Screen area the words float in: below the prompt, above Dialogic's text box.
@@ -60,8 +61,23 @@ func run(data: AnxietyPuzzleData) -> String:
 	tween.tween_property(root, "modulate:a", 1.0, FADE_TIME)
 	await tween.finished
 	_accepting = true
+	if data.hint_from_start:
+		_blink_answer_starts()
 	var result: String = await finished
 	return result
+
+## Plays a puzzle from a Dialogic [signal arg="anxiety_puzzle:<id>"] handler.
+## Pausing Dialogic here, inside the signal event, keeps it from running the
+## next event (the if on {anxiety_result}) until the puzzle has an answer.
+## The scene decides which puzzle an id means; this only runs it.
+static func play_from_dialogic(host: Node, data: AnxietyPuzzleData) -> void:
+	Dialogic.paused = true
+	# Loaded, not preloaded: the scene's own script cannot preload it.
+	var puzzle := (load(SCENE_PATH) as PackedScene).instantiate() as AnxietyPuzzle
+	host.add_child(puzzle)
+	var result := await puzzle.run(data)
+	Dialogic.VAR.set_variable("anxiety_result", result)
+	Dialogic.paused = false
 
 # =========================
 # Words
@@ -166,8 +182,9 @@ func _stumble() -> void:
 	_accepting = not _done
 	_blink_answer_starts()
 
-## Second hint: after a mistake, the words every answer starts with blink, so
-## the player knows where to begin without being told the whole order.
+## Second hint: after a mistake (or from the start, in a tutorial puzzle), the
+## words every answer starts with blink, so the player knows where to begin
+## without being told the whole order.
 func _blink_answer_starts() -> void:
 	var starts: PackedStringArray = []
 	for key in _data.phrases:

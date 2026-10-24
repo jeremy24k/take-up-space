@@ -4788,17 +4788,17 @@ position = Vector2(0, 576)
 push_direction = 3
 push_distance = 26.0
 push_duration = 0.4
-thought_lines = Array[String](["Mejor no me alejo más.", "No conozco esta zona. Primero, la comida de Wilson."])
+thought_lines = Array[String](["Mejor no me alejo más. No conozco esta zona. Primero, la comida de Wilson."])
 
 [node name="CollisionShape2D" parent="MapBoundaries/BoundaryLeft" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_boundary_left")
 
 [node name="BoundaryRight" parent="MapBoundaries" unique_id=1302775419 instance=ExtResource("38_boundary")]
-position = Vector2(1280, 576)
+position = Vector2(1282, 576)
 push_direction = 2
 push_distance = 26.0
 push_duration = 0.4
-thought_lines = Array[String](["Mejor no me alejo más.", "No conozco esta zona. Primero, la comida de Wilson."])
+thought_lines = Array[String](["Mejor no me alejo más. No conozco esta zona. Primero, la comida de Wilson."])
 
 [node name="CollisionShape2D" parent="MapBoundaries/BoundaryRight" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_boundary_right")
@@ -5191,7 +5191,7 @@ rect = Rect2(-40, -70, 80, 140)
 
 [node name="FirstCrossing" parent="ThoughtTriggers" unique_id=515253519 instance=ExtResource("35_thought")]
 position = Vector2(568, 1021)
-thought_lines = Array[String](["Solo por el paso de cebra.", "Si cruzo por donde no debo, alguien me gritará.", "Y no quiero que nadie me grite."])
+thought_lines = Array[String](["Solo por el paso de cebra.", "Si cruzo por donde no debo, alguien me gritará...  Y no quiero que nadie me grite."])
 wait_for_current = true
 metadata/_edit_group_ = true
 
@@ -5235,7 +5235,7 @@ position = Vector2(785, 401)
 [node name="StreetCat" type="Node2D" parent="PedestrianRoutes" unique_id=1009474339]
 
 [node name="Point1" type="Marker2D" parent="PedestrianRoutes/StreetCat" unique_id=1622216000]
-position = Vector2(1233, 237)
+position = Vector2(1233, 242)
 
 [node name="Point2" type="Marker2D" parent="PedestrianRoutes/StreetCat" unique_id=1786988767]
 position = Vector2(40, 214)
