@@ -28,10 +28,18 @@ var wilson: Wilson = null
 # =========================
 # IDs of the clues about Leo's store Alice has already seen (e.g. "delivery").
 var found_clues: Array[String] = []
+## Street beats that play only once, even if Alice comes back from Leo's store.
+var street_arrival_seen: bool = false
+var glass_tower_seen: bool = false
+
+# Emitted the first time each clue is found (the street's "lost" reminder
+# restarts its clock on it).
+signal clue_added(clue_id: String)
 
 func add_clue(clue_id: String) -> void:
 	if not found_clues.has(clue_id):
 		found_clues.append(clue_id)
+		clue_added.emit(clue_id)
 
 func has_any_clue(clue_ids: Array[String]) -> bool:
 	for clue_id in clue_ids:

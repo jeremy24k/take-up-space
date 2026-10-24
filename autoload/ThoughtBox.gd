@@ -31,7 +31,9 @@ const INSTANT_TEXT := "[lspeed=0!]"
 # =========================
 # Juice configuration
 # =========================
-const BORDER_ALPHA_MIN: float = 0.0
+## The cloud thins down to this opacity as the line's time runs out (the
+## text stays solid: only the panel's modulate changes).
+const CLOUD_ALPHA_MIN: float = 0.55
 ## Entry: from a bit smaller and lower to its place, overshooting slightly.
 ## The dialogue box enters from below; the cloud floats up instead.
 const ENTER_TIME: float = 0.22
@@ -55,12 +57,22 @@ const BUBBLE_EDGE := Color(0.82, 0.72, 1.0, 1.0)
 ## Where Alice's head is, in world pixels from her origin.
 const HEAD_OFFSET := Vector2(0, -22)
 ## Bottom of the cloud, measured up from the bottom of the screen (thought_style
-## puts its 88 px box 656 px above the bottom edge).
-const CLOUD_BOTTOM_FROM_SCREEN_BOTTOM: float = 656.0
+## puts its 96 px box 648 px above the bottom edge).
+const CLOUD_BOTTOM_FROM_SCREEN_BOTTOM: float = 648.0
 ## Bubbles draw in screen space, under Dialogic's layout.
 const BUBBLE_LAYER: int = 1
 
 var _token_counter: int = 0
+## True from the moment a say() starts preparing until its timeline is on
+## screen. Two thoughts starting at once (e.g. an NPC and a floor trigger on
+## the same step) would otherwise overlap: Dialogic would start the second one
+## while the first is not showing yet, _on_timeline_started would take it for a
+## conversation and turn auto-advance off, and the cloud would never close.
+var _starting: bool = false
+## Sources currently asking for the notice over Alice, and the notice itself
+## (in the bubble layer, created the first time it is needed).
+var _notice_sources: Dictionary = {}
+var _notice: ThoughtNotice
 ## Auto-advance settings of the dialogue style, restored after each thought.
 var _saved_fixed_delay: float = 1.0
 var _saved_per_character_delay: float = 0.1
@@ -69,9 +81,10 @@ var _auto_advance_owned: bool = false
 var _cloud_base_position := Vector2.ZERO
 var _cloud_tween: Tween
 var _bubble_layer: CanvasLayer
-## The cloud's own panel (thought_style.tres points its textbox at it). Its
-## border fades with the auto-advance progress: the thought "evaporates".
-var _thought_panel: StyleBoxFlat = preload("res://dialogic/styles/thought_panel.tres")
+## The cloud's own panel (thought_style.tres points its textbox at it): a
+## nine-slice StyleBoxTexture of thought_cloud.aseprite. Its opacity follows
+## the auto-advance progress: the thought "evaporates".
+var _thought_panel: StyleBoxTexture = preload("res://dialogic/styles/thought_panel.tres")
 
 # =========================
 # Lifecycle
@@ -93,6 +106,14 @@ func _on_timeline_started() -> void:
 		# A conversation never inherits the thought's auto-advance or juice.
 		_release_auto_advance()
 		_reset_cloud()
+		# Nor its style. Dialogic.start() only clears its state when no layout
+		# is active, so a conversation started over a thought (e.g. the train
+		# arriving while a remark is up) kept "Thought" as its base style and
+		# showed in the cloud, name tag cut off at the top of the screen.
+		# timeline_started fires before the first text event, so this is in time.
+		var styles: Node = Dialogic.Styles
+		if styles.base_style == THOUGHT_STYLE_NAME or styles.get_current_style() == THOUGHT_STYLE_NAME:
+			styles.change_style("")
 
 func _on_dialogic_signal(argument: Variant) -> void:
 	if argument is String and argument == EXIT_SIGNAL and is_showing():
@@ -108,6 +129,31 @@ func is_showing() -> bool:
 func is_thought(timeline: Variant) -> bool:
 	return timeline is DialogicTimeline and (timeline as DialogicTimeline).has_meta(THOUGHT_META)
 
+## The small thought cloud over Alice's head (ThoughtNotice) that says "Space
+## here gives a thought". Each source (e.g. an AmbientThought) turns its share
+## on and off; the notice shows while at least one source wants it.
+func set_notice(source: Object, on: bool) -> void:
+	if on:
+		_notice_sources[source] = true
+	else:
+		_notice_sources.erase(source)
+	for key in _notice_sources.keys():
+		if not is_instance_valid(key):
+			_notice_sources.erase(key)
+	_refresh_notice()
+
+## Never while a thought is being prepared or is on screen: between two
+## thoughts (Space pressed again) there is a gap of ~0.2 s with no timeline
+## (the bubbles rise first), and the areas ask for the notice in it.
+func _refresh_notice() -> void:
+	if not is_instance_valid(_notice):
+		_notice = ThoughtNotice.new()
+		_bubble_layer.add_child(_notice)
+	# Alice is a new node after every scene change.
+	_notice.target = get_tree().get_first_node_in_group("player") as Node2D
+	var busy := _starting or is_showing()
+	_notice.set_shown(not _notice_sources.is_empty() and _notice.target != null and not busy)
+
 ## Shows Alice's thought in the cloud, one line after the other, and returns
 ## when the cloud is gone (awaitable). A thought already on screen is replaced.
 ## With close_on_move, walking closes it at once: used by remarks on objects,
@@ -120,6 +166,12 @@ func say(lines: Array[String], close_on_move := false, hold_base := DEFAULT_HOLD
 			clean.append(line)
 	if clean.is_empty():
 		return
+
+	# One thought starts at a time; the next one then replaces it as usual.
+	while _starting:
+		await get_tree().process_frame
+	_starting = true
+	_refresh_notice()
 
 	# A conversation keeps the screen: the thought waits for it to end.
 	while Dialogic.current_timeline != null and not is_showing():
@@ -141,6 +193,7 @@ func say(lines: Array[String], close_on_move := false, hold_base := DEFAULT_HOLD
 	if _token_counter == token:
 		_release_auto_advance()
 		_reset_cloud()
+	_refresh_notice()
 
 # =========================
 # Timeline
@@ -167,13 +220,14 @@ func _watch(token: int, close_on_move: bool, bubbles: Array[Node2D]) -> void:
 	while not _is_showing_token(token) and start_wait > 0.0:
 		await tree.process_frame
 		start_wait -= get_process_delta_time()
+	_starting = false
 
 	await _enter_cloud(token)
 	_fade_bubbles(bubbles)
 
 	while _is_showing_token(token):
 		await tree.process_frame
-		_evaporate_border()
+		_evaporate_cloud()
 		if close_on_move and Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") != Vector2.ZERO:
 			await _leave_cloud()
 			if _is_showing_token(token):
@@ -213,7 +267,7 @@ func _enter_cloud(token: int) -> void:
 	cloud.scale = Vector2.ONE * ENTER_SCALE
 	cloud.position = _cloud_base_position + Vector2(0, ENTER_DRIFT)
 	cloud.modulate.a = 0.0
-	_set_border_alpha(1.0)
+	_set_cloud_alpha(1.0)
 
 	_kill_cloud_tween()
 	_cloud_tween = create_tween().set_parallel(true)
@@ -239,7 +293,7 @@ func _leave_cloud() -> void:
 ## normal before the dialogue box shows again.
 func _reset_cloud() -> void:
 	_kill_cloud_tween()
-	_set_border_alpha(1.0)
+	_set_cloud_alpha(1.0)
 	var cloud := _cloud()
 	if cloud == null:
 		return
@@ -254,17 +308,17 @@ func _kill_cloud_tween() -> void:
 		_cloud_tween.kill()
 
 # =========================
-# Evaporating border
+# Evaporating cloud
 # =========================
-## The border fades as the line's time runs out, and comes back with the next
+## The cloud thins as the line's time runs out, and comes back with the next
 ## line: the player sees how long it stays without a progress bar.
-func _evaporate_border() -> void:
+func _evaporate_cloud() -> void:
 	var progress: float = Dialogic.Inputs.auto_advance.get_progress()
 	if progress >= 0.0:
-		_set_border_alpha(lerpf(1.0, BORDER_ALPHA_MIN, clampf(progress, 0.0, 1.0)))
+		_set_cloud_alpha(lerpf(1.0, CLOUD_ALPHA_MIN, clampf(progress, 0.0, 1.0)))
 
-func _set_border_alpha(alpha: float) -> void:
-	_thought_panel.border_color.a = alpha
+func _set_cloud_alpha(alpha: float) -> void:
+	_thought_panel.modulate_color.a = alpha
 
 # =========================
 # Bubbles from Alice's head

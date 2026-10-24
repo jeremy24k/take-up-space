@@ -26,6 +26,7 @@ ThoughtBox="*res://autoload/ThoughtBox.gd"
 
 directories/dch_directory={
 "alice": "res://dialogic/characters/alice.dch",
+"grandma": "res://dialogic/characters/grandma.dch",
 "leo": "res://dialogic/characters/leo.dch",
 "metro_worker": "res://dialogic/characters/metro_worker.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
@@ -73,6 +74,7 @@ directories/dtl_directory={
 "metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
 "rotten_food": "res://dialogic/timeline/apartment/rotten_food.dtl",
 "street_ad_column": "res://dialogic/timeline/street/street_ad_column.dtl",
+"street_arrival": "res://dialogic/timeline/street/street_arrival.dtl",
 "street_atm": "res://dialogic/timeline/street/street_atm.dtl",
 "street_bakery": "res://dialogic/timeline/street/street_bakery.dtl",
 "street_bus_stop": "res://dialogic/timeline/street/street_bus_stop.dtl",
@@ -82,17 +84,12 @@ directories/dtl_directory={
 "street_glass_tower": "res://dialogic/timeline/street/street_glass_tower.dtl",
 "street_glass_tower_clue": "res://dialogic/timeline/street/street_glass_tower_clue.dtl",
 "street_grandma": "res://dialogic/timeline/street/street_grandma.dtl",
-"street_headphones_guy": "res://dialogic/timeline/street/street_headphones_guy.dtl",
-"street_office_man": "res://dialogic/timeline/street/street_office_man.dtl",
 "street_payphone": "res://dialogic/timeline/street/street_payphone.dtl",
 "street_payphone_broken": "res://dialogic/timeline/street/street_payphone_broken.dtl",
-"street_pedestrian_blonde": "res://dialogic/timeline/street/street_pedestrian_blonde.dtl",
-"street_pedestrian_cap": "res://dialogic/timeline/street/street_pedestrian_cap.dtl",
 "street_pets_closed": "res://dialogic/timeline/street/street_pets_closed.dtl",
 "street_phone_girl": "res://dialogic/timeline/street/street_phone_girl.dtl",
 "street_shop": "res://dialogic/timeline/street/street_shop.dtl",
 "street_shop_found": "res://dialogic/timeline/street/street_shop_found.dtl",
-"street_student": "res://dialogic/timeline/street/street_student.dtl",
 "street_subway_entrance": "res://dialogic/timeline/street/street_subway_entrance.dtl",
 "street_vending": "res://dialogic/timeline/street/street_vending.dtl",
 "test_tv": "res://dialogic/timeline/apartment/test_tv.dtl",

@@ -96,9 +96,10 @@ El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
 - **`thought` hereda de `dialogue`**, que a su vez hereda del estilo VN de
   Dialogic. Comparten raíz, así que cambiar de uno a otro solo reaplica
   ajustes sobre la misma caja: no se reconstruye nada y no hay parpadeo.
-  `thought` solo cambia la capa `"13"` (textbox): tamaño 640×88, a 24 px del
-  borde de arriba (`box_margin_bottom` 656), color, texto centrado, sin ▼, sin
-  barra de auto-avance, sin sonido de tipeo y entrada tipo *pop*.
+  `thought` solo cambia la capa `"13"` (textbox): tamaño 640×96, a 24 px del
+  borde de arriba (`box_margin_bottom` 648), panel propio (la nube), texto
+  centrado, sin ▼, sin barra de auto-avance, sin sonido de tipeo y sin las
+  animaciones de Dialogic (las hace `ThoughtBox`).
 - Están registrados en `dialogic/layout/style_list`, y `dialogue` es el
   `default_style`. Se editan en la pestaña **Styles** de Dialogic.
 - **`ThoughtBox.say(lines, close_on_move, hold_base)`** es la única entrada
@@ -114,8 +115,21 @@ El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
   estilo base si el actual es otro. Con el evento `[style]`, `thought` pasa a
   ser el base mientras dura el pensamiento. La primera línea de la siguiente
   conversación devuelve `dialogue` sola.
+- **Conversación que arranca encima de un pensamiento** (por ejemplo, el tren
+  llega mientras hay una nube): `Dialogic.start()` solo limpia su estado si no
+  hay un layout activo, así que el estilo base seguía siendo `Thought` y la
+  conversación salía en la nube, con la etiqueta del nombre cortada arriba.
+  `ThoughtBox._on_timeline_started` lo corrige: si empieza algo que no es un
+  pensamiento y el estilo es `Thought`, vuelve al estilo por defecto
+  (`change_style("")`) antes de la primera línea.
 - Si llega un pensamiento con una conversación en pantalla, espera a que
   termine. Si ya había otro pensamiento, lo reemplaza.
+- **Arrancan de a uno** (`_starting`). Si dos llegan en el mismo paso (un NPC
+  de ambiente y un `ThoughtTrigger` del suelo, por ejemplo), el segundo espera
+  a que el primero esté en pantalla y recién entonces lo reemplaza. Antes los
+  dos arrancaban mientras subían las burbujitas: Dialogic iniciaba el segundo
+  cuando el primero todavía no se veía, `_on_timeline_started` lo tomaba por
+  una conversación, apagaba el avance automático y la nube no se cerraba nunca.
 - `ThoughtBox.is_showing()` dice si lo que está en pantalla es un pensamiento.
   El `Player` lo usa para no frenarse y para poder interactuar igual (Espacio
   sigue siendo de las conversaciones, no de los pensamientos).
@@ -138,11 +152,25 @@ El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
   La señal dispara un fundido de 0,22 s mientras la nube sube 6 px, y el wait
   le da tiempo en pantalla. Si se cierra al caminar, se anima igual antes de
   terminar el timeline.
-- **El borde se evapora:** la nube usa su propio panel
-  (`dialogic/styles/thought_panel.tres`: fondo lila oscuro, borde 2 px lila
-  claro, esquinas de 10 px). Cada frame, el alfa del borde baja con
-  `auto_advance.get_progress()`, y vuelve entero con la línea siguiente. El
-  jugador ve cuánto le queda a la línea sin una barra.
+- **La nube es una nube de verdad (nine-slice):** `thought_panel.tres` es un
+  `StyleBoxTexture` de `dialogic/styles/thought_cloud.aseprite`. Es arte de
+  44×32 px, importado por AsepriteWizard como textura con `sheet/scale = 3`,
+  así que queda en 132×96. Los cortes son de 36 px por lado (12 de arte): las
+  esquinas son fijas, y el tramo del medio es un lóbulo grande (arriba y
+  abajo) o uno chico (a los costados) que se **repite** con `TILE_FIT`. Así la
+  nube suma lóbulos al crecer en vez de estirarse. Las esquinas no invaden el
+  tramo que se repite, y por eso las uniones no se notan. El script que la
+  generó (lóbulos = círculos, contorno = borde del relleno) se puede editar a
+  mano en Aseprite sin problema.
+  - Si cambias el tamaño del arte, actualiza `texture_margin_*` y que la
+    altura de la caja (96) siga siendo esquinas + un número entero de
+    repeticiones.
+  - Se probó antes un arte de 24×24 con bultos de 6 px: en 640 px de ancho
+    parecía un ribete festoneado, no una nube.
+- **La nube se evapora:** cada frame, la opacidad del panel
+  (`modulate_color`) baja de 1 a 0,55 con `auto_advance.get_progress()`, y
+  vuelve entera con la línea siguiente. El texto queda nítido. El jugador ve
+  cuánto le queda a la línea sin una barra.
 - **Los dos estilos comparten caja:** al terminar un pensamiento, y al
   empezar cualquier conversación, `_reset_cloud()` devuelve escala, posición,
   opacidad y borde a la normalidad.
@@ -270,9 +298,14 @@ activo. Emite `interacted` al empezar y `pushed_back` al terminar, por si la
 escena quiere cambiar el `timeline_name` (por ejemplo, otro texto la segunda vez).
 Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
 `CollisionShape2D` y fijar `thought_lines` (o `timeline_name`) y
-`push_direction`. En la calle usan las líneas "(se detiene y mira hacia atrás)
-Mejor no me alejo más." / "No conozco esta zona. Primero, la comida de Wilson."
-(antes era el timeline `street_boundary`, que se borró).
+`push_direction`. En la calle usan las líneas "Mejor no me alejo más." / "No
+conozco esta zona. Primero, la comida de Wilson." (antes era el timeline
+`street_boundary`, que se borró).
+
+**Sin acotaciones en la nube.** "(se detiene y mira hacia atrás)", "(mira las
+vidrieras)" o "(mira a su alrededor)" funcionan en la caja de abajo, que es
+una escena, pero en la nube se leen como si Alice pensara la acotación. Lo que
+va en la nube es solo lo que piensa.
 
 ### `NpcTalkArea` (`global/npcs/scenes/npc_talk_area.tscn`)
 `InteractableArea` para **cualquier personaje con el que Alice puede hablar**.
@@ -324,8 +357,56 @@ línea se escribe en la escena, sin `.dtl` propio.
 - `timeline_name` (heredado) sigue funcionando: si la escena lo pone desde
   `interacted`, Espacio abre ese diálogo en vez de la línea.
 - `speaker`: quién dice la línea (id del `.dch`, por defecto `alice`).
-- **Los NPCs ambientales no llevan el globito "..."**: ese globito
-  (`NpcTalkArea`) significa "tiene diálogo de verdad".
+- **La gente de fondo no es `RemarkInteractable`:** usa `AmbientThought`
+  (abajo). `RemarkInteractable` queda para objetos y puertas, donde es Alice
+  la que decide mirar.
+
+### `AmbientThought` (`global/npcs/scenes/ambient_thought.tscn`)
+Para la **gente de fondo**, la que Alice no se anima a hablarle. Es un
+`RemarkInteractable` (Espacio = una línea en la nube, rotando entre `lines`, o
+una del `pool`), con dos diferencias:
+- **Nada flota sobre el NPC.** Ni globito "..." ni "[Espacio]": el cartel del
+  área base sigue mostrándose y escondiéndose en los momentos de siempre, pero
+  invisible (`self_modulate.a = 0`), y su visibilidad maneja el aviso de Alice.
+- **El aviso va sobre Alice:** una nubecita lavanda arriba a la derecha de su
+  cabeza (`ThoughtNotice`, ver abajo). Dicen "a Alice se le pasa algo por la cabeza",
+  no "esta persona habla". El jugador decide si lo lee.
+- Alcance: círculo de 16 px alrededor del NPC, que toca el `InteractionDetector`
+  de Alice (16 px delante de ella).
+- Líneas: **1 o 2 cortas** por NPC. Cuatro seguidas ya es un monólogo.
+- En un `WalkingNPC` va como hijo, así se mueve con él. Se llama
+  `AmbientThought`, no `InteractableArea`, para que `street_zone_1.gd` no lo
+  congele al pulsar (no hay conversación que esperar).
+- **Historia:** primero la gente de fondo tuvo globito "..." (prometía una
+  charla que no llegaba). Después, pensamientos automáticos al pasar cerca, sin
+  Espacio: sumados a los avisos del suelo, la torre y los bordes, había nube
+  todo el tiempo y era abrumador. Lo que funcionaba era que el jugador decida
+  cuándo leer; solo faltaba que el aviso no prometiera nada.
+
+### `ThoughtNotice` (`global/thought_notice.gd`, `global/thought_notice.aseprite`)
+La nubecita de pensamiento sobre Alice. La crea y maneja `ThoughtBox`:
+`ThoughtBox.set_notice(fuente, true/false)`. Varias fuentes pueden pedirla a la
+vez y se ve mientras al menos una la pida.
+- **Dibujo (15×13):** de la misma familia que el globito "..." de los NPCs
+  (tamaño y contorno casi negro `121214`), pero es una nube con bultitos, en
+  el lavanda de la nube grande (`d1b8ff`, con luz `efe6ff` y sombra `a58cd8`),
+  y en vez de la colita de diálogo tiene dos burbujitas que bajan hacia su
+  cabeza. Se lee como "es de ella", no del NPC. (Antes eran tres puntitos
+  dibujados por código; se veían raros.)
+- **Se dibuja en pantalla, no en el mundo:** vive en la capa de las burbujas de
+  `ThoughtBox` y copia cada frame la transformación de Alice en pantalla (zoom
+  incluido). En el mundo, el `CanvasModulate` de la calle (`SunFilter`, cálido)
+  la teñía de rosa, y paredes y techos la podían tapar.
+- Arriba a la derecha de la cabeza (`BASE_POSITION` = (10, −24)), no encima:
+  encima suele estar la persona a la que Alice mira.
+- Aparece con un pop, flota 1 px, y se apaga con un fundido. Al pulsar Espacio
+  se apaga y suben las burbujas de verdad hacia la nube.
+- **Nunca mientras se prepara o se muestra un pensamiento** (`_refresh_notice`
+  mira `_starting` e `is_showing()`, y se vuelve a evaluar al empezar y al
+  terminar cada `say()`). Al pulsar Espacio con una nube en pantalla, entre el
+  pensamiento viejo y el nuevo hay ~0,2 s sin timeline (suben las burbujas), y
+  el área volvía a pedir el aviso: la nubecita asomaba un instante. Además
+  espera 0,12 s (`SHOW_DELAY`) antes de aparecer, para no parpadear nunca.
 
 **Regla de coherencia:** si un tipo de objeto responde en algún lugar,
 responden todos los que se ven igual. Si un tipo no tiene contenido en ningún
@@ -413,6 +494,18 @@ await npc.walk_to(target_position)    # Tween en línea recta + animación walk_
 # El propio NPC decide a dónde ir — la escena solo le pasa "el objetivo".
 npc.resolve_approach_point(target_position)
 ```
+
+**`pause_near_player`** (px, 0 = nunca): si Alice se acerca a esa distancia
+mientras camina, el NPC pausa su tween, la mira, y sigue cuando ella se aleja
+`PAUSE_HYSTERESIS` (12 px) más. Lo usan los dos peatones y el gato de la calle
+(20 px), para que haya tiempo de apretar Espacio.
+
+**Reposo lateral:** los peatones y el gato tienen un tag `idle_side` de un solo
+frame en su `.aseprite` (el frame 5, el paso con las piernas juntas del
+`walk_side`). Mientras está detenido, el NPC sigue mirando a Alice si ella lo
+rodea. Si un sprite no tiene el reposo de esa dirección, `face_direction` usa
+`idle_front`, y si tampoco existe, detiene el sprite, para que nunca quede
+caminando en el lugar.
 
 `resolve_approach_point()` es lo que hace configurable el destino **desde el
 NPC**, no desde la escena que lo llama:
@@ -728,8 +821,9 @@ tono bajo, nada de escena. Con Dialogic: `SittingGirl`, `ListeningGuy` y
   `station_map`. Las áreas de los mapas bajan hasta y≈592: el mapa está
   encerrado por bancos y antes no se podía alcanzar.
 - `TicketWindows`, `StaffDoorLeft`/`StaffDoorRight` y `NoticeBoards`.
-- **NPCs sin diálogo:** `OfficeWorker` y `VendingGuy` con línea propia;
-  `SittingBoy`, `LeaningBoy` y `CapGuy` con el pool.
+- **NPCs sin diálogo** (`AmbientThought`, sin globito; la nubecita aparece
+  sobre Alice): `OfficeWorker` y `VendingGuy` con línea propia; `SittingBoy`,
+  `LeaningBoy` y `CapGuy` con el pool.
 - **Los bancos no responden**, en ninguna escena. Se quitó `Bench` y su
   timeline `unknown_station_bench`.
 
@@ -899,20 +993,39 @@ Si se mueve un área, mantener las dos reglas.
 
 ### Pensamientos e interacciones
 Mismo patrón que la estación desconocida:
+- **Apertura: el objetivo en la caja de abajo.** Al entrar a la calle por
+  primera vez (`GameManager.street_arrival_seen`), un segundo después del
+  fundido, Alice dice `street_arrival`: "No sé dónde estoy. Pero necesito una
+  tienda que venda comida para gatos. Wilson me está esperando.". Va en la caja
+  y no en la nube porque es el objetivo de toda la calle y no se puede perder.
+  No rompe la regla de los dos lenguajes: no se dispara al caminar, es la
+  apertura de la escena (como el saludo de Leo). Reemplaza al antiguo
+  pensamiento `Arrival`.
+- **Primer vistazo a la torre de cristal.** `GlassTowerSighting` es un
+  `VisibleOnScreenNotifier2D` que cubre la torre. La primera vez que asoma en
+  pantalla (`GameManager.glass_tower_seen`), Alice queda quieta, la cámara se
+  desliza hasta la torre (`camera.offset`, 0,9 s), se queda 1,4 s y vuelve
+  (0,7 s). Mientras tanto, en la nube: "Qué edificio más raro... todo de
+  cristal.". Si después escucha "la torre de cristal", ya sabe cuál es.
+- **Recordatorio si se pierde** (`_tick_lost_reminder` en `street_zone_1.gd`).
+  Si pasan 150 s caminando (sin contar diálogos ni cutscenes) sin encontrar una
+  pista nueva (`GameManager.clue_added` reinicia el reloj) y sin acercarse a
+  menos de 220 px de la tienda, sale en la nube: "Quizá alguien por aquí sepa
+  dónde hay un minimercado..." y, la segunda vez, "Podría fijarme mejor en los
+  carteles. O en lo que dice la gente.". Si ya oyó a la chica del teléfono,
+  apunta a la torre: "Un minimercado junto a la torre de cristal... Tiene que
+  estar cerca.". Como máximo 2 recordatorios, y ninguno después de entrar a la
+  tienda de Leo.
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
-  al pasar: `Arrival` en el punto de inicio de Alice, `FirstCrossing`,
-  `Houses` y `ShoppingBlock`.
+  al pasar: `FirstCrossing`, `Houses` y `ShoppingBlock`.
 - **`FirstCrossing` explica la regla del mapa: solo se cruza por los pasos de
   cebra** ("(mira la calle) Mejor cruzo solo por los pasos de cebra.", y
   después "Hay muy poca gente..."). Está en x=540, en la columna del café, por
   donde pasan todos los caminos hacia la primera esquina. Antes estaba en
   x=777, pegado al borde, y aparecía cuando Alice ya había chocado con la calle.
-  Tiene `wait_for_current`, así que no corta `Arrival`. Para que el aviso salga
-  unos 2,5 s antes de la esquina caminando derecho (a 100 px/s), `Arrival` se
-  redujo a una sola línea (`display_duration` 3,0). Antes eran 4 líneas y unos
-  13 s, y tapaba todo el trayecto hasta la esquina. `ShoppingBlock` está en la vereda, junto a la
-  panadería, y cierra el desvío: "(mira las vidrieras) Una panadería,
-  discos... Nada para gatos.". Antes decía "Esto es una zona de tiendas. Por
+  Tiene `wait_for_current`, para no cortar otro pensamiento. `ShoppingBlock` está en la vereda, junto a la
+  panadería, y cierra el desvío: "Una panadería, discos... Nada para
+  gatos." Antes decía "Esto es una zona de tiendas. Por
   aquí tiene que haber algo.", y en los dos playtests hizo creer que la tienda
   estaba en esa manzana. El olor a pan quedó solo en el diálogo de la puerta
   (`BakeryDoor`), así no se repite.
@@ -929,8 +1042,8 @@ Mismo patrón que la estación desconocida:
   - Casas y edificios, "No es mi casa.": `HouseDoorGreen`/`Grey`,
     `HouseDoorNorth1`–`3`, `BuildingDoorNorthwest`, `BuildingDoorWest`.
     `ATMBuildingDoor` dice "Cerrado.".
-  - NPCs sin diálogo: `NewspaperReader` y `VinylBrowser` con línea propia,
-    `BenchSitter` con el pool.
+  - NPCs sin diálogo (`AmbientThought`): `NewspaperReader` y `VinylBrowser`
+    con línea propia, `BenchSitter` con el pool.
   - Las dos bocas del metro ya las cubre la misma área `SubwayEntrance`
     (89×109).
 - **La torre de vidrio es una interacción, no un pensamiento.** Antes era un
@@ -970,12 +1083,12 @@ Mismo patrón que la estación desconocida:
 - **Globito sobre los NPCs con diálogo** (`global/interaction_hint.tscn`):
   - Es un `Sprite2D` con un "..." dibujado en `interaction_hint.aseprite`
     (13×9). Flota 2 px arriba y abajo, redondeado a píxeles enteros, y se
-    esconde mientras haya cualquier diálogo en pantalla.
-  - Ya no se pone a mano: viene dentro de `NpcTalkArea` (sección 5). En la
-    calle lo tienen los 8 NPCs que hablan: oficinista, estudiante, chico de
-    auriculares, chica del teléfono, repartidor, abuela y los dos peatones.
-  - Sirve para que se distingan de la gente que es decorado. Un NPC nuevo con
-    diálogo usa `NpcTalkArea`; uno de ambiente, no lleva área.
+    esconde mientras haya una conversación en la caja de abajo. Con un
+    pensamiento en la nube se queda, porque la nube no frena a Alice.
+  - Ya no se pone a mano: viene dentro de `NpcTalkArea` (sección 5). **Solo
+    la gente con conversación de verdad lo lleva**: en la calle, la chica del
+    teléfono, el repartidor, la abuela y el gato. La gente de fondo usa
+    `AmbientThought`, sin globito.
 
 ### Pistas hacia la tienda de Leo
 La tienda de Leo no se ve desde el inicio. La idea es que el jugador la
@@ -992,8 +1105,8 @@ frutas** del escaparate de Leo.
 | `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` (grupo `vending`) |
 | `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | A medias: lleva latas de comida para gatos | `street_grandma` |
 | `BusStopMap` | Mapa de rutas de la parada | A medias: "Hay tiendas pasando la torre." | `street_bus_stop` |
-| `PhoneGirl` | Chica del teléfono (ya existía) | Buena e incompleta: oye "el almacén ese, el de la torre" | `street_phone_girl` |
-| `Delivery` | Repartidor (`DeliveryNPC`, col. 14), vereda este de la manzana central | Buena: caja de "Almacén" con frutas | `street_delivery` |
+| `PhoneGirl` | Chica del teléfono (ya existía) | Buena e incompleta: oye "el minimercado ese, el de la torre de cristal", y Alice **la repite**: "¿Un minimercado junto a una torre de cristal? Quizá ahí venden comida para gatos." Así el jugador sabe que es **la** pista | `street_phone_girl` |
+| `Delivery` | Repartidor (`DeliveryNPC`, col. 14), vereda este de la manzana central | Buena: caja de "Minimercado" con frutas | `street_delivery` |
 | `AdColumn` | Columna de afiches de la manzana de Leo | Buena, la confirmación: volante con frutas | `street_ad_column` |
 
 - **Registro:** `street_zone_1.gd` (`CLUE_AREAS`) conecta el `interacted` de
@@ -1008,7 +1121,7 @@ frutas** del escaparate de Leo.
   | Área | Pistas que la activan | Timeline nuevo |
   |---|---|---|
   | `Shop`, el escaparate de Leo | `delivery_box` o `store_flyer` | `street_shop_found`: "El cartel de frutas... Es aquí." |
-  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "El de la torre", decía. (mira a su alrededor) Aquí no hay ningún almacén... ¿Cruzando la calle, quizás? |
+  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "El de la torre de cristal", decía. (mira a su alrededor) Aquí no hay ningún minimercado... ¿Cruzando la calle, quizás? |
 
 - **Por qué existe la reacción de la torre:** en el playtest, la jugadora
   escuchó "el de la torre", llegó a la base de la torre y se quedó sin saber
@@ -1017,6 +1130,23 @@ frutas** del escaparate de Leo.
   torre"): no dice dónde. Es la torre la que empuja un poco, sin dar la
   respuesta. Se probó decir "detrás de la torre" en la pista, pero era
   demasiado obvio.
+- **"Minimercado", no "almacén".** "Almacén" puede ser un depósito o muchas
+  otras cosas; "minimercado" es español neutro y se entiende como una tienda
+  chica de comida. Se usa en el volante, la caja del repartidor, la chica del
+  teléfono y la torre.
+- **NPCs de pista vs. de ambiente.** Solo los que dan pistas (la chica del
+  teléfono, la abuela de las latas y el repartidor) tienen conversación. Los
+  de ambiente (`OfficeMan`, `Student`, `HeadphonesGuy` y los peatones
+  `PedestrianA`/`PedestrianB`, más `NewspaperReader`, `VinylBrowser` y
+  `BenchSitter`) son `AmbientThought`: sin globito; cerca de ellos aparecen
+  las burbujitas sobre Alice y Espacio muestra una línea en la nube (su mejor
+  momento de los diálogos viejos, recortado a 1 o 2 líneas). Sus `.dtl` (`street_office_man`, `street_student`,
+  `street_headphones_guy`, `street_pedestrian_cap`,
+  `street_pedestrian_blonde`) se borraron. El gato es la excepción: conserva
+  su diálogo (Wilson).
+- **Los que caminan se detienen cuando Alice se acerca**
+  (`WalkingNPC.pause_near_player`, 20 px en los dos peatones y el gato). Se
+  paran, la miran y siguen cuando ella se aleja 12 px más.
 - **Una pista no puede depender de otra.** El jugador puede verlas en
   cualquier orden, o ninguna, así que ningún texto debe nombrar una pista
   anterior (por ejemplo "como en la caja del repartidor").
@@ -1025,7 +1155,7 @@ frutas** del escaparate de Leo.
 Todos son monólogos de Alice: los NPCs no hablan. Al escribir uno nuevo:
 - **Poco texto y nada de explicar lo que ya se ve.** El jugador ya sabe que
   está perdida y sin teléfono. No hace falta repetir el objetivo (la comida de
-  Wilson) en cada diálogo. Ya lo dicen `Arrival`, el de
+  Wilson) en cada diálogo. Ya lo dicen `street_arrival`, el de
   gorra roja, la entrada del metro y el límite del mapa.
 - **Mostrar, no decir.** El teléfono público termina en "Ni siquiera el mío" en
   vez de "estoy sola". La panadería cierra con "No. Es para Wilson." y nada más.
@@ -1208,6 +1338,12 @@ delantal con el carrito, pantalón gris azulado y zapatillas grises. Tags:
   salieron.
 - `metro_stations.tscn` es la escena activa del andén. La copia antigua con
   espacio fue eliminada para evitar rutas ambiguas.
+- **Gente del andén:** con conversación (globito "..."), `ImportantMan` y
+  `TwoYoungGuys`. De fondo (`AmbientThought`): `BenchSitter` (pool),
+  `ReadingStander` ("Lee de pie, en pleno andén." / "Yo me mareo si leo en el
+  metro."), `PhoneGirl` ("Habla por teléfono como si nadie la oyera.") y
+  `ListeningGuy` ("Auriculares puestos. Así nadie te habla." / "Yo también
+  llevo los míos."). Los tres últimos antes no respondían a nada.
 - La escena reutilizable de escaleras vive en `global/stairs/` y conserva su
   UID original para no romper las instancias existentes.
 - **`TrainAmbience`** no tiene sonido asignado; el código lo detecta y no falla.

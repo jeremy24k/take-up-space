@@ -48,6 +48,9 @@ func set_suppressed(value: bool) -> void:
 	_refresh()
 
 func _on_dialogue_started() -> void:
+	# A thought in the cloud does not stop Alice, so the street stays as it is.
+	if ThoughtBox.is_showing():
+		return
 	_in_dialogue = true
 	_refresh()
 

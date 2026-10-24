@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="RemarkPool" format=3]
+[gd_resource type="Resource" script_class="RemarkPool" format=3 uid="uid://dph764nuocydh"]
 
-[ext_resource type="Script" path="res://global/remark_pool.gd" id="1_pool"]
+[ext_resource type="Script" uid="uid://r4s4jtq4upd" path="res://global/remark_pool.gd" id="1_pool"]
 
 [resource]
 script = ExtResource("1_pool")

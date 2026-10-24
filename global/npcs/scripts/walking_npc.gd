@@ -38,6 +38,39 @@ var facing: Vector2 = Vector2.DOWN
 ## Animation played while it is stopped for a dialogue (e.g. the street cat's
 ## "meow"). Empty = it just freezes on its current frame.
 @export var talk_animation: String = ""
+## Distance (px) at which it stops walking and turns to Alice, so a passer-by
+## gives the player time to press Space. It walks on once she is a bit
+## further away. 0 = never stops.
+@export var pause_near_player: float = 0.0
+
+## Extra distance before walking on again, so it does not stutter at the edge.
+const PAUSE_HYSTERESIS: float = 12.0
+
+var _walk_tween: Tween
+var _walk_direction := Vector2.ZERO
+var _paused_for_player: bool = false
+
+# =========================
+# Pausing near Alice
+# =========================
+func _physics_process(_delta: float) -> void:
+	if pause_near_player <= 0.0 or _walk_tween == null or not _walk_tween.is_valid():
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return
+	var distance := global_position.distance_to(player.global_position)
+	if not _paused_for_player and distance <= pause_near_player:
+		_paused_for_player = true
+		_walk_tween.pause()
+		face_direction(global_position.direction_to(player.global_position))
+	elif _paused_for_player and distance <= pause_near_player + PAUSE_HYSTERESIS:
+		# Keeps looking at her if she walks around it.
+		face_direction(global_position.direction_to(player.global_position))
+	elif _paused_for_player:
+		_paused_for_player = false
+		_play_animation("walk_" + _direction_suffix(_walk_direction))
+		_walk_tween.play()
 
 # =========================
 # Route configuration
@@ -61,7 +94,16 @@ func face_direction(direction: Vector2) -> void:
 	if direction == Vector2.ZERO:
 		return
 	facing = direction
-	_play_animation("idle_" + _direction_suffix(direction))
+	var idle := "idle_" + _direction_suffix(direction)
+	if sprite.sprite_frames.has_animation(idle):
+		sprite.play(idle)
+	elif sprite.sprite_frames.has_animation("idle_front"):
+		# Several sprites only have a front idle (e.g. the street pedestrians):
+		# standing still facing the camera beats sliding in a walk cycle.
+		sprite.flip_h = false
+		sprite.play("idle_front")
+	else:
+		sprite.stop()
 
 func _direction_suffix(direction: Vector2) -> String:
 	# Side movement has priority and controls horizontal flip.
@@ -129,11 +171,22 @@ func _walk_leg(target_position: Vector2, speed: float) -> Vector2:
 	if direction == Vector2.ZERO:
 		return Vector2.ZERO
 
-	_play_animation("walk_" + _direction_suffix(direction))
+	_walk_direction = direction
+	if _paused_for_player:
+		# A new leg started while she was standing next to it: start it paused.
+		face_direction(global_position.direction_to(_player_position()))
+	else:
+		_play_animation("walk_" + _direction_suffix(direction))
 
 	var distance := global_position.distance_to(target_position)
-	var tween := create_tween()
-	tween.tween_property(self, "global_position", target_position, distance / speed)
-	await tween.finished
+	_walk_tween = create_tween()
+	_walk_tween.tween_property(self, "global_position", target_position, distance / speed)
+	if _paused_for_player:
+		_walk_tween.pause()
+	await _walk_tween.finished
 
 	return direction
+
+func _player_position() -> Vector2:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	return player.global_position if player else global_position + _walk_direction

@@ -11,12 +11,14 @@
 [ext_resource type="Texture2D" uid="uid://bubfhme61ygfc" path="res://scenes/prologue_scene/assets/hallway_sprite_sheet.aseprite" id="10_iund7"]
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="16_0u374"]
 [ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="17_qodp8"]
+[ext_resource type="Resource" uid="uid://dph764nuocydh" path="res://global/remarks/ambient_npc_pool.tres" id="19_ch5yu"]
 [ext_resource type="PackedScene" uid="uid://myv7hnkrtdph" path="res://player/player.tscn" id="23_ru8rr"]
 [ext_resource type="Material" uid="uid://cmbcfxlkxxnwq" path="res://addons/TileMapDual/ghost_material.tres" id="25_di0kh"]
 [ext_resource type="Texture2D" uid="uid://c3252cnas5bar" path="res://scenes/prologue_scene/assets/borders.aseprite" id="26_704ny"]
 [ext_resource type="Script" uid="uid://cjk8nronimk5r" path="res://addons/TileMapDual/tile_map_dual.gd" id="27_o4735"]
 [ext_resource type="Texture2D" uid="uid://27cyc8vi7hms" path="res://scenes/prologue_scene/assets/dual_collisions.aseprite" id="28_rldfb"]
 [ext_resource type="Script" uid="uid://cf0avee3l6ary" path="res://scenes/prologue_scene/scenes/lights_container.gd" id="29_0pxkv"]
+[ext_resource type="PackedScene" path="res://global/npcs/scenes/ambient_thought.tscn" id="ambient_thought"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wgfvr"]
@@ -1269,18 +1271,45 @@ metadata/_edit_lock_ = true
 [node name="InteractableDetectors" type="Node2D" parent="." unique_id=42133056]
 z_index = 3
 
+[node name="ReadingStander" parent="InteractableDetectors" unique_id=1984831089 instance=ExtResource("ambient_thought")]
+position = Vector2(879, 266)
+lines = Array[String](["Lee de pie, en pleno andén.", "Yo me mareo si leo en el metro."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
+[node name="PhoneGirl" parent="InteractableDetectors" unique_id=666239537 instance=ExtResource("ambient_thought")]
+position = Vector2(761, 206)
+lines = Array[String](["Habla por teléfono como si nadie la oyera."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
+[node name="ListeningGuy" parent="InteractableDetectors" unique_id=1781956517 instance=ExtResource("ambient_thought")]
+position = Vector2(782, 217)
+lines = Array[String](["Auriculares puestos. Así nadie te habla.", "Yo también llevo los míos."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
 [node name="TicketStore" parent="InteractableDetectors" unique_id=444772387 instance=ExtResource("16_0u374")]
 position = Vector2(449, 651)
 timeline_name = "metro/ticket_store"
 
 [node name="ImportantMan" parent="InteractableDetectors" unique_id=176282367 instance=ExtResource("npc_talk_area")]
-hint_position = Vector2(-1, -18)
 position = Vector2(497, 282)
+hint_position = Vector2(-1, -18)
 timeline_name = "metro/important_man"
 
 [node name="TwoYoungGuys" parent="InteractableDetectors" unique_id=2012285578 instance=ExtResource("npc_talk_area")]
-hint_position = Vector2(-11, -24)
 position = Vector2(197, 264)
+hint_position = Vector2(-11, -24)
 timeline_name = "metro/two_young_guys"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/TwoYoungGuys" index="0" unique_id=1198806918]
@@ -1300,6 +1329,15 @@ shape = SubResource("RectangleShape2D_0u374")
 [node name="Label" parent="InteractableDetectors/MetroNoticeBoard" index="1" unique_id=1384165053]
 offset_top = -14.0
 offset_bottom = -2.0
+
+[node name="BenchSitter" parent="InteractableDetectors" unique_id=845812205 instance=ExtResource("ambient_thought")]
+position = Vector2(520, 659)
+lines = Array[String]([])
+loop_lines = true
+pool = ExtResource("19_ch5yu")
+group_id = ""
+first_timeline = ""
+first_line = ""
 
 [node name="TrainTriggerArea" type="Area2D" parent="." unique_id=368345101]
 position = Vector2(521, 212)
@@ -1342,5 +1380,6 @@ autostart = true
 [editable path="MiddleLayer/Player"]
 [editable path="InteractableDetectors/TwoYoungGuys"]
 [editable path="InteractableDetectors/MetroNoticeBoard"]
+[editable path="InteractableDetectors/BenchSitter"]
 [editable path="ThoughtTriggers/Metro"]
 [editable path="ThoughtTriggers/Entry"]

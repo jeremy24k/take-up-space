@@ -13,8 +13,52 @@ const PEDESTRIAN_PAUSE: float = 2.5
 @onready var pedestrian_routes: Node2D = $PedestrianRoutes
 @onready var interactables: Node2D = $InteractableDetectors
 @onready var cat_talk_area: InteractableArea = $MiddleLayer/NPCS/StreetCat/InteractableArea
+@onready var player: Player = $MiddleLayer/Player
+@onready var camera: Camera2D = $MiddleLayer/Player/Camera2D
+@onready var tower_sighting: VisibleOnScreenNotifier2D = $GlassTowerSighting
+@onready var shop: Node2D = $InteractableDetectors/Shop
 
 var _cat_met: bool = false
+
+# =========================
+# Arrival configuration
+# =========================
+## The scene opens with Alice saying what she needs, in the dialogue box (it
+## is the goal of the whole street, so it must not get lost while walking).
+## Played once, after the fade-in.
+const ARRIVAL_TIMELINE := "street_arrival"
+const ARRIVAL_DELAY: float = 1.0
+
+# =========================
+# Glass tower configuration
+# =========================
+## The first time the tower comes on screen, the camera glides to it for a
+## moment and Alice notices it. When the phone girl later says "la torre de
+## cristal", the player already knows which building she means.
+const TOWER_LINE := "Qué edificio más raro... todo de cristal."
+const TOWER_PAN_TIME: float = 0.9
+const TOWER_HOLD_TIME: float = 1.4
+const TOWER_RETURN_TIME: float = 0.7
+
+# =========================
+# Lost reminder configuration
+# =========================
+## If Alice wanders this long without finding a new clue or getting near the
+## shop, she reminds the player that people and signs can help. Never more
+## than LOST_REMINDER_MAX times, and the clock restarts with every clue.
+const LOST_REMINDER_AFTER: float = 150.0
+const LOST_REMINDER_MAX: int = 2
+const SHOP_NEAR_DISTANCE: float = 220.0
+const LOST_LINES: Array[String] = [
+	"Quizá alguien por aquí sepa dónde hay un minimercado...",
+	"Podría fijarme mejor en los carteles. O en lo que dice la gente.",
+]
+## Once she overheard the phone girl, the reminder points at the tower.
+const LOST_TOWER_LINE := "Un minimercado junto a la torre de cristal... Tiene que estar cerca."
+const TOWER_CLUE := "overheard_store"
+
+var _lost_time: float = 0.0
+var _lost_reminders_shown: int = 0
 
 # =========================
 # Clue configuration
@@ -42,6 +86,76 @@ func _ready() -> void:
 	_connect_clues()
 	_start_pedestrians()
 	cat_talk_area.interacted.connect(_on_cat_interacted.bind(cat_talk_area))
+	GameManager.clue_added.connect(func(_clue_id: String) -> void: _lost_time = 0.0)
+	if not GameManager.glass_tower_seen:
+		tower_sighting.screen_entered.connect(_on_tower_on_screen, CONNECT_ONE_SHOT)
+	if not GameManager.street_arrival_seen:
+		_play_arrival()
+
+func _process(delta: float) -> void:
+	_tick_lost_reminder(delta)
+
+# =========================
+# Arrival
+# =========================
+func _play_arrival() -> void:
+	GameManager.street_arrival_seen = true
+	player.lock_control()
+	await get_tree().create_timer(ARRIVAL_DELAY).timeout
+	# Dialogic stops her for the dialogue on its own; the lock was only for
+	# the fade-in.
+	player.unlock_control()
+	Dialogic.start(ARRIVAL_TIMELINE)
+
+# =========================
+# First look at the glass tower
+# =========================
+func _on_tower_on_screen() -> void:
+	if GameManager.glass_tower_seen:
+		return
+	GameManager.glass_tower_seen = true
+	# A conversation on screen comes first; the tower waits for it.
+	while Dialogic.current_timeline != null and not ThoughtBox.is_showing():
+		await Dialogic.timeline_ended
+	player.lock_control()
+
+	var to_tower := tower_sighting.global_position - camera.get_screen_center_position()
+	var pan := create_tween()
+	pan.tween_property(camera, "offset", to_tower, TOWER_PAN_TIME) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	var tower_lines: Array[String] = [TOWER_LINE]
+	ThoughtBox.say(tower_lines)
+	await pan.finished
+	await get_tree().create_timer(TOWER_HOLD_TIME).timeout
+
+	var back := create_tween()
+	back.tween_property(camera, "offset", Vector2.ZERO, TOWER_RETURN_TIME) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	await back.finished
+	player.unlock_control()
+
+# =========================
+# Lost reminder
+# =========================
+func _tick_lost_reminder(delta: float) -> void:
+	if _lost_reminders_shown >= LOST_REMINDER_MAX or GameManager.leo_greeted:
+		return
+	# Only time spent actually walking around counts.
+	if Dialogic.current_timeline != null or player.is_control_locked:
+		return
+	if player.global_position.distance_to(shop.global_position) < SHOP_NEAR_DISTANCE:
+		_lost_time = 0.0
+		return
+	_lost_time += delta
+	if _lost_time < LOST_REMINDER_AFTER:
+		return
+	_lost_time = 0.0
+	var line := LOST_LINES[mini(_lost_reminders_shown, LOST_LINES.size() - 1)]
+	if GameManager.found_clues.has(TOWER_CLUE):
+		line = LOST_TOWER_LINE
+	_lost_reminders_shown += 1
+	var reminder: Array[String] = [line]
+	ThoughtBox.say(reminder)
 
 # =========================
 # Clues about Leo's store

@@ -24,9 +24,9 @@ overrides = {
 "box_animation_out": "0",
 "box_color_custom": "Color(1, 1, 1, 1)",
 "box_color_use_global": "false",
-"box_margin_bottom": "656",
+"box_margin_bottom": "648",
 "box_panel": "res://dialogic/styles/thought_panel.tres",
-"box_size": "Vector2(640, 88)",
+"box_size": "Vector2(640, 96)",
 "next_indicator_enabled": "false",
 "text_alignment": "1",
 "typing_sounds_enabled": "false"
