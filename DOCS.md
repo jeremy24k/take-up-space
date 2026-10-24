@@ -1123,9 +1123,9 @@ frutas** del escaparate de Leo.
 | `PetsShopDoor` | Puerta de la tienda PETS, arriba de la panadería | Falsa: "Cerrado por reformas." | `street_pets_closed` |
 | `BrokenPayphone` | Segunda cabina, junto al señor del diario | Falsa: "(levanta el auricular) ... No hay tono." La otra cabina (`Payphone`) tiene el diálogo de "Ni siquiera el mío". | `street_payphone_broken` |
 | `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` (grupo `vending`) |
-| `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | A medias: lleva latas de comida para gatos | `street_grandma` |
+| `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15, personaje `grandma` = "Anciana"), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | **La precisa**: Alice se atreve a preguntarle y ella contesta "Hay un minimercado justo detrás de la torre de cristal." | `street_grandma` |
 | `BusStopMap` | Mapa de rutas de la parada | A medias: "Hay tiendas pasando la torre." | `street_bus_stop` |
-| `PhoneGirl` | Chica del teléfono (ya existía) | Buena e incompleta: oye "el minimercado ese, el de la torre de cristal", y Alice **la repite**: "¿Un minimercado junto a una torre de cristal? Quizá ahí venden comida para gatos." Así el jugador sabe que es **la** pista | `street_phone_girl` |
+| `PhoneGirl` | Chica del teléfono (ya existía) | Buena pero vaga: oye "...sí, en el minimercado ese, junto a la torre de cristal...", y Alice **la repite**: "¿Un minimercado? ¿Junto a la torre?" / "Quizá ahí vendan comida para gatos." | `street_phone_girl` |
 | `Delivery` | Repartidor (`DeliveryNPC`, col. 14), vereda este de la manzana central | Buena: caja de "Minimercado" con frutas | `street_delivery` |
 | `AdColumn` | Columna de afiches de la manzana de Leo | Buena, la confirmación: volante con frutas | `street_ad_column` |
 
@@ -1141,7 +1141,7 @@ frutas** del escaparate de Leo.
   | Área | Pistas que la activan | Timeline nuevo |
   |---|---|---|
   | `Shop`, el escaparate de Leo | `delivery_box` o `store_flyer` | `street_shop_found`: "El cartel de frutas... Es aquí." |
-  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "El de la torre de cristal", decía. (mira a su alrededor) Aquí no hay ningún minimercado... ¿Cruzando la calle, quizás? |
+  | `GlassTower` | `overheard_store` | `street_glass_tower_clue`: "Junto a la torre de cristal", decía. (mira a su alrededor) Aquí no hay ningún minimercado... ¿Cruzando la calle, quizás? |
 
 - **Por qué existe la reacción de la torre:** en el playtest, la jugadora
   escuchó "el de la torre", llegó a la base de la torre y se quedó sin saber
@@ -1150,6 +1150,13 @@ frutas** del escaparate de Leo.
   torre"): no dice dónde. Es la torre la que empuja un poco, sin dar la
   respuesta. Se probó decir "detrás de la torre" en la pista, pero era
   demasiado obvio.
+- **De vaga a precisa (2026-10-23).** Las pistas tienen que coincidir entre
+  sí: la chica dice "junto a la torre de cristal", la torre cita eso mismo y
+  el recordatorio de "perdida" también. La **única** que dice "detrás de la
+  torre" es la anciana, y es la única vez en la calle que Alice le pregunta
+  algo a alguien: la respuesta clara es el premio por atreverse a hablar.
+  (No es un Rompecabezas de la Ansiedad a propósito, para no saturar: el de
+  la estación y los dos de Leo alcanzan.)
 - **"Minimercado", no "almacén".** "Almacén" puede ser un depósito o muchas
   otras cosas; "minimercado" es español neutro y se entiende como una tienda
   chica de comida. Se usa en el volante, la caja del repartidor, la chica del
