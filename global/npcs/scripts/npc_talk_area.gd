@@ -25,13 +25,23 @@ func _ready() -> void:
 	var owner_item := get_parent() as CanvasItem
 	if owner_item and owner_item.y_sort_enabled:
 		y_sort_enabled = true
-		hint.use_depth_sorting(hint_position)
-	else:
-		hint.set_base_position(hint_position)
+	set_hint_position(hint_position)
 	# Bubble and "[Espacio]" take turns: the bubble says "you can talk to this
 	# one" from afar, the prompt replaces it once Alice is close enough.
 	if label:
 		label.visibility_changed.connect(func() -> void: hint.set_suppressed(label.visible))
+
+# =========================
+# Hint placement
+# =========================
+## Moves the bubble, e.g. when the owner's sprite changes height (Wilson's
+## "MEOW!" frames have text over his head; his idle ones do not).
+func set_hint_position(new_position: Vector2) -> void:
+	hint_position = new_position
+	if y_sort_enabled:
+		hint.use_depth_sorting(new_position)
+	else:
+		hint.set_base_position(new_position)
 
 # =========================
 # Interaction action

@@ -1019,7 +1019,7 @@ animations = [{
 metadata/imported_via_aw = true
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8gtpx"]
-size = Vector2(47, 13)
+size = Vector2(47, 30)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8crjl"]
 texture = ExtResource("1_jhnfj")
@@ -1749,7 +1749,7 @@ prompt_text = "[Espacio] Preguntar"
 one_time_interaction = true
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/WorkerNPC/InteractableArea" index="0" unique_id=1198806918]
-position = Vector2(-15.5, -3.5)
+position = Vector2(-15.5, 5)
 shape = SubResource("RectangleShape2D_8gtpx")
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("8_bqf6q")]

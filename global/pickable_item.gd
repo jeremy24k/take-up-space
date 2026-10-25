@@ -34,9 +34,8 @@ func interact() -> void:
 func _can_be_interacted_with() -> bool:
 	if GameManager.quest_step < 3:
 		return false
-	# The backpack is only picked up once everything else is in it.
-	if item_id == "alice_backpack":
-		return GameManager.has_all_prep_items()
+	# Every prep item, the backpack included, is picked up once Alice has
+	# checked the backpack (she slings it on right then).
 	return GameManager.are_prep_items_unlocked()
 
 # =========================

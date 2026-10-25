@@ -5190,8 +5190,8 @@ rect = Rect2(-40, -70, 80, 140)
 [node name="ThoughtTriggers" type="Node2D" parent="." unique_id=1410678488]
 
 [node name="FirstCrossing" parent="ThoughtTriggers" unique_id=515253519 instance=ExtResource("35_thought")]
-position = Vector2(568, 1021)
-thought_lines = Array[String](["Solo por el paso de cebra.", "Si cruzo por donde no debo, alguien me gritará...  Y no quiero que nadie me grite."])
+position = Vector2(470, 1025)
+thought_lines = Array[String](["Solo por el paso de cebra.", "No me gusta romper las reglas"])
 wait_for_current = true
 metadata/_edit_group_ = true
 

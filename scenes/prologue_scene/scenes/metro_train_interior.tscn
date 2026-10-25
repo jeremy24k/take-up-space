@@ -540,7 +540,7 @@ offset = Vector2(0, -20)
 frame = 1
 
 [node name="CollisionShape2D" parent="Train/NPCS/ReadingSitDownNPC" index="1" unique_id=1201320476]
-position = Vector2(0, -19)
+position = Vector2(0, -5)
 
 [node name="VisibleOnScreenNotifier2D" parent="Train/NPCS/ReadingSitDownNPC" index="2" unique_id=1008644508]
 position = Vector2(0, -20)
@@ -848,6 +848,7 @@ visible = false
 position = Vector2(-181, -11)
 monitoring = false
 thought_text = "Ya estoy dentro... Ahora no puedo echarme atrás."
+thought_lines = Array[String](["Ya estoy dentro... Ahora no puedo echarme atrás.", "Me tiemblan las piernas. Mejor me siento."])
 display_duration = 3.5
 
 [editable path="Train/NPCS/ReadingSitDownNPC"]

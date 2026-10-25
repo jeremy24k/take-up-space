@@ -7,9 +7,18 @@ if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
 	leave alice
 	[signal arg="item_picked:alice_headphones"]
 	if GameManager.has_all_prep_items():
-		alice: Auriculares, cartera, zapatos... ya está todo.
-		alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
-		alice: Solo falta la mochila. Sigue en mi cuarto.
+		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.
+		join alice (worried) leftmost
+		alice: Ojalá me emocionara.
+		alice: Quizás, si espero un poco...
+		(Wilson maúlla, impaciente.)
+		update alice (neutral)
+		alice: No. Wilson me necesita. Lo voy a hacer.
+		update alice (nervous)
+		alice: Pero antes... un par de frases frente al espejo del baño.
+		alice: Por si alguien me habla. Por si acaso.
+		leave alice
+		[signal arg="step_4"]
 else:
 	alice: Mis auriculares... todavía aquí.
 	alice: Menos mal que no los perdí.

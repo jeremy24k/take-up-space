@@ -1818,7 +1818,7 @@ sources/5 = SubResource("TileSetAtlasSource_w14u2")
 size = Vector2(13, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nawij"]
-size = Vector2(9.5, 6)
+size = Vector2(32, 22)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p2bbp"]
 size = Vector2(12.5, 11)
@@ -2272,6 +2272,7 @@ timeline_name = "apartment/alice_wallet"
 texture = ExtResource("10_p6kcd")
 
 [node name="AreaDetector" parent="MiddleLayer/AssetsLayerSuperior/PickableItems/AliceWallet" index="3" unique_id=1984041911]
+position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_nawij")
 
 [node name="AliceHeadphones" parent="MiddleLayer/AssetsLayerSuperior/PickableItems" unique_id=614159209 node_paths=PackedStringArray("sprite_2d") instance=ExtResource("8_xo77v")]

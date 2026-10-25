@@ -1,10 +1,6 @@
 if {GameManager.quest_step} >= 4.0 and GameManager.mirror_practice_done == false:
 	alice: (con la mano en el picaporte, duda) Todavía no.
 	alice: Primero el espejo. Un par de frases, nada más.
-elif GameManager.has_all_prep_items():
-	alice: Auriculares, cartera, zapatos... ya tengo todo.
-	alice: (se lleva la mano al hombro, buscando una correa que no está) Ah.
-	alice: La mochila. Sigue en mi cuarto.
 else:
 	alice: No puedo irme todavía. Siento que se me olvida algo importante...
 	alice: (mira hacia el interior del apartamento) Wilson está bien. La casa también.

@@ -54,28 +54,35 @@ apartment.tscn ──global/stairs/stairs.gd──►  metro_stations.tscn  ─�
 a propósito, como placeholder: la escena de la calle todavía no existe. Cuando la crees,
 solo hay que cambiar `next_scene_path` en esos dos nodos.
 
-**La puerta del departamento** (`outside_door.gd`) solo se abre con
-`quest_step >= 4`, es decir, después de **volver a la mochila** con los tres
-objetos (la mochila emite `step_4`). Tener auriculares, cartera y zapatos no
-alcanza: si falta la mochila, `alice_cant_leave_yet` tiene una rama propia
-("La mochila. Sigue en mi cuarto."). Antes la puerta miraba
-`has_all_prep_items()` y se podía salir sin pasar por la mochila.
+**La mochila se lleva al revisarla.** La primera vez que Alice la mira
+(`apartment/alice_backpack`, con `quest_step == 3`) cuenta lo que falta, da
+la pista de los zapatos ("alguien de por aquí siempre se los lleva al baño
+cuando se aburre") y se la cuelga: emite `prep_items_unlocked` y
+`item_picked:alice_backpack`. Antes había que volver al cuarto a buscarla
+después de juntar todo, y los playtests 6 y 8 lo marcaron como un rodeo
+artificial.
 
-**Antes de salir, el espejo.** Al recoger la mochila, Alice dice "Pero
-antes... un par de frases frente al espejo. Por si alguien me habla." La
-puerta pide además `GameManager.mirror_practice_done`: si va sin ensayar,
-`alice_cant_leave_yet` dice "Todavía no. Primero el espejo." El espejo
-(`apartment/bathroom_glass`) tiene tres estados: antes de la mochila, las
-ojeras de siempre; con la mochila, el ensayo (ver `AnxietyPuzzle`); después,
-"Ya. Basta de practicar.", para que no se repita.
+**El tercer objeto cierra la preparación.** `alice_wallet`,
+`alice_headphones` y `alice_shoes` llevan, justo después de su
+`item_picked`, una rama `if GameManager.has_all_prep_items()` con la
+despedida ("Ojalá me emocionara... No. Wilson me necesita. Lo voy a
+hacer."), la decisión de ensayar ("Pero antes... un par de frases frente al
+espejo del baño.") y la señal `step_4`. Como la señal se procesa antes que la
+condición, solo la dice el último objeto, sea cual sea el orden.
 
-Para que el jugador no tenga que descubrirlo en la puerta, **el tercer objeto
-que recoge avisa**: `alice_wallet`, `alice_headphones` y `alice_shoes` llevan,
-justo después de su `item_picked`, una rama `if
-GameManager.has_all_prep_items()` donde Alice dice "Solo falta la mochila.
-Sigue en mi cuarto.". Como la señal se procesa antes que la condición, solo
-la dice el último objeto, sea cual sea el orden. Por eso los zapatos ya no
-cierran con "Listo. Ahora sí.", que mandaba al jugador a la puerta.
+**La puerta del departamento** (`outside_door.gd`) se abre con
+`quest_step >= 4` **y** `GameManager.mirror_practice_done`. Si va sin
+ensayar, `alice_cant_leave_yet` dice "Todavía no. Primero el espejo." El
+espejo (`apartment/bathroom_glass`) tiene tres estados: antes de la
+preparación, las ojeras de siempre; con todo listo, el ensayo (ver
+`AnxietyPuzzle`); después, "Ya. Basta de practicar.", para que no se repita.
+
+Después de la despedida de Wilson, la puerta funciona como una puerta
+automática **solo para Alice** (Wilson no la mueve), y se abre y se cierra
+cada vez que ella pasa, en los dos sentidos. Antes se cerraba para siempre
+con el primer cuerpo que salía de su área, Wilson incluido: si Alice volvía
+a entrar al piso, quedaba atrapada en el pasillo negro detrás de la puerta
+cerrada (bloqueo del playtest 8).
 
 Todos los cambios de escena pasan por **`FadeTransition.transition_to_scene()`**
 (directo, o vía `SceneTransitionArea`/`ExitArea`, que lo llaman por dentro).
@@ -356,6 +363,10 @@ colocarlo a mano.
   flotaba solo cuando Wilson pasaba por detrás de algo (en el baño, por
   ejemplo). Los NPCs quietos, cuya área cuelga de `InteractableDetectors`,
   siguen con el globito por encima de todo.
+- **`set_hint_position()`** mueve el globito en tiempo de juego. Wilson lo usa
+  porque su sprite cambia de alto: mientras maúlla, el globito va sobre el
+  texto "MEOW!" (-26); sentado o caminando, justo sobre su cabeza (-21). Con
+  una sola altura, el globito quedaba flotando lejos de él.
 - La usan: los 8 NPCs de la calle, Leo, el oficinista y los dos chicos del
   metro, el trabajador, la chica sentada y el chico de auriculares de la
   terminal, y Wilson. La ventanilla de tickets no, porque es un objeto.
@@ -493,6 +504,12 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   (`project.godot`).
 - Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
   1, así el clic no lo atrapa su capa de input) y por debajo del fundido.
+- **Frase que no lleva a ningún lado:** además de temblar en rojo y
+  reacomodarse, la pista de arriba muestra "No... así no." durante 1,2 s. Sin
+  eso, el reinicio parecía un fallo.
+- **Ninguna palabra tiene el foco al abrir.** La primera flecha enfoca una; hasta
+  entonces Espacio no dice nada. Antes el foco caía en una palabra al azar y
+  el Espacio de cerrar el diálogo anterior la decía sin querer.
 - **`relaxed`** (ensayo): sin reloj, sin viñeta que se cierra y sin perder
   tiempo por error. Solo se sale eligiendo una frase o "(...)". Lo usan los
   tres ensayos del espejo.
@@ -769,6 +786,16 @@ El tren entra en la estación por dos caminos, el primero que ocurra
 
 Si en ese momento hay un diálogo abierto, `metro_is_entering_station`
 espera a que termine en vez de cortarlo.
+
+**Al subir**, `metro_train.gd` cierra las puertas (1 s) y, apenas el tren
+arranca, funde al vagón tras `fade_after_leaving` (1,2 s). Antes esperaba a
+que el tren saliera del todo (`arrival_time × 1,5`) y quedaban unos 10 s de
+andén vacío, con Alice ya dentro, que parecían un cuelgue. El tren de la
+terminal, sin `next_scene_path`, sigue saliendo entero.
+
+Al entrar al vagón, el primer pensamiento empuja a sentarse: "Ya estoy
+dentro... Ahora no puedo echarme atrás." / "Me tiemblan las piernas. Mejor
+me siento." Antes nada indicaba que había que buscar un asiento.
 
 `metro_train_interior.tscn` se usa **dos veces sin recargarse**: el mismo nodo se
 transforma en sitio, así Alice nunca se mueve del asiento.

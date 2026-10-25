@@ -22,6 +22,11 @@ const STUMBLE_COLOR := Color(1, 0.45, 0.45)
 ## After a mistake the first word of every answer blinks this color, as a hint.
 const HINT_COLOR := Color(1, 0.88, 0.54)
 const HINT_BLINKS: int = 3
+## Alice's own reaction to a sentence that goes nowhere, shown for a moment
+## in place of the prompt. Without it the reshuffle looked like a glitch.
+const STUMBLE_LINE := "No... así no."
+const STUMBLE_LINE_TIME: float = 1.2
+const ARROW_ACTIONS: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
 ## Words of the sentence line, same look as thought_word.tscn: 4x the m3x6
 ## pixel font, with a thick near-black outline, readable over any scene.
 const WORD_FONT_SIZE: int = 64
@@ -36,6 +41,9 @@ const WORD_OUTLINE_COLOR := Color(0.04, 0.01, 0.07)
 
 var _data: AnxietyPuzzleData
 var _words: Array[ThoughtWord] = []
+## No word has the focus until the first arrow: otherwise Space (for example,
+## to finish reading) said whatever random word happened to be focused.
+var _awaiting_first_focus: bool = true
 var _picked: PackedStringArray = []
 var _time_left: float = 0.0
 var _cooldown: float = 0.0
@@ -124,7 +132,8 @@ func _scatter_words() -> void:
 		taken.append(Rect2(spot, word.size))
 		word.base_position = spot
 		word.position = spot
-	_words[0].grab_focus()
+	if not _awaiting_first_focus:
+		_words[0].grab_focus()
 
 func _focus_any_visible() -> void:
 	for word in _words:
@@ -139,6 +148,7 @@ func _on_word_pressed(word: ThoughtWord) -> void:
 	if not _accepting or _cooldown > 0.0:
 		return
 	_cooldown = PICK_COOLDOWN
+	_awaiting_first_focus = false
 	if word.text == SILENCE_WORD:
 		_finish(SILENCE)
 		return
@@ -174,6 +184,7 @@ func _stumble() -> void:
 	if not _data.relaxed:
 		_time_left -= _data.mistake_penalty
 	sentence_line.modulate = STUMBLE_COLOR
+	_show_stumble_line()
 	var start := sentence_line.position
 	var tween := create_tween()
 	for step in [9, -9, 6, -6, 3, 0]:
@@ -187,6 +198,13 @@ func _stumble() -> void:
 	_scatter_words()
 	_accepting = not _done
 	_blink_answer_starts()
+
+## Shows Alice's reaction where the prompt is, then puts the prompt back.
+func _show_stumble_line() -> void:
+	prompt_label.text = STUMBLE_LINE
+	await get_tree().create_timer(STUMBLE_LINE_TIME).timeout
+	if is_instance_valid(prompt_label) and not _done:
+		prompt_label.text = _data.prompt
 
 ## Second hint: after a mistake (or from the start, in a tutorial puzzle), the
 ## words every answer starts with blink, so the player knows where to begin
@@ -216,7 +234,13 @@ func _make_sentence_word(text: String) -> Label:
 # Time pressure
 # =========================
 func _input(event: InputEvent) -> void:
-	if not _accepting or _clock_started:
+	if not _accepting:
+		return
+	if _awaiting_first_focus and ARROW_ACTIONS.any(func(action: StringName) -> bool: return event.is_action_pressed(action)):
+		_awaiting_first_focus = false
+		_focus_any_visible()
+		get_viewport().set_input_as_handled()
+	if _clock_started:
 		return
 	if (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
 		_clock_started = true

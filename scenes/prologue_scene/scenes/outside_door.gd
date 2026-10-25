@@ -3,14 +3,17 @@ extends "res://scenes/prologue_scene/script/basic_door.gd"
 # =========================
 # Door state configuration
 # =========================
+## Opens after the goodbye to Wilson. From then on it works as an automatic
+## door for Alice only, on both sides: it used to lock for good on the first
+## body leaving its area (Wilson included), and if Alice went back in she got
+## stuck in the black corridor behind a closed door.
 var exits_unlocked: bool = false
-var door_permanently_closed: bool = false
 
 # =========================
 # Enter/exit handling
 # =========================
 func _on_area_2d_body_entered(_body: Node2D) -> void:
-	if door_permanently_closed or not _is_player_body(_body):
+	if not _body.is_in_group("player"):
 		return
 
 	if exits_unlocked:
@@ -25,12 +28,8 @@ func _on_area_2d_body_entered(_body: Node2D) -> void:
 		_trigger_missing_items_dialogue()
 
 func _on_area_2d_body_exited(_body: Node2D) -> void:
-	if not _is_player_body(_body):
-		return
-
-	if exits_unlocked and not door_permanently_closed:
-		_lock_door_permanently()
-	else:
+	# Only Alice moves this door: Wilson must not open it, or close it on her.
+	if _body.is_in_group("player"):
 		super._on_area_2d_body_exited(_body)
 
 # =========================
@@ -50,18 +49,12 @@ func _trigger_exit_sequence() -> void:
 # =========================
 func _on_goodbye_finished() -> void:
 	exits_unlocked = true
+	# Alice is standing in the doorway: count her, so the door closes behind
+	# her when she walks off and opens again if she comes back.
+	bodies_inside = 1
 
 	if GameManager.wilson:
 		GameManager.wilson.is_following = false
 
 	sprite_door.play("open_door")
 	collision_door.set_deferred("disabled", true)
-
-# =========================
-# Door locking
-# =========================
-func _lock_door_permanently() -> void:
-	door_permanently_closed = true
-	
-	sprite_door.play("closed_door")
-	collision_door.set_deferred("disabled", false)

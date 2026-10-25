@@ -25,6 +25,12 @@ var last_direction: Vector2 = Vector2.DOWN  # Face down by default while idle.
 # =========================
 @onready var animate_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var nav_agent: NavigationAgent2D = $NavigationAgent2D
+@onready var talk_area: NpcTalkArea = $WilsonArea
+
+## Height of the "..." bubble: over the "MEOW!" text while he meows, right
+## over his head otherwise (at meowing height it floated far above him).
+const HINT_OVER_MEOW := Vector2(0, -26)
+const HINT_OVER_HEAD := Vector2(0, -21)
 
 var is_following: bool = false
 
@@ -134,6 +140,10 @@ func process_animation_state() -> void:
 			# The "MEOW!" text is drawn in the frames, so it must never be mirrored.
 			animate_sprite.flip_h = false
 			animate_sprite.animation = "meowing"
+
+	var hint_height := HINT_OVER_MEOW if current_state == State.MEOWING else HINT_OVER_HEAD
+	if talk_area.hint_position != hint_height:
+		talk_area.set_hint_position(hint_height)
 
 	animate_sprite.play(animate_sprite.animation)
 
