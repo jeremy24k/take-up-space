@@ -1619,9 +1619,11 @@ shape = SubResource("RectangleShape2D_exit")
 
 [node name="LeoCounter" parent="InteractableDetectors" unique_id=1590630069 instance=ExtResource("npc_talk_area")]
 position = Vector2(703, 450)
-hint_position = Vector2(27, -21)
 timeline_name = "leo_store_counter_early"
 prompt_text = "[Espacio] Hablar"
+
+[node name="InteractionHint" parent="InteractableDetectors/LeoCounter" index="2"]
+position = Vector2(27, -21)
 
 [node name="CollisionShape2D" parent="InteractableDetectors/LeoCounter" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_leo_counter")

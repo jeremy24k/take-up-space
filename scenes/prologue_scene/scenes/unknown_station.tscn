@@ -1698,7 +1698,7 @@ frame = 8
 [node name="LinseningGuyNPC" parent="MiddleLayer/NPCS" unique_id=575336252 instance=ExtResource("7_f8vot")]
 y_sort_enabled = true
 position = Vector2(880, 184)
-column_npc = 4
+column_npc = 16
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/LinseningGuyNPC" index="0" unique_id=2102186028]
@@ -1706,7 +1706,7 @@ frame = 4
 
 [node name="OficinistManNPC" parent="MiddleLayer/NPCS" unique_id=199056823 instance=ExtResource("7_f8vot")]
 position = Vector2(493, 179)
-column_npc = 7
+column_npc = 20
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/OficinistManNPC" index="0" unique_id=2102186028]
@@ -1722,7 +1722,7 @@ position = Vector2(0, -9)
 [node name="NormalGuyNPC" parent="MiddleLayer/NPCS" unique_id=421669071 instance=ExtResource("7_f8vot")]
 y_sort_enabled = true
 position = Vector2(938, 345)
-column_npc = 6
+column_npc = 19
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/NormalGuyNPC" index="0" unique_id=2102186028]
@@ -1743,10 +1743,12 @@ position = Vector2(0, 0)
 
 [node name="InteractableArea" parent="MiddleLayer/NPCS/WorkerNPC" unique_id=687754286 instance=ExtResource("npc_talk_area")]
 position = Vector2(-1, 1)
-hint_position = Vector2(1, -22)
 timeline_name = "unknown_station_worker_dismissive"
 prompt_text = "[Espacio] Preguntar"
 one_time_interaction = true
+
+[node name="InteractionHint" parent="MiddleLayer/NPCS/WorkerNPC/InteractableArea" index="2"]
+position = Vector2(1, -22)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/WorkerNPC/InteractableArea" index="0" unique_id=1198806918]
 position = Vector2(-15.5, 5)
@@ -1901,13 +1903,17 @@ shape = SubResource("RectangleShape2D_l7uo0")
 
 [node name="SittingGirl" parent="InteractableDetectors" unique_id=1664604836 instance=ExtResource("npc_talk_area")]
 position = Vector2(786, 565)
-hint_position = Vector2(0, -18)
 timeline_name = "unknown_station_sitting_girl"
+
+[node name="InteractionHint" parent="InteractableDetectors/SittingGirl" index="2"]
+position = Vector2(0, -18)
 
 [node name="ListeningGuy" parent="InteractableDetectors" unique_id=660232352 instance=ExtResource("npc_talk_area")]
 position = Vector2(880, 184)
-hint_position = Vector2(0, -17)
 timeline_name = "unknown_station_listening_guy"
+
+[node name="InteractionHint" parent="InteractableDetectors/ListeningGuy" index="2"]
+position = Vector2(0, -17)
 
 [node name="Tracks" parent="InteractableDetectors" unique_id=731738913 instance=ExtResource("15_ewlva")]
 position = Vector2(237, 641)
@@ -2009,7 +2015,7 @@ shape = SubResource("RectangleShape2D_ti_board")
 
 [node name="OfficeWorker" parent="InteractableDetectors" unique_id=68687408 instance=ExtResource("ambient_thought")]
 position = Vector2(493, 172)
-lines = Array[String](["Lleva maletín. Seguro va tarde."])
+lines = Array[String](["Tiene cara de pocos amigos. No lo miro."])
 loop_lines = true
 pool = null
 group_id = ""
@@ -2018,7 +2024,7 @@ first_line = ""
 
 [node name="VendingGuy" parent="InteractableDetectors" unique_id=36587582 instance=ExtResource("ambient_thought")]
 position = Vector2(938, 345)
-lines = Array[String](["Está eligiendo algo. No miro."])
+lines = Array[String](["Un niño con un globo.", "Es el único aquí que no tiene prisa."])
 loop_lines = true
 pool = null
 group_id = ""
@@ -2116,3 +2122,5 @@ shape = SubResource("RectangleShape2D_0t0kd")
 [editable path="ExitAreas/ExitToStreet"]
 [editable path="ExitAreas/ExitToStreet2"]
 [editable path="ThoughtTriggers/Metro"]
+[editable path="InteractableDetectors/SittingGirl"]
+[editable path="InteractableDetectors/ListeningGuy"]

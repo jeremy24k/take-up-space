@@ -255,6 +255,40 @@ player.play_animation("sit_down", "idle_front")   # el 2º es fallback si no exi
 `lock_control()` sobrevive a un diálogo que ocurra dentro de la cutscene: al
 terminar el diálogo, Alice sigue bloqueada hasta que llames `unlock_control()`.
 
+**Sprite por capas (2026-10-25).** Alice se dibuja desde un solo archivo,
+`player/alice.aseprite`, con cinco capas: `body` (Alice descalza), `backpack`,
+`shoes`, `headphones_neck` y `headphones_head`. Se importa con
+"Aseprite SpriteFrames (Split By Layer)" (`aseprite_wizard.plugin.spriteframes-split`),
+que genera un `.ase_layer` por capa en `player/alice_layers/`, cada uno un
+`SpriteFrames` con las mismas 9 animaciones.
+- En `player.tscn`, `AnimatedSprite2D` es el cuerpo, y tiene cuatro hijos
+  (`Backpack`, `Shoes`, `HeadphonesNeck`, `HeadphonesHead`) con el mismo
+  `offset`. El código solo maneja el cuerpo; `_sync_outfit()` copia
+  animación, frame y `flip_h` a cada capa visible. Se engancha a
+  `frame_changed`/`animation_changed` del cuerpo (en `_process` iban un frame
+  atrasadas y parpadeaban) y también corre en `_process` por el `flip_h`, que
+  no tiene señal.
+- **Qué lleva puesto** (`_refresh_outfit()`, con `GameManager.outfit_changed`):
+  cada pieza se ve cuando la recogió (`alice_backpack`, `alice_shoes`,
+  `alice_headphones` en `GameManager.collected_items`). Los auriculares van al
+  cuello, y en la cabeza solo si `GameManager.headphones_on_head`. Salen todas
+  las combinaciones, también las que no tenían versión dibujada (zapatos sin
+  mochila, etc.).
+- **Auriculares en la cabeza, en momentos concretos:** se los pone al sentarse
+  en el tren, después del pensamiento del asiento y antes de cabecear
+  (`metro_train_interior.gd::_fall_asleep`, `set_headphones_on_head(true)`), y
+  se los quita al bajarse perdida (`unknown_station_lost_phone.dtl`, `[signal
+  arg="headphones_off"]`, "(se quita los auriculares y mira a su alrededor)").
+  Desde Dialogic: `[signal arg="headphones_on"]` / `"headphones_off"`.
+- Para retocar a Alice se edita una sola capa. La capa de un accesorio solo
+  tiene sus píxeles (salen de comparar las versiones que se dibujaron
+  completas): nunca borra nada del cuerpo, solo pinta encima. El orden de
+  capas importa: `shoes` va sobre `backpack`.
+- `metro_train_interior.tscn` tenía su propia copia vieja de las animaciones
+  de Alice incrustada en la escena; se quitó para que use la del jugador.
+- Si se abre una escena suelta (la calle, por ejemplo) sin pasar por el
+  apartamento, Alice sale descalza y sin mochila: no recogió nada.
+
 ---
 
 ## 5. Piezas reutilizables (`global/`)
@@ -329,9 +363,9 @@ activo. Emite `interacted` al empezar y `pushed_back` al terminar, por si la
 escena quiere cambiar el `timeline_name` (por ejemplo, otro texto la segunda vez).
 Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
 `CollisionShape2D` y fijar `thought_lines` (o `timeline_name`) y
-`push_direction`. En la calle usan las líneas "Mejor no me alejo más." / "No
-conozco esta zona. Primero, la comida de Wilson." (antes era el timeline
-`street_boundary`, que se borró).
+`push_direction`. En la calle usan la línea "Mejor no me alejo más. Si me
+pierdo más, no sabré volver." (antes era el timeline `street_boundary`, que se
+borró).
 
 **Sin acotaciones en la nube.** "(se detiene y mira hacia atrás)", "(mira las
 vidrieras)" o "(mira a su alrededor)" funcionan en la caja de abajo, que es
@@ -344,9 +378,14 @@ Es una escena heredada de `interactable_area.tscn` que ya trae el globito "..."
 (`InteractionHint`), así ningún NPC que habla se queda sin él y no hay que
 colocarlo a mano.
 
-- `hint_position`: dónde flota el globito, relativo al área. Casi siempre el
-  área está corrida respecto del NPC (está donde se para Alice para hablar),
-  así que se ajusta por instancia para que quede 2 px sobre la cabeza.
+- **Dónde flota el globito:** es la posición del propio nodo `InteractionHint`.
+  Se coloca arrastrándolo en el editor (la instancia tiene **Hijos editables**
+  activado) y eso es lo que se ve en el juego. Antes había un export
+  `hint_position` que pisaba esa posición al arrancar, así que mover el
+  globito en el editor no servía de nada; los valores que tenía cada escena se
+  pasaron a la posición del nodo (2026-10-25). Casi siempre el área está
+  corrida respecto del NPC (está donde se para Alice para hablar), así que se
+  ajusta por instancia para que quede 2 px sobre la cabeza.
 - **El globito y el "[Espacio]" se turnan:** el globito avisa de lejos que se
   puede hablar; cuando Alice se acerca y aparece el cartel, el globito se
   esconde (`InteractionHint.set_suppressed`, conectado al
@@ -478,10 +517,15 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   decir pero no *cómo* ("¿Le digo la verdad... o que estoy bien?"). Y
   después de cada error, la primera palabra de cada respuesta parpadea en
   amarillo mientras las palabras se reacomodan.
-- **El reloj espera** a la primera tecla o clic del jugador, y abajo hay una
-  línea fija con los controles ("Flechas: elegir · Espacio: decir · (...):
-  callarse"). En el tercer playtest el tiempo se acababa antes de entender
-  cómo se jugaba.
+- **El reloj corre desde que aparecen las palabras** en los puzzles reales
+  (estación y Leo). Abajo sigue la línea fija con los controles ("Flechas:
+  elegir · Espacio: decir · (...): callarse"). Antes esperaba a la primera
+  tecla, porque en el tercer playtest el tiempo se acababa antes de entender
+  cómo se jugaba; ahora eso lo enseña el ensayo del espejo (`relaxed`, sin
+  reloj), así que la presión empieza en el acto.
+- **Aviso sin distractores:** si un puzzle real llega sin `extra_words`,
+  `run()` lo avisa con `push_warning`. El editor se los borró más de una vez
+  (la última, en el commit del espejo).
 - **Ojo con el editor:** al guardar los `.tres` de los puzzles desde Godot se
   perdieron una vez los `extra_words` (y el commit los llevó así). Si en el
   juego no aparecen los distractores, revisa que la línea siga en el
@@ -552,7 +596,9 @@ Muestra sus líneas (`thought_lines`, o `thought_text` si no hay) en la **nube
 de arriba**, con `ThoughtBox.say`. `display_duration` es la base en segundos de
 cada línea, a la que se suma un poco por letra. Con `monitoring = false` solo
 se dispara desde código. Con `wait_for_current` espera a que termine la nube
-que esté en pantalla, en vez de reemplazarla.
+que esté en pantalla, en vez de reemplazarla. Con `skip_visits` ignora las
+primeras entradas: con 1, solo salta la segunda vez que Alice pasa ("Ya pasé
+por aquí. Creo.").
 - Antes dibujaba un globo de texto sobre la cabeza de Alice, en una
   `CanvasLayer` propia. Se quitó para que el juego tenga solo dos lenguajes:
   abajo conversación, arriba mente.
@@ -576,8 +622,9 @@ npc.resolve_approach_point(target_position)
 
 **`pause_near_player`** (px, 0 = nunca): si Alice se acerca a esa distancia
 mientras camina, el NPC pausa su tween, la mira, y sigue cuando ella se aleja
-`PAUSE_HYSTERESIS` (12 px) más. Lo usan los dos peatones y el gato de la calle
-(20 px), para que haya tiempo de apretar Espacio.
+`PAUSE_HYSTERESIS` (12 px) más. Hoy solo lo usa el gato de la calle (20 px):
+los peatones no se paran por cercanía, solo cuando Alice pulsa Espacio (ver
+la calle).
 
 **Reposo lateral:** los peatones y el gato tienen un tag `idle_side` de un solo
 frame en su `.aseprite` (el frame 5, el paso con las piernas juntas del
@@ -784,8 +831,13 @@ El tren entra en la estación por dos caminos, el primero que ocurra
   solo existía la franja, y un jugador que esperaba quieto en el andén se
   quedaba sin tren.
 
-Si en ese momento hay un diálogo abierto, `metro_is_entering_station`
-espera a que termine en vez de cortarlo.
+**La llegada se ve.** `_call_train()` espera a que termine cualquier diálogo
+abierto, bloquea a Alice, hace entrar el tren y lleva la cámara hasta donde
+va a frenar (`station_position_x` + `train_view_offset`, 1 s). Se queda hasta
+que el tren para y abre las puertas (1,6 s más), vuelve a Alice (0,8 s), la
+desbloquea y recién ahí lanza `metro_is_entering_station` ("Ahí viene").
+Usa `Player.pan_camera_to()` / `reset_camera()`, igual que la torre de la
+calle.
 
 **Al subir**, `metro_train.gd` cierra las puertas (1 s) y, apenas el tren
 arranca, funde al vagón tras `fade_after_leaving` (1,2 s). Antes esperaba a
@@ -807,6 +859,16 @@ quedaba debajo de ella aunque pasara por delante. `_empty_the_car()` salta a
 Alice igual que al trabajador. El trabajador llega con `approach_offset =
 (-26, 6)`: se frena un poco más allá de Alice (antes −14, se le encimaba) y
 6 px más abajo, en el pasillo, para dibujarse delante de ella sentada.
+
+**Los pasajeros piensan** (`AmbientThought` como hijo de cada uno, así se van
+con ellos cuando `_empty_the_car()` los oculta y desactiva). Son la misma gente
+del andén, y lo dicen: el lector ("Sigue con su periódico. Ni levantó la
+vista."), el de auriculares ("El chico de los auriculares. Subimos en la misma
+estación." / "Ni me ha visto. Mejor.") y el de la ventana ("Mira por la ventana
+como si fuera la primera vez." / "...O como si no quisiera mirar a nadie.").
+Ojo: los pasajeros están sentados en la fila de asientos. Desde el pasillo
+(mirando hacia arriba) gana el pasajero, que está a ~14 px; pegada a la fila
+puede ganar un asiento, y sentarse dispara el viaje.
 
 ```
 _setup_boarding_mode()      tren en marcha, pasajeros, asientos activos,
@@ -1063,10 +1125,23 @@ Si se mueve un área, mantener las dos reglas.
     17 corredora, 18 chica con su perro, 19 niño con globo y 20 grandullón. Las
     columnas 21–29 están libres. El perro y el globo están dentro de la celda de
     32×32, así que la colisión de pies de 14×8 solo cubre a la persona.
-- **Peatones:** instancias de `walking_npc.tscn` con su `InteractableArea` como hija,
-  para que el diálogo se mueva con ellos. `street_zone_1.gd` los pasea de ida
-  y vuelta por los `Marker2D` de `PedestrianRoutes/<NombreDelPeatón>`, con una
-  pausa en cada extremo, en la que los gira de frente.
+- **Peatones:** instancias de `walking_npc.tscn` con su área de interacción
+  como hija (`InteractableArea` o `AmbientThought`), para que se mueva con
+  ellos. **El recorrido se configura en el propio NPC** (grupo "Patrol" del
+  inspector, 2026-10-25): `patrol_points` (se arrastran los `Marker2D`, dos o
+  más, en orden), `patrol_speed` (28 px/s) y `patrol_pause` (2,5 s en cada
+  extremo, de frente). `street_zone_1.gd` llama `start_patrol()` a cada
+  `WalkingNPC` de `NPCS` que tenga al menos dos puntos: va de ida por todos,
+  descansa, vuelve al revés, y así siempre. Cada tramo es una línea recta, así
+  que para doblar una esquina se agrega un punto.
+  - Los marcadores siguen en la carpeta `PedestrianRoutes`, pero los nombres ya
+    no importan (antes la ruta se buscaba por el nombre del peatón). No van
+    dentro del NPC: se moverían con él.
+  - Antes había un export `route_waypoints` con `walk_route()`, que nadie
+    llamaba; se reemplazó por esto.
+  - Ojo con el editor: si tiene cargada la versión vieja del script, al guardar
+    la escena descarta `patrol_points` (pasó una vez). Recargar el proyecto
+    después de cambiar exports de un script.
 - **`WalkingNPC.stops_when_talked_to`** (grupo "Interaction" del inspector,
   `true` por defecto) decide si el NPC se frena cuando Alice le habla. Si está
   activado, `street_zone_1.gd` lo congela durante el diálogo
@@ -1125,20 +1200,27 @@ Mismo patrón que la estación desconocida:
 - **Primer vistazo a la torre de cristal.** `GlassTowerSighting` es un
   `VisibleOnScreenNotifier2D` que cubre la torre. La primera vez que asoma en
   pantalla (`GameManager.glass_tower_seen`), Alice queda quieta, la cámara se
-  desliza hasta la torre (`camera.offset`, 0,9 s), se queda 1,4 s y vuelve
-  (0,7 s). Mientras tanto, en la nube: "Qué edificio más raro... todo de
+  desliza hasta la torre (`Player.pan_camera_to()`, 0,9 s), se queda 1,4 s y
+  vuelve (`reset_camera()`, 0,7 s). Mientras tanto, en la nube: "Qué edificio más raro... todo de
   cristal.". Si después escucha "la torre de cristal", ya sabe cuál es.
 - **Recordatorio si se pierde** (`_tick_lost_reminder` en `street_zone_1.gd`).
   Si pasan 150 s caminando (sin contar diálogos ni cutscenes) sin encontrar una
   pista nueva (`GameManager.clue_added` reinicia el reloj) y sin acercarse a
-  menos de 220 px de la tienda, sale en la nube: "Quizá alguien por aquí sepa
-  dónde hay un minimercado..." y, la segunda vez, "Podría fijarme mejor en los
+  menos de 220 px de la tienda, sale en la nube: "Si le preguntara a alguien,
+  ya habría llegado. ...No." y, la segunda vez, "Podría fijarme mejor en los
   carteles. O en lo que dice la gente.". Si ya oyó a la chica del teléfono,
   apunta a la torre: "Un minimercado detrás de la torre de cristal, cruzando
   la avenida... Tiene que estar cerca.". Como máximo 2 recordatorios, y ninguno después de entrar a la
   tienda de Leo.
 - **`ThoughtTriggers`:** pensamientos espontáneos que se disparan una sola vez
-  al pasar: `FirstCrossing`, `Houses` y `ShoppingBlock`.
+  al pasar: `FirstCrossing`, `Houses`, `ShoppingBlock` y, desde 2026-10-25,
+  tres que hablan de Alice y no del objetivo (todos con `wait_for_current`):
+  - `WalkNormally` (700, 420), en la vereda frente a la torre, por donde pasa
+    la peatona: "Camina normal. ¿Cómo se camina normal?"
+  - `BeenHereBefore` (843, 560), vereda derecha de la manzana central, con
+    `skip_visits = 1`: "Ya pasé por aquí. Creo." solo la segunda vez.
+  Quedan para cuando haya sprites: "¿Cómo hace la gente para hablar tan
+  fácil?" (dos amigas charlando).
 - **`FirstCrossing` explica la regla del mapa: solo se cruza por los pasos de
   cebra** ("(mira la calle) Mejor cruzo solo por los pasos de cebra.", y
   después "Hay muy poca gente..."). Está en x=540, en la columna del café, por
@@ -1157,12 +1239,34 @@ Mismo patrón que la estación desconocida:
   - `VendingMachines` (grupo `vending`, compartido con la estación).
   - `AdColumn` y `AdColumn2`, la que está junto a la tienda de Leo (grupo
     `ad_column`).
-  - Puertas de tiendas sin contenido, "Aquí no venden comida para gatos.":
-    `PizzaDoor`, `VinylDoor`, `CafeDoor` (junto al inicio) y `CafeDoorNorth`
-    (junto a Leo).
-  - Casas y edificios, "No es mi casa.": `HouseDoorGreen`/`Grey`,
-    `HouseDoorNorth1`–`3`, `BuildingDoorNorthwest`, `BuildingDoorWest`.
-    `ATMBuildingDoor` dice "Cerrado.".
+  - **Puertas de tiendas, con diálogo propio en la caja** (`timeline_name`),
+    porque tienen acotaciones y más de una línea:
+    - `CafeDoor` (junto al inicio, `street_cafe`): "(mira por el cristal; hay
+      gente riendo en una mesa) Aquí no venden comida para gatos." / "Igual,
+      no entraría. Hay mucha gente."
+    - `CafeDoorNorth` (junto a Leo, `street_cafe_north`): "(huele a pan
+      tostado) Antes venía a sitios así. Con un libro. Sola." / "Me gustaba.
+      Creo."
+    - `PizzaDoor` (`street_pizza`): "Huele a pizza." / "Qué hambre..."
+    - `VinylDoor` (`street_vinyl`): "¿Quién compra discos hoy en día?" / "(ve
+      a una chica en el mostrador comprando uno)" / "Supongo que gente
+      cool... No como yo."
+  - **Casas y edificios, una línea distinta cada uno** (antes los 7 decían "No
+    es mi casa."): `HouseDoorGreen` "Alguien vive aquí y sabe exactamente cómo
+    volver.", `HouseDoorGrey` "Si tocara el timbre, ¿qué diría? 'Hola, me
+    perdí'... No.", `HouseDoorNorth1` "Hay luz dentro. Alguien está en casa.",
+    `HouseDoorNorth2` "Plantas en la ventana. A mí nunca me duran.",
+    `HouseDoorNorth3` "Se oye una tele. Como en mi casa.",
+    `BuildingDoorNorthwest` "Un portero automático. Odio hablar por esas
+    cosas.", `BuildingDoorWest` "Tantos timbres. Tanta gente que no conozco." y
+    `ATMBuildingDoor` "Cerrado. Casi me alegro: así no tengo que hablar con
+    nadie."
+  - **Regla (2026-10-25):** lo que Alice encuentra dice algo de ella (miedo a
+    molestar, a la gente, a que la miren; su casa, su rutina), no repite el
+    objetivo. Wilson solo se nombra en la llegada y en el gato; la panadería
+    ("No. El dinero es justo."), la entrada del metro ("Y volver con las manos
+    vacías no es una opción."), los bordes y las máquinas ("Otra máquina. El
+    dinero ya tiene dueño.") ya no lo nombran.
   - NPCs sin diálogo (`AmbientThought`): `NewspaperReader` y `VinylBrowser`
     con línea propia, `BenchSitter` con el pool.
   - Las dos bocas del metro ya las cubre la misma área `SubwayEntrance`
@@ -1221,7 +1325,7 @@ frutas** del escaparate de Leo.
 
 | Área (`InteractableDetectors`) | Dónde | Tipo | Timeline |
 |---|---|---|---|
-| `PetsShopDoor` | Puerta de la tienda PETS, arriba de la panadería | Falsa: "Cerrado por reformas." | `street_pets_closed` |
+| `PetsShopDoor` | Puerta de la tienda PETS, arriba de la panadería | **Precisa** (desde 2026-10-25, clue `pets_note`): "Cerrado por reformas", pero debajo hay un papelito a mano: "Mientras tanto, comida para mascotas en el minimercado detrás de la torre". Alice: "Por lo menos alguien pensó en gente como yo." Es la segunda pista precisa, junto con la anciana. | `street_pets_closed` |
 | `BrokenPayphone` | Segunda cabina, junto al señor del diario | Falsa: "(levanta el auricular) ... No hay tono." La otra cabina (`Payphone`) tiene el diálogo de "Ni siquiera el mío". | `street_payphone_broken` |
 | `VendingMachines` | Máquinas entre la panadería y los vinilos | Falsa, con humor | `street_vending` (grupo `vending`) |
 | `BusStopGrandma` | Abuela (`BusStopGrandmaNPC`, col. 15, personaje `grandma` = "Anciana"), en la manzana de arriba a la derecha (se movió desde la parada; el nombre quedó) | **La precisa**: Alice se atreve a preguntarle y ella contesta "Hay un minimercado justo detrás de la torre de cristal." | `street_grandma` |
@@ -1256,9 +1360,12 @@ frutas** del escaparate de Leo.
   2. **La torre**, si Alice llega a su base habiendo oído a la chica, cita
      esa misma frase y deduce el resto: "¿Al otro lado de la avenida?". La
      dirección es un premio por haber ido, no algo que se regala.
-  3. **La anciana** es la **única** que dice "justo detrás de la torre de
-     cristal", y es la única vez en la calle que Alice le pregunta algo a
-     alguien: la respuesta clara es el premio por atreverse a hablar. (No es
+  3. **La anciana** dice "justo detrás de la torre de cristal", y es la única
+     vez en la calle que Alice le pregunta algo a alguien: la respuesta clara
+     es el premio por atreverse a hablar. Desde 2026-10-25 hay una segunda
+     pista precisa, el papelito de la tienda de mascotas cerrada ("...en el
+     minimercado detrás de la torre"): premia mirar con atención en vez de
+     hablar. (No es
      un Rompecabezas de la Ansiedad a propósito, para no saturar: el de la
      estación y los dos de Leo alcanzan.)
   4. **El recordatorio** (`LOST_TOWER_LINE`), solo tras 150 s sin avanzar:
@@ -1278,7 +1385,8 @@ frutas** del escaparate de Leo.
   teléfono y la torre.
 - **NPCs de pista vs. de ambiente.** Solo los que dan pistas (la chica del
   teléfono, la abuela de las latas y el repartidor) tienen conversación. Los
-  de ambiente (`OfficeMan`, `Student`, `HeadphonesGuy` y los peatones
+  de ambiente (`OfficeMan` —hoy la chica deportista, ver "NPCs repetidos"—,
+  `Student` y los peatones
   `PedestrianA`/`PedestrianB`, más `NewspaperReader`, `VinylBrowser` y
   `BenchSitter`) son `AmbientThought`: sin globito; cerca de ellos aparecen
   las burbujitas sobre Alice y Espacio muestra una línea en la nube (su mejor
@@ -1286,9 +1394,133 @@ frutas** del escaparate de Leo.
   `street_headphones_guy`, `street_pedestrian_cap`,
   `street_pedestrian_blonde`) se borraron. El gato es la excepción: conserva
   su diálogo (Wilson).
-- **Los que caminan se detienen cuando Alice se acerca**
-  (`WalkingNPC.pause_near_player`, 20 px en los dos peatones y el gato). Se
-  paran, la miran y siguen cuando ella se aleja 12 px más.
+- **Los peatones solo se paran si Alice les "habla"** (Espacio). Pasar al lado
+  no los detiene. Al pulsar, `_on_pedestrian_interacted` los congela mirándola
+  hasta que termina **su** pensamiento (`RemarkInteractable.remark_finished`),
+  no cualquiera: si el Espacio corta un pensamiento del suelo, el fin de ese no
+  los suelta. Varios Espacios seguidos solo alargan la parada (contador en el
+  meta `talk_holds`), y siguen con el paso que traían. Para que sea fácil
+  alcanzarlos caminando, su `AmbientThought` tiene un círculo de 24 px (no
+  16). El gato sí se para por cercanía (`pause_near_player`, 20 px).
+- **NPCs repetidos (2026-10-25).** El chico de auriculares salía en las cuatro
+  escenas. Ahora el andén de salida y el tren comparten gente a propósito
+  (subieron al mismo tren), y la estación desconocida y la calle usan
+  personajes de la hoja que no salían en ningún lado:
+
+  | Escena | Nodo | Antes (col.) | Ahora (col.) | Texto nuevo |
+  |---|---|---|---|---|
+  | Estación desconocida | `LinseningGuyNPC` / `ListeningGuy` | auriculares (4) | guitarrista (16) | "Toca como si nadie lo estuviera escuchando." / "Qué envidia." |
+  | Estación desconocida | `OficinistManNPC` / `OfficeWorker` | oficinista (7) | hombre calvo (20) | "Tiene cara de pocos amigos. No lo miro." |
+  | Estación desconocida | `NormalGuyNPC` / `VendingGuy` | chico (6) | niño del globo (19) | "Un niño con un globo." / "Es el único aquí que no tiene prisa." |
+  | Calle | `HeadphonesGuyNPC` / `HeadphonesGuy` | auriculares (4) | chica con perro (18), **quitada** después: su sitio, junto al STOP, lo ocupa la pareja | ("Saca a pasear al perro como si nada." / "Yo tuve que ensayar en el espejo para salir." — línea libre para reubicarla) |
+  | Calle | `OfficeManNPC` / `OfficeMan` | oficinista (7) | chica deportista (17) | "Ropa de deporte. Sale a correr... por gusto." / "A mí me cuesta salir hasta para comprar." |
+
+  Los nombres de los nodos se dejaron igual. Siguen repitiéndose el lector de
+  diario (andén y calle), la estudiante (andén y calle) y el chico sentado
+  (estación desconocida y calle).
+- **La pareja que discute (2026-10-25).** Al pie del paso de cebra de arriba,
+  junto al café del inicio (x≈737–767), una pareja discute y tapa el paso:
+  `CoupleGuyNPC` (col. 10) y `CoupleGirlNPC` (col. 12), más `CoupleBlocker`
+  (`StaticBody2D`, capa 1, 34×12 en (752, 899)) para que no se pueda pasar
+  entre ellos. `StreetCouple` es un `NpcTalkArea` (globito "...", porque sí
+  responden) con `street_couple`:
+  - Oye la discusión (personajes `couple_girl` "Chica" y `couple_guy` "Chico")
+    y sale un **Rompecabezas de la Ansiedad** (`puzzles/street_couple.tres`,
+    15 s): "Perdón... ¿me dejan pasar?" (`ask`) o "Ya terminarán..." (`wait`),
+    con distractores "Disculpen", "cruzar", "rápido", "calle". Interrumpir a
+    desconocidos es justo un momento de mucha ansiedad (regla 1 del puzzle).
+  - `ask`: se callan, "Ay... perdona. Claro." / "Perdón, perdón.", y la señal
+    `couple_step_aside` los aparta a los costados (`_clear_couple`): el
+    bloqueo y el área se apagan. Alice: "...Lo dije." (`relaxed`). Queda en
+    `GameManager.street_couple_cleared`: si vuelve a la calle, siguen
+    apartados.
+  - `wait`: **Alice se queda escuchando y se entera de chismes**, uno nuevo
+    cada vez que espera (`GameManager.street_couple_waits`, que sube con la
+    señal `couple_waited`; dura entre visitas):
+    1. "¡Y encima invitaste a tu ex al cumpleaños de MI hermana!" / "¡Es amiga
+       de tu hermana!..." → Alice: "...¿A su ex?" / "No debería estar
+       escuchando esto."
+    2. "¿Y lo del perro?..." / "¡Se comió mis zapatos nuevos, Marcos!" →
+       Alice (por Wilson y sus zapatos): "Igual que en casa..."
+    3. y siguientes: "¡No me hables así delante de la gente!" / "¿Qué gente?
+       ¡Si no hay nadie!" → Alice: "...Estoy yo."
+  - Silencio: "(abre la boca, pero no le sale nada)" / "Siguen discutiendo."
+  - Después de esperar o de callarse, Alice pregunta "¿Lo intento otra vez?" y
+    hay un menú: **"Intentar hablarles otra vez"** salta (`jump try`) a la
+    etiqueta `label try`, justo antes del puzzle, sin salir de la
+    conversación; **"Cruzar por el otro paso"** termina con "Mejor cruzo por
+    el otro lado." (`nervous`).
+  - Ojo con Dialogic: un menú (`- opción`) tiene que ir **justo después de una
+    línea de texto**. Si va después del cierre de un `if/else` (o de un
+    comentario `#`), no se muestra y la conversación termina sin preguntar.
+    Por eso está la línea "¿Lo intento otra vez?".
+  - **Nunca bloquea el juego:** el paso de cebra de la derecha lleva al mismo
+    lado.
+  - **Se ve de lejos que discuten:** `StreetCouple/ArgueFx` (`AnimatedSprite2D`,
+    `assets/couple_argue.aseprite`, tag `argue`, 4 frames de 0,22 s) muestra
+    un "!!" amarillo y un "#!" rojo (palabrota de cómic) que se alternan sobre
+    él y sobre ella, con un saltito de 1 px, en el estilo del "MEOW!" de
+    Wilson (amarillo `#fbf236`, contorno negro que sigue cada signo). Se
+    esconde cuando se apartan (`_clear_couple`). Se puede mover arrastrando el
+    nodo en el editor.
+  - `street_zone_1.gd` despacha `anxiety_puzzle:<id>` con `ANXIETY_PUZZLES`,
+    igual que la estación y la tienda de Leo.
+- **El coche aparcado (2026-10-25).** Un coche negro aparcado en la calle de
+  las casas, junto a la acera de la parada (`MiddleLayer/ParkedCar` en
+  (505, 839): `Sprite2D` con la región (8, 88, 83×40) de
+  `assets/vehicles.aseprite`, que ahora se importa como textura estática).
+  `InteractableDetectors/ParkedCar` (área de 80×14 en el borde de la acera,
+  `one_time_interaction`) abre `street_car`.
+  - **Por qué se acerca Alice:** su reflejo en la ventanilla oscura. Mira que
+    no haya nadie y se arregla el pelo: Alice nunca se mira en público, y la
+    única vez que lo hace la "pillan". Retoma el espejo de casa y el miedo a
+    ser vista. (Primero se probó un gato dibujado en el polvo, pero Alice
+    hacía algo raro sin motivo; se descartó.)
+  - El dueño aparece "de la nada" (`car_owner_appears`: `CarOwnerNPC`, col. 7,
+    el oficinista del maletín, sin colisión, con un fundido). Se coloca
+    respecto al sprite `Body` del coche (`CAR_OWNER_OFFSET`, junto a la puerta
+    del conductor, en la acera), así que si se mueve el coche en el editor él
+    lo sigue. Personaje `car_owner` = "Dueño". "¿Todo bien?". Alice se queda helada (`shocked`) y sale un **Rompecabezas de la
+    Ansiedad** (`puzzles/street_car.tres`, 15 s): "Solo... me estaba...
+    arreglando el pelo." (`explain`) o "Perdón, perdón." (`sorry`), con
+    distractores "mirando", "coche", "nada", "robar".
+  - Ninguna rama la juzga: el dueño se ríe con ella ("Tranquila. Yo también lo
+    hago en todos los coches."; con `sorry`: "¿Perdón por qué?..."; con
+    silencio: "Tranquila, mujer..."). "Bueno, me voy, que llego tarde." →
+    `car_drives_away`: él se sube y el coche se va hacia la derecha (760 px
+    en 3 s). Alice: "(se va casi corriendo) ...Quiero que me trague la
+    tierra." / "Pero se rió conmigo. No de mí." (`nervous` → `relaxed`).
+  - `GameManager.street_car_gone`: al volver a la calle ya no está.
+  - Se quitó el pensamiento de paso `ShopWindowReflection` ("Mi reflejo en el
+    escaparate..."): el momento del reflejo es el coche, y tener los dos cerca
+    repetía la idea.
+- **Coches aparcados de decorado** (`MiddleLayer/ParkedVehicles`, con
+  y-sort): `Sprite2D` con una región de `assets/vehicles.aseprite`,
+  `centered = false` y `offset = (-ancho/2, -alto)`, así el punto de apoyo es
+  el centro del borde inferior (para ordenarse bien con Alice). Están sobre la
+  calzada, que ya tiene colisión, así que no llevan cuerpo propio. No tapan
+  ningún paso de cebra.
+
+  | Nodo | Región | Dónde (borde inferior) |
+  |---|---|---|
+  | `BlueCar` (de perfil) | (6, 22, 85×42) | (697, 345): avenida de la torre, carril de abajo, a la derecha de la torre. Más abajo se metía en la valla de la plaza. |
+  | `BrownVan` (desde atrás) | (110, 37, 36×59) | (875, 656): calle vertical derecha, carril derecho, entre los dos cruces |
+  | `WhiteVan` (desde atrás) | (174, 29, 37×67) | (266, 631): calle vertical izquierda, carril derecho, entre los dos cruces |
+
+  Las furgonetas se ven de espaldas: están aparcadas mirando calle arriba. Si
+  hicieran falta en el otro carril, habría que dibujarlas de frente.
+  - **Cada uno tiene un pensamiento** (`RemarkInteractable` en la acera, sin
+    globito; la línea sale en la nube). Por la regla de coherencia: el coche
+    negro responde, así que los demás coches también. No repiten lo del
+    reflejo (eso es del coche negro) y cada uno dice algo de Alice:
+    `BlueCarRemark` (697, 356, sobre la valla de la plaza; se alcanza desde la
+    acera de abajo) "Nunca aprendí a conducir. Tampoco tuve a dónde ir.";
+    `BrownVanRemark` (893, 626) "Una mudanza. Alguien empezando de cero... Qué
+    valor."; `WhiteVanRemark` (290, 597) "Hay alguien dentro comiéndose un
+    bocadillo. No miro. No miro."
+- **Ojo con `StreetRoadColisions`:** es una capa de colisión y tiene que estar
+  oculta (`visible = false`; las colisiones funcionan igual). Al editar el mapa
+  quedó visible una vez y tapaba media calle con marrón.
 - **Una pista no puede depender de otra.** El jugador puede verlas en
   cualquier orden, o ninguna, así que ningún texto debe nombrar una pista
   anterior (por ejemplo "como en la caja del repartidor").

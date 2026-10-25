@@ -36,6 +36,13 @@ var found_clues: Array[String] = []
 ## Street beats that play only once, even if Alice comes back from Leo's store.
 var street_arrival_seen: bool = false
 var glass_tower_seen: bool = false
+## The arguing couple stepped aside: the zebra crossing by the café stays free.
+var street_couple_cleared: bool = false
+## Times Alice chose to wait at the couple: each wait overhears a new bit of
+## their fight (street_couple.dtl branches on it).
+var street_couple_waits: int = 0
+## The dusty car's owner drove off with Alice's cat drawing: the car is gone.
+var street_car_gone: bool = false
 
 # Emitted the first time each clue is found (the street's "lost" reminder
 # restarts its clock on it).
@@ -131,6 +138,12 @@ func _on_dialogic_signal(argument: String) -> void:
 			leo_knows_wilson = true
 		"leo_talk_done":
 			leo_talk_done = true
+		"couple_waited":
+			street_couple_waits += 1
+		"headphones_on":
+			set_headphones_on_head(true)
+		"headphones_off":
+			set_headphones_on_head(false)
 		_:
 			# "leo_confidence:<amount>", e.g. "leo_confidence:-1".
 			if argument.begins_with("leo_confidence:"):
@@ -152,6 +165,25 @@ func add_item(item_id: String) -> void:
 		collected_items.append(item_id)
 		print("Item added to GameManager: ", item_id)
 		print("Missing items: ", get_missing_items_count())
+		outfit_changed.emit()
+
+# =========================
+# Outfit
+# =========================
+## What Alice wears follows what she picked up (shoes, backpack, headphones).
+## The headphones hang around her neck, and only go on her head at specific
+## moments: she puts them on to sleep on the train and takes them off when she
+## gets off, lost. Dialogic: [signal arg="headphones_on"] / "headphones_off".
+var headphones_on_head: bool = false
+
+## Emitted when anything Alice wears changes; the Player redraws its layers.
+signal outfit_changed
+
+func set_headphones_on_head(on_head: bool) -> void:
+	if headphones_on_head == on_head:
+		return
+	headphones_on_head = on_head
+	outfit_changed.emit()
 
 func is_item_collected(item_id: String) -> bool:
 	return collected_items.has(item_id)

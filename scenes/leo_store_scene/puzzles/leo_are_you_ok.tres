@@ -8,6 +8,7 @@ phrases = {
 "lie": PackedStringArray("N-no,", "estoy", "bien."),
 "truth": PackedStringArray("La", "verdad...", "no.", "Me", "perdí.")
 }
+extra_words = PackedStringArray("Sí...", "metro", "perdón", "gato")
 prompt = "¿Le digo la verdad... o que estoy bien?"
 time_limit = 15.0
 mistake_penalty = 2.0

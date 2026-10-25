@@ -18,6 +18,14 @@ const CORNER_SLIDE_SPEED: float = 60.0
 
 @onready var player_animation: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interaction_detector: Area2D = $InteractionDetector
+## Alice is drawn in layers (player/alice.aseprite, imported split by layer):
+## the body is player_animation, and each piece she can wear is a child
+## sprite that copies the body's animation, frame and flip every frame.
+@onready var backpack_layer: AnimatedSprite2D = $AnimatedSprite2D/Backpack
+@onready var shoes_layer: AnimatedSprite2D = $AnimatedSprite2D/Shoes
+@onready var headphones_neck_layer: AnimatedSprite2D = $AnimatedSprite2D/HeadphonesNeck
+@onready var headphones_head_layer: AnimatedSprite2D = $AnimatedSprite2D/HeadphonesHead
+@onready var outfit_layers: Array[AnimatedSprite2D] = [backpack_layer, shoes_layer, headphones_neck_layer, headphones_head_layer]
 
 var current_state: State = State.IDLE
 var last_direction: Vector2 = Vector2.DOWN # Face down by default while idle.
@@ -30,6 +38,17 @@ var is_control_locked: bool = false  # True while a scripted sequence owns the p
 func _ready() -> void:
 	Dialogic.timeline_started.connect(_on_dialogic_started)
 	Dialogic.timeline_ended.connect(_on_dialogic_ended)
+	GameManager.outfit_changed.connect(_refresh_outfit)
+	# The body advances its own frames after this script's _process, so the
+	# layers follow its signals, not the frame loop: otherwise they lag one
+	# frame behind on every pose change and flicker.
+	player_animation.frame_changed.connect(_sync_outfit)
+	player_animation.animation_changed.connect(_sync_outfit)
+	_refresh_outfit()
+
+## Flip has no signal; it is set in _physics_process, before this runs.
+func _process(_delta: float) -> void:
+	_sync_outfit()
 
 # =========================
 # Main frame logic
@@ -136,6 +155,56 @@ func lock_control() -> void:
 func unlock_control() -> void:
 	is_control_locked = false
 	can_move = true
+
+# =========================
+# Outfit layers
+# =========================
+## Shows the pieces Alice has picked up. The headphones are either around her
+## neck or on her head (GameManager.headphones_on_head), never both.
+func _refresh_outfit() -> void:
+	backpack_layer.visible = GameManager.is_item_collected("alice_backpack")
+	shoes_layer.visible = GameManager.is_item_collected("alice_shoes")
+	var has_headphones := GameManager.is_item_collected("alice_headphones")
+	headphones_neck_layer.visible = has_headphones and not GameManager.headphones_on_head
+	headphones_head_layer.visible = has_headphones and GameManager.headphones_on_head
+	_sync_outfit()
+
+## Every layer shows the same animation, frame and flip as the body, so code
+## only ever drives player_animation (play_animation, face_direction...).
+func _sync_outfit() -> void:
+	for layer in outfit_layers:
+		if not layer.visible:
+			continue
+		if layer.animation != player_animation.animation:
+			layer.animation = player_animation.animation
+		layer.frame = player_animation.frame
+		layer.flip_h = player_animation.flip_h
+
+# =========================
+# Cutscene camera
+# =========================
+## Glides Alice's camera until `target` (a world point) is at the centre of
+## the screen, e.g. to show the glass tower or the train coming in. The
+## camera limits still apply. Await it; pair it with reset_camera().
+func pan_camera_to(target: Vector2, duration: float) -> void:
+	var camera := get_node_or_null("Camera2D") as Camera2D
+	if camera == null:
+		return
+	var offset := camera.offset + target - camera.get_screen_center_position()
+	var tween := create_tween()
+	tween.tween_property(camera, "offset", offset, duration) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	await tween.finished
+
+## Brings the camera back onto Alice after pan_camera_to(). Await it.
+func reset_camera(duration: float) -> void:
+	var camera := get_node_or_null("Camera2D") as Camera2D
+	if camera == null:
+		return
+	var tween := create_tween()
+	tween.tween_property(camera, "offset", Vector2.ZERO, duration) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	await tween.finished
 
 # =========================
 # State helpers

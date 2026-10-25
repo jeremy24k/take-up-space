@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.spriteframes-split-layer"
+type="SpriteFrames"
+uid="uid://jn648o3kbsjj"
+path="res://.godot/imported/alice_backpack.ase_layer-c2ce8e58af88c20ef6b46f9223ed778b.res"
+
+[deps]
+
+source_file="res://player/alice_layers/alice_backpack.ase_layer"
+dest_files=["res://.godot/imported/alice_backpack.ase_layer-c2ce8e58af88c20ef6b46f9223ed778b.res"]
+
+[params]
+

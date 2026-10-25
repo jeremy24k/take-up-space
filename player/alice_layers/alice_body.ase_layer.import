@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.spriteframes-split-layer"
+type="SpriteFrames"
+uid="uid://dip4v1kagela8"
+path="res://.godot/imported/alice_body.ase_layer-3b0483427f995843dd2fb75858dd4541.res"
+
+[deps]
+
+source_file="res://player/alice_layers/alice_body.ase_layer"
+dest_files=["res://.godot/imported/alice_body.ase_layer-3b0483427f995843dd2fb75858dd4541.res"]
+
+[params]
+

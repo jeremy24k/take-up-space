@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"explain": PackedStringArray("Solo...", "me estaba...", "arreglando", "el pelo."),
+"sorry": PackedStringArray("Perdón,", "perdón.")
+}
+extra_words = PackedStringArray("mirando", "coche", "nada", "robar")
+prompt = "¿Le explico qué hacía... o pido perdón y me voy?"
+time_limit = 15.0
+mistake_penalty = 2.0

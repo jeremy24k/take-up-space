@@ -73,12 +73,18 @@ func _physics_process(_delta: float) -> void:
 		_walk_tween.play()
 
 # =========================
-# Route configuration
+# Patrol configuration
 # =========================
-## Waypoints walked in order (drag Marker2D nodes here, reorder freely) before
-## reaching the final destination - lets a route step around a corner or a
-## wall instead of cutting through it. Leave empty for a straight line.
-@export var route_waypoints: Array[Marker2D] = []
+@export_group("Patrol")
+## Points walked in order, then back, forever, once the scene calls
+## start_patrol(). Drag Marker2D nodes here (two or more) and reorder freely;
+## each leg is a straight line, so add a point to go round a corner. Keep the
+## markers outside the NPC (e.g. a PedestrianRoutes folder): as its children
+## they would move with it.
+@export var patrol_points: Array[Marker2D] = []
+@export var patrol_speed: float = 28.0
+## Seconds it rests at each end of the route, facing the camera.
+@export var patrol_pause: float = 2.5
 
 # =========================
 # Facing and animation
@@ -153,15 +159,28 @@ func walk_path(points: Array[Vector2], speed: float = DEFAULT_WALK_SPEED) -> voi
 		face_direction(last_direction)
 	collision_layer = SOLID_COLLISION_LAYER
 
-## Walks through route_waypoints (in the order set in the inspector), then to
-## target_position. With no waypoints, this is the same as walk_to().
-func walk_route(target_position: Vector2, speed: float = DEFAULT_WALK_SPEED) -> void:
+## Walks patrol_points forward, then backwards, forever, resting
+## patrol_pause seconds at each end. Starts at the first point. Does nothing
+## with fewer than two points.
+func start_patrol() -> void:
 	var points: Array[Vector2] = []
-	for waypoint in route_waypoints:
-		if waypoint:
-			points.append(waypoint.global_position)
-	points.append(target_position)
-	await walk_path(points, speed)
+	for marker in patrol_points:
+		if marker:
+			points.append(marker.global_position)
+	if points.size() < 2:
+		return
+	global_position = points[0]
+	var forward := true
+	while is_inside_tree():
+		var leg: Array[Vector2] = points.duplicate()
+		if not forward:
+			leg.reverse()
+		leg.remove_at(0)
+		await walk_path(leg, patrol_speed)
+		# Walkers only walk sideways; they rest facing the camera.
+		face_direction(Vector2.DOWN)
+		await get_tree().create_timer(patrol_pause).timeout
+		forward = not forward
 
 ## One leg of movement: tweens straight to target_position while playing the
 ## matching walk animation. Returns the direction walked (Vector2.ZERO if

@@ -3,22 +3,68 @@ extends Node2D
 # =========================
 # Pedestrian configuration
 # =========================
-const PEDESTRIAN_SPEED: float = 28.0
-## Seconds a pedestrian waits at each end of its route before turning back.
-const PEDESTRIAN_PAUSE: float = 2.5
+## Per-pedestrian meta while Alice holds it with Space: how many lines are
+## still up, and the [animation, flip_h] to walk on with.
+const TALK_HOLDS_META := &"talk_holds"
+const TALK_RESUME_META := &"talk_resume"
 
-## Each child of PedestrianRoutes is named after a pedestrian in NPCS and holds
-## the Marker2D points that pedestrian walks through, in order, back and forth.
+## Every WalkingNPC in NPCS with patrol points set in its inspector (the
+## markers live in the PedestrianRoutes folder) walks them back and forth.
 @onready var npcs: Node2D = $MiddleLayer/NPCS
-@onready var pedestrian_routes: Node2D = $PedestrianRoutes
 @onready var interactables: Node2D = $InteractableDetectors
 @onready var cat_talk_area: InteractableArea = $MiddleLayer/NPCS/StreetCat/InteractableArea
 @onready var player: Player = $MiddleLayer/Player
-@onready var camera: Camera2D = $MiddleLayer/Player/Camera2D
 @onready var tower_sighting: VisibleOnScreenNotifier2D = $GlassTowerSighting
 @onready var shop: Node2D = $InteractableDetectors/Shop
 
 var _cat_met: bool = false
+
+# =========================
+# Arguing couple configuration
+# =========================
+## A couple argues at the foot of the zebra crossing by the café and blocks
+## it (CoupleBlocker). Asking them to let her through is an anxiety puzzle;
+## backing off is fine too: the crossing to the right goes the same way.
+## Where each of them steps to (from where they stand) once she asks.
+const COUPLE_SIDE_STEP := {
+	# Back and to the left, below the STOP sign: straight left he stood
+	# behind its post.
+	"CoupleGuyNPC": Vector2(-17, 24),
+	"CoupleGirlNPC": Vector2(24, 3),
+}
+const COUPLE_STEP_TIME: float = 0.5
+## "Rompecabezas de la Ansiedad" played from the timelines with
+## [signal arg="anxiety_puzzle:<id>"].
+const ANXIETY_PUZZLES := {
+	"street_couple": preload("res://scenes/street_scenes/puzzles/street_couple.tres"),
+	"street_car": preload("res://scenes/street_scenes/puzzles/street_car.tres"),
+}
+
+@onready var couple_blocker: CollisionShape2D = $CoupleBlocker/CollisionShape2D
+@onready var couple_talk_area: NpcTalkArea = $InteractableDetectors/StreetCouple
+## "#!" and "!!" taking turns over their heads, so the fight shows from afar.
+@onready var couple_argue_fx: AnimatedSprite2D = $InteractableDetectors/StreetCouple/ArgueFx
+
+# =========================
+# Dusty car configuration
+# =========================
+## A black car parked by the bus stop. Alice, who never looks at herself in
+## public, fixes her hair in its dark window; the owner appears out of nowhere
+## and "catches" her (anxiety puzzle). She laughs with her, not at her, and
+## drives off.
+const CAR_OWNER_FADE_TIME: float = 0.3
+## Where the owner shows up, from the car sprite's origin (its bottom centre):
+## by the driver's door, on the pavement. Relative, so moving the car in the
+## editor brings the owner along.
+const CAR_OWNER_OFFSET := Vector2(48, -39)
+## The car pulls away to the right, along its lane, until it is off screen.
+const CAR_DRIVE_DISTANCE: float = 760.0
+const CAR_DRIVE_TIME: float = 3.0
+
+@onready var parked_car: Node2D = $MiddleLayer/ParkedCar
+@onready var parked_car_body: Sprite2D = $MiddleLayer/ParkedCar/Body
+@onready var car_owner: Node2D = $MiddleLayer/NPCS/CarOwnerNPC
+@onready var car_area: InteractableArea = $InteractableDetectors/ParkedCar
 
 # =========================
 # Arrival configuration
@@ -50,7 +96,7 @@ const LOST_REMINDER_AFTER: float = 150.0
 const LOST_REMINDER_MAX: int = 2
 const SHOP_NEAR_DISTANCE: float = 220.0
 const LOST_LINES: Array[String] = [
-	"Quizá alguien por aquí sepa dónde hay un minimercado...",
+	"Si le preguntara a alguien, ya habría llegado. ...No.",
 	"Podría fijarme mejor en los carteles. O en lo que dice la gente.",
 ]
 ## Once she overheard the phone girl, the reminder points at the tower.
@@ -70,6 +116,7 @@ const CLUE_AREAS := {
 	"PhoneGirl": "overheard_store",
 	"Delivery": "delivery_box",
 	"AdColumn": "store_flyer",
+	"PetsShopDoor": "pets_note",
 }
 ## InteractableDetectors child -> [clues that unlock it, timeline to play instead].
 ## Lets a place react to what Alice already learned (e.g. the shop window
@@ -91,9 +138,85 @@ func _ready() -> void:
 		tower_sighting.screen_entered.connect(_on_tower_on_screen, CONNECT_ONE_SHOT)
 	if not GameManager.street_arrival_seen:
 		_play_arrival()
+	Dialogic.signal_event.connect(_on_dialogic_signal)
+	if GameManager.street_couple_cleared:
+		_clear_couple(false)
+	car_owner.process_mode = Node.PROCESS_MODE_DISABLED
+	if GameManager.street_car_gone:
+		_remove_car()
 
 func _process(delta: float) -> void:
 	_tick_lost_reminder(delta)
+
+func _on_dialogic_signal(argument: Variant) -> void:
+	if not argument is String:
+		return
+	if argument == "couple_step_aside":
+		GameManager.street_couple_cleared = true
+		_clear_couple(true)
+	elif argument == "car_owner_appears":
+		_show_car_owner()
+	elif argument == "car_drives_away":
+		GameManager.street_car_gone = true
+		_drive_car_away()
+	elif argument.begins_with("anxiety_puzzle:"):
+		var data: AnxietyPuzzleData = ANXIETY_PUZZLES.get(argument.get_slice(":", 1))
+		if data == null:
+			push_warning("Unknown anxiety puzzle '%s'" % argument)
+			return
+		AnxietyPuzzle.play_from_dialogic(self, data)
+
+# =========================
+# Dusty car
+# =========================
+## "Out of nowhere": she fades in by the driver's door while Alice is busy.
+func _show_car_owner() -> void:
+	car_owner.process_mode = Node.PROCESS_MODE_INHERIT
+	car_owner.global_position = (parked_car_body.global_position + CAR_OWNER_OFFSET).round()
+	car_owner.modulate.a = 0.0
+	car_owner.show()
+	create_tween().tween_property(car_owner, "modulate:a", 1.0, CAR_OWNER_FADE_TIME)
+
+## She gets in (fades out) and the car pulls away.
+func _drive_car_away() -> void:
+	var owner_out := create_tween()
+	owner_out.tween_property(car_owner, "modulate:a", 0.0, CAR_OWNER_FADE_TIME)
+	await owner_out.finished
+	car_owner.hide()
+	var drive := create_tween()
+	drive.tween_property(parked_car, "position:x", parked_car.position.x + CAR_DRIVE_DISTANCE, CAR_DRIVE_TIME) 		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	await drive.finished
+	_remove_car()
+
+## Gone for good, also when Alice comes back to the street later.
+func _remove_car() -> void:
+	parked_car.hide()
+	car_owner.hide()
+	car_area.set_deferred("monitoring", false)
+	car_area.set_deferred("monitorable", false)
+	if car_area.label:
+		car_area.label.hide()
+
+# =========================
+# Arguing couple
+# =========================
+## They step to the sides and the crossing is free. Without animation when
+## Alice comes back to the street after they already moved.
+func _clear_couple(animated: bool) -> void:
+	couple_blocker.set_deferred("disabled", true)
+	couple_talk_area.set_deferred("monitoring", false)
+	couple_talk_area.set_deferred("monitorable", false)
+	if couple_talk_area.label:
+		couple_talk_area.label.hide()
+	couple_talk_area.hint.retire()
+	couple_argue_fx.hide()
+	for npc_name in COUPLE_SIDE_STEP:
+		var npc := npcs.get_node(NodePath(npc_name)) as Node2D
+		var target: Vector2 = npc.position + COUPLE_SIDE_STEP[npc_name]
+		if animated:
+			create_tween().tween_property(npc, "position", target, COUPLE_STEP_TIME) 				.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+		else:
+			npc.position = target
 
 # =========================
 # Arrival
@@ -119,19 +242,11 @@ func _on_tower_on_screen() -> void:
 		await Dialogic.timeline_ended
 	player.lock_control()
 
-	var to_tower := tower_sighting.global_position - camera.get_screen_center_position()
-	var pan := create_tween()
-	pan.tween_property(camera, "offset", to_tower, TOWER_PAN_TIME) \
-		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	var tower_lines: Array[String] = [TOWER_LINE]
 	ThoughtBox.say(tower_lines)
-	await pan.finished
+	await player.pan_camera_to(tower_sighting.global_position, TOWER_PAN_TIME)
 	await get_tree().create_timer(TOWER_HOLD_TIME).timeout
-
-	var back := create_tween()
-	back.tween_property(camera, "offset", Vector2.ZERO, TOWER_RETURN_TIME) \
-		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-	await back.finished
+	await player.reset_camera(TOWER_RETURN_TIME)
 	player.unlock_control()
 
 # =========================
@@ -185,63 +300,59 @@ func _connect_clues() -> void:
 # Pedestrian setup
 # =========================
 func _start_pedestrians() -> void:
-	for route in pedestrian_routes.get_children():
-		var pedestrian := npcs.get_node_or_null(NodePath(route.name)) as WalkingNPC
-		if pedestrian == null:
-			push_warning("PedestrianRoutes/%s has no matching NPC in NPCS" % route.name)
+	for child in npcs.get_children():
+		var pedestrian := child as WalkingNPC
+		if pedestrian == null or pedestrian.patrol_points.size() < 2:
 			continue
-		var points: Array[Vector2] = []
-		for marker in route.get_children():
-			if marker is Marker2D:
-				points.append(marker.global_position)
-		if points.size() < 2:
-			continue
+		# A conversation (the cat) or a background person's thought.
 		var talk_area := pedestrian.get_node_or_null("InteractableArea")
+		if talk_area == null:
+			talk_area = pedestrian.get_node_or_null("AmbientThought")
 		if talk_area:
-			talk_area.interacted.connect(_on_pedestrian_interacted.bind(pedestrian))
-		_patrol(pedestrian, points)
-
-# =========================
-# Pedestrian patrol
-# =========================
-## Walks the route forward, then backwards, forever, pausing at each end.
-func _patrol(pedestrian: WalkingNPC, points: Array[Vector2]) -> void:
-	pedestrian.global_position = points[0]
-	var forward := true
-	while is_inside_tree():
-		var leg: Array[Vector2] = points.duplicate()
-		if not forward:
-			leg.reverse()
-		leg.remove_at(0)
-		await pedestrian.walk_path(leg, PEDESTRIAN_SPEED)
-		# Pedestrians only walk sideways; they rest facing the camera.
-		pedestrian.face_direction(Vector2.DOWN)
-		await get_tree().create_timer(PEDESTRIAN_PAUSE).timeout
-		forward = not forward
+			talk_area.interacted.connect(_on_pedestrian_interacted.bind(pedestrian, talk_area))
+		pedestrian.start_patrol()
 
 # =========================
 # Talking to a pedestrian
 # =========================
 ## Freezes the pedestrian (and its walk tween, which is bound to it) while the
-## dialogue runs, so it does not walk away mid-conversation. Pedestrians with
-## stops_when_talked_to off keep walking, as if they never noticed Alice.
-func _on_pedestrian_interacted(pedestrian: WalkingNPC) -> void:
+## dialogue or thought runs, so it does not walk away mid-line, turned to
+## Alice. Walking past her is not enough: they only stop when she reaches out
+## (Space). Pedestrians with stops_when_talked_to off keep walking, as if they
+## never noticed her.
+func _on_pedestrian_interacted(pedestrian: WalkingNPC, talk_area: Area2D) -> void:
 	if not pedestrian.stops_when_talked_to:
 		return
-	# The sprite keeps running while its NPC is frozen, so it can play a
-	# talk animation (the cat meows) and then go back to what it was doing.
+	# Space again while it is already stopped (the next line) only extends
+	# the stop: it walks on when the last line is over, with the walk it had.
+	var holds: int = pedestrian.get_meta(TALK_HOLDS_META, 0)
+	pedestrian.set_meta(TALK_HOLDS_META, holds + 1)
 	var sprite: AnimatedSprite2D = pedestrian.sprite
-	var previous_animation := sprite.animation
 	var talks := sprite.sprite_frames.has_animation(pedestrian.talk_animation)
-	if talks:
-		sprite.process_mode = Node.PROCESS_MODE_ALWAYS
-		sprite.play(pedestrian.talk_animation)
-	pedestrian.process_mode = Node.PROCESS_MODE_DISABLED
-	Dialogic.timeline_ended.connect(func() -> void:
+	if holds == 0:
+		pedestrian.set_meta(TALK_RESUME_META, [sprite.animation, sprite.flip_h])
+		# The sprite keeps running while its NPC is frozen, so it can play a
+		# talk animation (the cat meows) and then go back to what it was doing.
+		if talks:
+			sprite.process_mode = Node.PROCESS_MODE_ALWAYS
+			sprite.play(pedestrian.talk_animation)
+		else:
+			pedestrian.face_direction(pedestrian.global_position.direction_to(player.global_position))
+		pedestrian.process_mode = Node.PROCESS_MODE_DISABLED
+	# A thought waits for its own end: the one it replaces ending (e.g. a floor
+	# thought cut off by this Space) must not send the pedestrian on its way.
+	var done: Signal = talk_area.remark_finished if talk_area.has_signal("remark_finished") else Dialogic.timeline_ended
+	done.connect(func() -> void:
+		var left: int = pedestrian.get_meta(TALK_HOLDS_META, 1) - 1
+		pedestrian.set_meta(TALK_HOLDS_META, left)
+		if left > 0:
+			return
+		var resume: Array = pedestrian.get_meta(TALK_RESUME_META)
 		pedestrian.process_mode = Node.PROCESS_MODE_INHERIT
 		if talks:
 			sprite.process_mode = Node.PROCESS_MODE_INHERIT
-			sprite.play(previous_animation), CONNECT_ONE_SHOT)
+		sprite.flip_h = resume[1]
+		sprite.play(resume[0]), CONNECT_ONE_SHOT)
 
 # =========================
 # Street cat

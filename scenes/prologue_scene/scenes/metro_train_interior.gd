@@ -115,8 +115,10 @@ func _on_player_sat_down(seated_player: Player) -> void:
 	_fall_asleep(seated_player)
 
 func _fall_asleep(seated_player: Player) -> void:
-	# 1. What she thinks once she is settled in the seat.
+	# 1. What she thinks once she is settled in the seat. Then the headphones
+	# go from her neck to her head: she shuts the world out and dozes off.
 	await seat_thought_trigger.show_thought(seated_player)
+	GameManager.set_headphones_on_head(true)
 
 	# 2. Alice starts to nod off.
 	await get_tree().create_timer(sleepy_delay).timeout

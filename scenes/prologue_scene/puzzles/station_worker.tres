@@ -8,6 +8,7 @@ phrases = {
 "ask": PackedStringArray("¿Qué", "estación", "es", "esta?"),
 "leave": PackedStringArray("Nada...", "perdón.")
 }
+extra_words = PackedStringArray("tren", "casa", "dormida")
 prompt = "¿Le pregunto dónde estoy... o lo dejo estar?"
 time_limit = 18.0
 mistake_penalty = 2.0

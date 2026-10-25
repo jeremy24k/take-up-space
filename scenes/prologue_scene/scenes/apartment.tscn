@@ -2339,7 +2339,9 @@ position = Vector2(890, 237)
 target = NodePath("../Player")
 
 [node name="WilsonArea" parent="MiddleLayer/Wilson" index="3" unique_id=444772387]
-hint_position = Vector2(0, -22)
+
+[node name="InteractionHint" parent="MiddleLayer/Wilson/WilsonArea" index="2"]
+position = Vector2(0, -22)
 
 [node name="SuperiorLayer" type="TileMapLayer" parent="." unique_id=1472274550]
 z_index = 1

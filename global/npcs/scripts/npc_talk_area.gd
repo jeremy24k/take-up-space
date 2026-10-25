@@ -5,9 +5,10 @@ extends "res://global/interactable_area.gd"
 # Hint configuration
 # =========================
 ## Where the "..." bubble floats, relative to this area: over the head of the
-## NPC it belongs to. The area itself is often offset from the NPC (it sits
-## where Alice stands to talk), so this is set per instance.
-@export var hint_position := Vector2(0, -38)
+## NPC it belongs to. It is the InteractionHint child's own position, so it
+## is placed by dragging the bubble in the editor (Editable Children on the
+## instance). Code can still move it later with set_hint_position().
+var hint_position := Vector2.ZERO
 
 @onready var hint: InteractionHint = $InteractionHint
 
@@ -25,7 +26,7 @@ func _ready() -> void:
 	var owner_item := get_parent() as CanvasItem
 	if owner_item and owner_item.y_sort_enabled:
 		y_sort_enabled = true
-	set_hint_position(hint_position)
+	set_hint_position(hint.position)
 	# Bubble and "[Espacio]" take turns: the bubble says "you can talk to this
 	# one" from afar, the prompt replaces it once Alice is close enough.
 	if label:

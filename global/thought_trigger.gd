@@ -15,6 +15,11 @@ extends Area2D
 ## If another thought is still on screen, wait for it to end instead of
 ## cutting it off (by default a new thought replaces the current one).
 @export var wait_for_current: bool = false
+## Walks in that are ignored before the thought fires: 1 = only from the
+## second time she passes ("Ya pasé por aquí. Creo.").
+@export var skip_visits: int = 0
+
+var _visits: int = 0
 
 # =========================
 # Lifecycle
@@ -25,6 +30,9 @@ func _ready() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	var player := body as Player
 	if not player:
+		return
+	_visits += 1
+	if _visits <= skip_visits:
 		return
 
 	if trigger_once:

@@ -1,226 +1,11 @@
 [gd_scene format=4 uid="uid://myv7hnkrtdph"]
 
 [ext_resource type="Script" uid="uid://ctsetmtehu5j2" path="res://player/player.gd" id="1_onrkg"]
-
-[sub_resource type="PortableCompressedTexture2D" id="PortableCompressedTexture2D_oul6g"]
-_data = PackedByteArray("AAADAAUAAAABAAAAoAAAAKAAAAB6BAAAUklGRnIEAABXRUJQVlA4TGYEAAAvn8AnECdAkG0zmIFP7STXEAgQYvyPiEKQbTOYOc73Ip//APxXVcZAdiRJdhshxgU5AHbDgmlaQKz/RmGhaexq7/kV0X8JbhtJksQcVG/1XoqsrE9scxdim7x2DGdPt+02+0HWdGH2aLebNudzIPyKCP9rzP5xX4fPjvm/a8/Eo33D94RrTblBjG/dXepat2dcz/Wow0F4cc9Ux66e60nHbucK1/H9JqXv4WauBx0IM9f+eO4UxLzxcw3OiTBzl1kvfaXoze/wqg6IdccdV59rhTnn2QUguc2cC2I+6fDnvJqLgGg7Bue04Slhm/EemY2l73jQ7ecyoTRzIhVDHSlljF8q6HP5Dm+sA+JiHcrU762jr6U6gAQW6LDncrGOWKwDCGCljl19Lv7OOm77hAU6/uHXDnvseofvmip1rSi7bx2+a3hOmy3abvquiXPmjcJ2P+iaN2cKYpaYEvgDc1ZZL32lWOGVwjK7tfYW3ZxzqadE5WxNQ3Pe0c9VcR0pXZ+KkTkh5hDBP5fz2ZxD3UDSnDsiHpwbP6fnQmLkXAN9rqE52cvKzpSuThdajnWbE8Pv0YN9dJ1RYs+in9N1chuTYu1szeHFX+zcY9TepisJA2JWcBdDTtUy/bZn1v/WjVhiDXdRw4/KGxk0+qrwhiUan6N/3crnAKAGJFABOqDuNDc4j8YqFKDkbpDuPeyvuXsQV1a5T2YfUg+EFaPO+BhKAwhggoGuJCBzrBVmMHRhAGNuf8qz++6QtRafo95W63aDB/teh7hL77q4su1/zgKAqR37eIeuFTM7ck4HJ3bsWq0jbxS+o8CUwG20Yy5KL27DHeU2tdbeou+o6KIY76icrUl0HZYU8zpSau+hjl24PffxjtKpi++ow4jYhjvGz51/b2Z2ACLwoMMNvrkODHWkboP5jhIvZh8GO/JsjUnbMSKVYpRcx061N0XfUUvzGCmR4bB2yjnl6AnVYBxdO3xHKQ0+uNBAB4wADMBeSPccfWf/Gig9OEckKgBouz6mA4DrSiNln6OURms47FyH6aZM96MO62O05iWjBrk/2TucGBQp1t19K0rRR3U3mxVTwQPCQt0BBIA6c+8dLg2bXXau/zqrn3Is1ZG6VizUsavjQh15o/iVOiDmxI5daq29xZGOl75ybsfZmnzHTyj3tb3dTXv/9HM6H3T8iJnnEEBO7QBExEjHpPcILkMx2oHytf7W4Qettulsrfato+qyc/HRhckC1d7kNtChlHjUTMd+XFK1U86pEbuGtaM7tucdyjmqG6DDACBVd9HDBUAV4iqA/rU9SKy7Lo+6Suk62OeynXM7jk87as3O1Q6LvsN2f550TAXxU9s+o7YPxKjBSOkTtd13d/ZFHoXNLABjc20WHohtcAHwHW4jAV/1X2ftALCU1LVipU91XO1TipVATMVK9y99pbie9b7+fdkFILnce4Sl3vP+s9yFS33NRfF3hytBB6z0D93/raWwHb87n98eYC0L/WoD")
-size_override = Vector2(160, 160)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_rkbax"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(96, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_g1dw6"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(32, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_yw30f"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(64, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_qjkh3"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(0, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_g6k8r"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(32, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_boad6"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(64, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_rgyib"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(96, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_hg6s5"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(128, 0, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_8t03j"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(0, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2ieo8"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(96, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ebec5"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(128, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_yllr7"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(0, 96, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_kb6p2"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(32, 96, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_wodsf"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(64, 96, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_32hag"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(96, 96, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tqiix"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(128, 96, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_e7oew"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(0, 128, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c35mf"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(128, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_65viv"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(0, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_x7c3f"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(32, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_bjvpn"]
-atlas = SubResource("PortableCompressedTexture2D_oul6g")
-region = Rect2(64, 64, 32, 32)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_s7qer"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rkbax")
-}],
-"loop": 1,
-"name": &"idle_back",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g1dw6")
-}],
-"loop": 1,
-"name": &"idle_front",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yw30f")
-}],
-"loop": 1,
-"name": &"idle_side",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qjkh3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g6k8r")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_boad6")
-}],
-"loop": 1,
-"name": &"sit_asleep",
-"speed": 3.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rgyib")
-}],
-"loop": 1,
-"name": &"sit_down",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rgyib")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_hg6s5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_8t03j")
-}],
-"loop": 1,
-"name": &"sit_sleepy",
-"speed": 3.0
-}, {
-"frames": [{
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_2ieo8")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_ebec5")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_rkbax")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yllr7")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_kb6p2")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_rkbax")
-}],
-"loop": 1,
-"name": &"walk_back",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.5,
-"texture": SubResource("AtlasTexture_wodsf")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_32hag")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g1dw6")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_tqiix")
-}, {
-"duration": 2.0,
-"texture": SubResource("AtlasTexture_e7oew")
-}, {
-"duration": 1.5,
-"texture": SubResource("AtlasTexture_g1dw6")
-}],
-"loop": 1,
-"name": &"walk_front",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c35mf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_65viv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yw30f")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_x7c3f")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_bjvpn")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yw30f")
-}],
-"loop": 1,
-"name": &"walk_side",
-"speed": 10.0
-}]
+[ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_body.ase_layer" id="alice_body"]
+[ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_backpack.ase_layer" id="alice_backpack"]
+[ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_shoes.ase_layer" id="alice_shoes"]
+[ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_headphones_neck.ase_layer" id="alice_headphones_neck"]
+[ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_headphones_head.ase_layer" id="alice_headphones_head"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h4t55"]
 size = Vector2(17, 10)
@@ -238,31 +23,37 @@ zoom = Vector2(3, 3)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1954972618]
 texture_filter = 1
-sprite_frames = SubResource("SpriteFrames_s7qer")
-animation = &"sit_sleepy"
-frame_progress = 0.30563003
+sprite_frames = ExtResource("alice_body")
+animation = &"idle_front"
 offset = Vector2(0, -9)
-metadata/_aseprite_wizard_interface_config_ = {
-"animation_section": true,
-"layer_section": true,
-"output_section": true,
-"pending_changes": {},
-"slice_section": true
-}
-metadata/_aseprite_wizard_config_ = {
-"embed_tex": true,
-"layers": [],
-"o_ex_p": "",
-"o_folder": "",
-"o_name": "",
-"only_visible": false,
-"scale": "1.0",
-"should_round_fps": true,
-"slice": "",
-"source": "res://player/walk_animation.aseprite",
-"source_uid": 7162798891771416105
-}
-metadata/_aseprite_wizard_source_file_hash_ = "c76f4fdb843192013e9afce64f830c52"
+
+[node name="Backpack" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
+visible = false
+texture_filter = 1
+sprite_frames = ExtResource("alice_backpack")
+animation = &"idle_front"
+offset = Vector2(0, -9)
+
+[node name="Shoes" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
+visible = false
+texture_filter = 1
+sprite_frames = ExtResource("alice_shoes")
+animation = &"idle_front"
+offset = Vector2(0, -9)
+
+[node name="HeadphonesNeck" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
+visible = false
+texture_filter = 1
+sprite_frames = ExtResource("alice_headphones_neck")
+animation = &"idle_front"
+offset = Vector2(0, -9)
+
+[node name="HeadphonesHead" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
+visible = false
+texture_filter = 1
+sprite_frames = ExtResource("alice_headphones_head")
+animation = &"idle_front"
+offset = Vector2(0, -9)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1888454445]
 y_sort_enabled = true

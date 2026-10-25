@@ -1,4 +1,5 @@
-alice: (mira a su alrededor) ¿Eh...?
+[signal arg="headphones_off"]
+alice: (se quita los auriculares y mira a su alrededor) ¿Eh...?
 join alice (worried) leftmost
 alice: (observa la estación) Esta no es mi parada...
 alice: (busca en sus bolsillos) Mi teléfono...

@@ -31,6 +31,10 @@ extends "res://global/interactable_area.gd"
 const REOPEN_COOLDOWN_MSEC: int = 250
 
 var _next_line: int = 0
+
+## Emitted when this remark's own thought is gone (not when any other thought
+## or dialogue ends), e.g. so a pedestrian walks on only then.
+signal remark_finished
 var _closed_at_msec: int = -REOPEN_COOLDOWN_MSEC
 
 # =========================
@@ -67,6 +71,7 @@ func _say(line: String) -> void:
 	var remark_lines: Array[String] = [line]
 	await ThoughtBox.say(remark_lines, true)
 	_closed_at_msec = Time.get_ticks_msec()
+	remark_finished.emit()
 
 ## Same as InteractableArea.interact() for a timeline, without emitting
 ## `interacted` a second time.

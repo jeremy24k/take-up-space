@@ -49,9 +49,6 @@ var _time_left: float = 0.0
 var _cooldown: float = 0.0
 var _accepting: bool = false
 var _done: bool = false
-## The clock waits for the player's first key or click, so the first time
-## they can read the prompt and the controls before the panic starts.
-var _clock_started: bool = false
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -66,6 +63,10 @@ signal finished(result: String)
 ## [/codeblock]
 func run(data: AnxietyPuzzleData) -> String:
 	_data = data
+	# Saving the .tres from the editor has dropped extra_words more than once,
+	# silently: say so instead of quietly playing an easier puzzle.
+	if not data.relaxed and data.extra_words.is_empty():
+		push_warning("Anxiety puzzle '%s' has no extra_words (distractors)" % data.resource_path)
 	_time_left = data.time_limit
 	prompt_label.text = data.prompt
 	_spawn_words()
@@ -240,17 +241,15 @@ func _input(event: InputEvent) -> void:
 		_awaiting_first_focus = false
 		_focus_any_visible()
 		get_viewport().set_input_as_handled()
-	if _clock_started:
-		return
-	if (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
-		_clock_started = true
 
 func _process(delta: float) -> void:
 	if not _accepting:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	# A rehearsal has no clock: no pressure, no closing vignette, no freezing.
-	if not _clock_started or _data.relaxed:
+	# A real puzzle starts ticking as soon as the words are up: the mirror
+	# already taught how to play, so there is no grace time to read.
+	if _data.relaxed:
 		return
 	_time_left -= delta
 	var pressure := clampf(1.0 - _time_left / _data.time_limit, 0.0, 1.0)

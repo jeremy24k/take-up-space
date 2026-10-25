@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.spriteframes-split-layer"
+type="SpriteFrames"
+uid="uid://biiqmxns7a33n"
+path="res://.godot/imported/alice_shoes.ase_layer-e04128726f3d845f9c5362b44d61cd3f.res"
+
+[deps]
+
+source_file="res://player/alice_layers/alice_shoes.ase_layer"
+dest_files=["res://.godot/imported/alice_shoes.ase_layer-e04128726f3d845f9c5362b44d61cd3f.res"]
+
+[params]
+

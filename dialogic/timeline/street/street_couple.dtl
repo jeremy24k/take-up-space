@@ -1,0 +1,43 @@
+(Una pareja discute al pie del paso de cebra. Tapan todo el paso.)
+couple_girl: ¡Siempre haces lo mismo! ¡Siempre!
+couple_guy: ¿Yo? ¡Fuiste tú la que dijo que no venía!
+alice: (se queda a un paso, sin saber dónde ponerse)
+label try
+[signal arg="anxiety_puzzle:street_couple"]
+if {anxiety_result} == "ask":
+	alice: Perdón... ¿me dejan pasar?
+	(Se callan de golpe. Los dos la miran.)
+	couple_girl: Ay... perdona. Claro.
+	couple_guy: (se aparta, incómodo) Perdón, perdón.
+	[signal arg="couple_step_aside"]
+	join alice (relaxed) leftmost
+	alice: (con la cara ardiendo) ...Lo dije.
+	leave alice
+else:
+	if {anxiety_result} == "wait":
+		alice: (muy bajito) Ya terminarán...
+		[signal arg="couple_waited"]
+		if {GameManager.street_couple_waits} == 1:
+			couple_girl: ¡Y encima invitaste a tu ex al cumpleaños de MI hermana!
+			couple_guy: ¡Es amiga de tu hermana! ¿Qué querías que hiciera?
+			alice: (abre mucho los ojos) ...¿A su ex?
+			alice: No debería estar escuchando esto.
+		elif {GameManager.street_couple_waits} == 2:
+			couple_guy: ¿Y lo del perro? ¿También es culpa mía lo del perro?
+			couple_girl: ¡Se comió mis zapatos nuevos, Marcos!
+			alice: (piensa en sus zapatos, tirados en el baño) Igual que en casa...
+			alice: ...Sigo sin moverme. Y sigo escuchando.
+		else:
+			couple_girl: ¡No me hables así delante de la gente!
+			couple_guy: ¿Qué gente? ¡Si no hay nadie!
+			alice: (mira a su alrededor) ...Estoy yo.
+	else:
+		alice: (abre la boca, pero no le sale nada)
+		(Siguen discutiendo. Ni la han visto.)
+	alice: ¿Lo intento otra vez?
+	- Intentar hablarles otra vez
+		jump try
+	- Cruzar por el otro paso
+		join alice (nervous) leftmost
+		alice: Mejor cruzo por el otro lado.
+		leave alice

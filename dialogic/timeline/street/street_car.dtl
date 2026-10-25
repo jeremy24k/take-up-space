@@ -1,0 +1,25 @@
+(Un coche negro aparcado. En la ventanilla oscura, Alice se ve reflejada.)
+alice: (se detiene y mira a los lados. No hay nadie.)
+alice: (se acerca un poco y se arregla el pelo en el reflejo) Así... un poco mejor.
+[signal arg="car_owner_appears"]
+car_owner: ¿Todo bien?
+join alice (shocked) leftmost
+alice: (se queda helada, con la mano todavía en el pelo)
+leave alice
+[signal arg="anxiety_puzzle:street_car"]
+if {anxiety_result} == "explain":
+	alice: S-solo me estaba... arreglando el pelo. Perdón.
+	car_owner: (se ríe) Tranquila. Yo también lo hago en todos los coches.
+elif {anxiety_result} == "sorry":
+	alice: Perdón, perdón.
+	car_owner: (sonríe) ¿Perdón por qué? ¿Por mirarte en mi ventanilla? Yo lo hago en todos los coches.
+else:
+	alice: (se pone roja; no le sale nada)
+	car_owner: (sonríe) Tranquila, mujer. Yo también me miro en todos los coches.
+car_owner: Bueno, me voy, que llego tarde.
+[signal arg="car_drives_away"]
+join alice (nervous) leftmost
+alice: (se va casi corriendo) ...Quiero que me trague la tierra.
+update alice (relaxed)
+alice: Pero se rió conmigo. No de mí.
+leave alice

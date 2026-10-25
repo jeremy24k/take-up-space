@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://vcwtapjtkyt0"
+path="res://.godot/imported/npcs_draft.aseprite-ddfcc8019e9ff95ab24e2d23714d4b80.res"
+
+[deps]
+
+source_file="res://global/npcs/assets/npcs_draft.aseprite"
+dest_files=["res://.godot/imported/npcs_draft.aseprite-ddfcc8019e9ff95ab24e2d23714d4b80.res"]
+
+[params]
+
