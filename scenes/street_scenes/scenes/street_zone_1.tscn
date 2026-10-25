@@ -34,6 +34,15 @@
 [ext_resource type="SpriteFrames" uid="uid://dm7qwiqtnsv06" path="res://global/npcs/assets/street_cat.aseprite" id="street_cat"]
 [ext_resource type="Texture2D" uid="uid://cd0cj73bhbbf7" path="res://scenes/street_scenes/assets/vehicles.aseprite" id="vehicles"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_BlueCarRemark"]
+size = Vector2(84, 14)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_BrownVanRemark"]
+size = Vector2(14, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_WhiteVanRemark"]
+size = Vector2(14, 66)
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4frjd"]
 texture = ExtResource("1_axu3w")
 texture_region_size = Vector2i(32, 32)
@@ -4932,6 +4941,9 @@ group_id = ""
 first_timeline = ""
 first_line = ""
 
+[node name="CollisionShape2D" parent="InteractableDetectors/BlueCarRemark" index="0"]
+shape = SubResource("RectangleShape2D_BlueCarRemark")
+
 [node name="BrownVanRemark" parent="InteractableDetectors" unique_id=1595116133 instance=ExtResource("remark_interactable")]
 position = Vector2(890, 600)
 lines = Array[String](["Una mudanza. Alguien empezando de cero... Qué valor."])
@@ -4941,6 +4953,9 @@ group_id = ""
 first_timeline = ""
 first_line = ""
 
+[node name="CollisionShape2D" parent="InteractableDetectors/BrownVanRemark" index="0"]
+shape = SubResource("RectangleShape2D_BrownVanRemark")
+
 [node name="WhiteVanRemark" parent="InteractableDetectors" unique_id=1917065871 instance=ExtResource("remark_interactable")]
 position = Vector2(197, 474)
 lines = Array[String](["Hay alguien dentro comiéndose un bocadillo. No miro. No miro."])
@@ -4949,6 +4964,9 @@ pool = null
 group_id = ""
 first_timeline = ""
 first_line = ""
+
+[node name="CollisionShape2D" parent="InteractableDetectors/WhiteVanRemark" index="0"]
+shape = SubResource("RectangleShape2D_WhiteVanRemark")
 
 [node name="PhoneGirl" parent="InteractableDetectors" unique_id=577986319 instance=ExtResource("npc_talk_area")]
 position = Vector2(1048, 975)
