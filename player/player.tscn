@@ -6,6 +6,7 @@
 [ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_shoes.ase_layer" id="alice_shoes"]
 [ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_headphones_neck.ase_layer" id="alice_headphones_neck"]
 [ext_resource type="SpriteFrames" path="res://player/alice_layers/alice_headphones_head.ase_layer" id="alice_headphones_head"]
+[ext_resource type="PackedScene" path="res://global/character_shadow.tscn" id="character_shadow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h4t55"]
 size = Vector2(17, 10)
@@ -26,6 +27,8 @@ texture_filter = 1
 sprite_frames = ExtResource("alice_body")
 animation = &"idle_front"
 offset = Vector2(0, -9)
+
+[node name="Shadow" parent="AnimatedSprite2D" instance=ExtResource("character_shadow")]
 
 [node name="Backpack" type="AnimatedSprite2D" parent="AnimatedSprite2D"]
 visible = false

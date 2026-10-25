@@ -18,5 +18,5 @@ sheet/sheet_type="packed"
 sheet/sheet_columns=12
 sheet/frame_padding=0
 sheet/scale=1
-animation/round_fps=true
+animation/round_fps=false
 output/layers_resources_folder="alice_layers"

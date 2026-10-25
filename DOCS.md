@@ -286,6 +286,14 @@ que genera un `.ase_layer` por capa en `player/alice_layers/`, cada uno un
   capas importa: `shoes` va sobre `backpack`.
 - `metro_train_interior.tscn` tenía su propia copia vieja de las animaciones
   de Alice incrustada en la escena; se quitó para que use la del jugador.
+- **Los tiempos de cada frame viven en `alice.aseprite`**, no en Godot: la
+  importación los copia. `sit_sleepy` y `sit_asleep` van a 1/3 s por frame
+  (3 fps, la respiración lenta al dormirse) y los pasos tienen duraciones
+  desiguales (`walk_front` 0,15/0,2/0,1/0,2/0,2/0,15; `walk_back`
+  0,2/0,2/0,1/0,1/0,2/0,2). Antes estaban ajustados a mano en el
+  `SpriteFrames` incrustado en `player.tscn`; al pasar a capas se perdieron y
+  Alice "dormía" a 10 fps. `alice.aseprite.import` tiene
+  `animation/round_fps=false`: con el redondeo, 3 fps se volvían 4.
 - Si se abre una escena suelta (la calle, por ejemplo) sin pasar por el
   apartamento, Alice sale descalza y sin mochila: no recogió nada.
 
@@ -371,6 +379,27 @@ borró).
 vidrieras)" o "(mira a su alrededor)" funcionan en la caja de abajo, que es
 una escena, pero en la nube se leen como si Alice pensara la acotación. Lo que
 va en la nube es solo lo que piensa.
+
+### `CharacterShadow` (`global/character_shadow.tscn`)
+La sombra bajo los pies de cada personaje (2026-10-25): una elipse plana del
+mismo color que las sombras de la calle (`shadow-tile`: negro al 29 %), para
+que los personajes se apoyen en el suelo.
+- Dos tamaños dibujados en Aseprite: `character_shadow.aseprite` (14×7,
+  personas) y `character_shadow_small.aseprite` (10×6, gatos; `small = true`).
+  No va centrada (`centered = false` + `offset` redondeado): con un tamaño
+  impar (como el 7 de 14×7) caería en medio píxel y se vería borrosa.
+- Va **como hija del sprite** del personaje, no del personaje, con
+  `show_behind_parent`: así siempre se dibuja justo debajo del sprite (si fuera
+  hermana, el y-sort podía ponerla encima). Se coloca sola al arrancar en la
+  línea de los pies: el borde inferior del frame del sprite (contando su
+  `offset`, que cambia por instancia) menos `feet_margin` (2 px), centrada ahí
+  para que asome alrededor del calzado. Es `@tool`, así que se ve en el editor.
+- Ya está en las plantillas, así que la tienen todos: Alice (`player.tscn`),
+  `base_npc.tscn` (todos los de la hoja), `walking_npc.tscn` (peatones,
+  trabajador del metro) y Wilson (`small`). El gato de la calle la tiene
+  `small` como override de su instancia.
+- Leo no la lleva: está detrás del mostrador, no se le ven los pies, y la
+  sombra se dibujaría sobre el mostrador.
 
 ### `NpcTalkArea` (`global/npcs/scenes/npc_talk_area.tscn`)
 `InteractableArea` para **cualquier personaje con el que Alice puede hablar**.
@@ -924,6 +953,27 @@ sin ese filtro un evento de OTRO diálogo activaría esto por error.
 
 Todo se ajusta desde el inspector del nodo raíz: grupos **Falling Asleep** y
 **Awakening**.
+
+**Cabecear y dormirse:** después de `sleepy_delay`, Alice hace `sit_sleepy`
+durante `sleepy_loops` vueltas completas (1 en la escena; el script trae 2 por defecto) y recién ahí pasa a
+`sit_asleep`, que queda en bucle. Se cuentan vueltas con
+`Player.wait_animation_loops()` (que calcula lo que dura una vuelta con los tiempos de sus frames), no con un tiempo fijo: con un tiempo fijo
+(`asleep_delay`, 1,5 s) el cabeceo, que dura 1 s por vuelta, se cortaba a la
+mitad de la segunda.
+
+**Despertar:** con la señal `alice_wakes_up`, `_come_to()` reproduce
+`awakening_animation` (`sit_sleepy`) al revés **una sola vez** y luego deja a
+Alice quieta en `awake_animation` (`sit_down`), sentada y despierta. Antes la
+reproducía al revés en bucle, sin fin. No se espera: el diálogo sigue mientras
+tanto, y si la escena ya la movió, no pisa su pose.
+
+**Salida y asientos se apagan del todo** (`_set_area_active`: visibilidad,
+`monitoring` y `monitorable`). Antes la salida se ocultaba y se le apagaba
+solo `monitoring` mientras Alice subía: seguía siendo detectable, el
+`InteractionDetector` de Alice la encontraba igual y con Espacio en la puerta
+se saltaba toda la secuencia de dormirse. Lo mismo pasaba con los asientos
+después de despertar (podía volver a sentarse y dormirse). Regla: para que
+Alice no pueda usar un área, también `monitorable = false`.
 
 ---
 

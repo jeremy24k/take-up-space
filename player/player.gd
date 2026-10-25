@@ -258,6 +258,22 @@ func play_animation_backwards(animation_name: String, fallback_name: String = ""
 	elif fallback_name != "" and player_animation.sprite_frames.has_animation(fallback_name):
 		player_animation.play_backwards(fallback_name)
 
+## Waits for `count` full cycles of the animation that just started, so a
+## cutscene moves on at the end of a loop instead of cutting it halfway,
+## whatever the animation's speed. Call it right after play_animation(); await
+## it. The cycle length comes from the frame durations: animation_looped could
+## fire early, right after switching animations.
+func wait_animation_loops(count: int) -> void:
+	var frames := player_animation.sprite_frames
+	var animation := player_animation.animation
+	var fps := frames.get_animation_speed(animation) * absf(player_animation.speed_scale)
+	if fps <= 0.0:
+		return
+	var cycle := 0.0
+	for i in frames.get_frame_count(animation):
+		cycle += frames.get_frame_duration(animation, i) / fps
+	await get_tree().create_timer(cycle * count).timeout
+
 # =========================
 # Direction and facing helper
 # =========================

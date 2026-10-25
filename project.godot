@@ -23,7 +23,6 @@ FadeTransition="*uid://cikuexy8o2qwo"
 ThoughtBox="*res://autoload/ThoughtBox.gd"
 AppExit="*res://autoload/AppExit.gd"
 
-McpBridge="*res://.mcp/godot-runtime/bridge/mcp_bridge.gd"
 [dialogic]
 
 directories/dch_directory={

@@ -86,7 +86,8 @@ size = Vector2(28, 26)
 script = ExtResource("6_metro")
 shake_intensity = 0.3
 shake_speed = 12.0
-sleepy_delay = 1.0
+sleepy_delay = 0.5
+sleepy_loops = 1
 awakening_animation = "sit_sleepy"
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1519345299]
@@ -326,6 +327,14 @@ position = Vector2(0, -18)
 [node name="VisibleOnScreenNotifier2D" parent="Train/NPCS/ReadingSitDownNPC" index="2" unique_id=1008644508]
 position = Vector2(0, -20)
 
+[node name="AmbientThought" parent="Train/NPCS/ReadingSitDownNPC" unique_id=944981346 instance=ExtResource("ambient_thought")]
+lines = Array[String](["Sigue con su periódico. Ni levantó la vista."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
 [node name="LinseningGuyNPC" parent="Train/NPCS" unique_id=2061985888 instance=ExtResource("6_mnram")]
 y_sort_enabled = true
 position = Vector2(-330, -15)
@@ -334,6 +343,14 @@ metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="Train/NPCS/LinseningGuyNPC" index="0" unique_id=2102186028]
 frame = 4
+
+[node name="AmbientThought" parent="Train/NPCS/LinseningGuyNPC" unique_id=308578811 instance=ExtResource("ambient_thought")]
+lines = Array[String](["El chico de los auriculares. Subimos en la misma estación.", "Ni me ha visto. Mejor."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
 
 [node name="NormalGuyNPC" parent="Train/NPCS" unique_id=1617399268 instance=ExtResource("6_mnram")]
 y_sort_enabled = true
@@ -344,14 +361,13 @@ metadata/_edit_group_ = true
 [node name="Sprite2D" parent="Train/NPCS/NormalGuyNPC" index="0" unique_id=2102186028]
 frame = 6
 
-[node name="AmbientThought" parent="Train/NPCS/ReadingSitDownNPC" instance=ExtResource("ambient_thought")]
-lines = Array[String](["Sigue con su periódico. Ni levantó la vista."])
-
-[node name="AmbientThought" parent="Train/NPCS/LinseningGuyNPC" instance=ExtResource("ambient_thought")]
-lines = Array[String](["El chico de los auriculares. Subimos en la misma estación.", "Ni me ha visto. Mejor."])
-
-[node name="AmbientThought" parent="Train/NPCS/NormalGuyNPC" instance=ExtResource("ambient_thought")]
+[node name="AmbientThought" parent="Train/NPCS/NormalGuyNPC" unique_id=166485782 instance=ExtResource("ambient_thought")]
 lines = Array[String](["Mira por la ventana como si fuera la primera vez.", "...O como si no quisiera mirar a nadie."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
 
 [node name="WorkerNPC" parent="Train/NPCS" unique_id=15668528 instance=ExtResource("7_fnne6")]
 y_sort_enabled = true
@@ -364,6 +380,17 @@ sprite_frames = ExtResource("8_ci765")
 
 [node name="ApproachPoint" parent="Train/NPCS/WorkerNPC" index="2" unique_id=1932895539]
 visible = false
+
+[node name="Player" parent="Train/NPCS" unique_id=172954088 instance=ExtResource("4_yr0db")]
+position = Vector2(-288, 15)
+metadata/_edit_group_ = true
+
+[node name="Camera2D" parent="Train/NPCS/Player" index="0" unique_id=1567288049]
+limit_left = -395
+limit_top = -30
+limit_right = 395
+limit_bottom = 30
+limit_smoothed = true
 
 [node name="SpawnContainers" type="Node2D" parent="." unique_id=846825535]
 
@@ -384,20 +411,6 @@ position = Vector2(159, 22)
 
 [node name="DoorSpawn_6" type="Marker2D" parent="SpawnContainers" unique_id=1383415287]
 position = Vector2(267, 22)
-
-[node name="Player" parent="Train/NPCS" unique_id=172954088 instance=ExtResource("4_yr0db")]
-position = Vector2(-288, 15)
-metadata/_edit_group_ = true
-
-[node name="Camera2D" parent="Train/NPCS/Player" index="0" unique_id=1567288049]
-limit_left = -395
-limit_top = -30
-limit_right = 395
-limit_bottom = 30
-limit_smoothed = true
-
-[node name="AnimatedSprite2D" parent="Train/NPCS/Player" index="1" unique_id=1954972618]
-frame_progress = 0.0
 
 [node name="InteractiveContainer" type="Node2D" parent="." unique_id=802742790]
 position = Vector2(-182, -9)
@@ -627,7 +640,6 @@ shape = SubResource("RectangleShape2D_exit")
 visible = false
 position = Vector2(-181, -11)
 monitoring = false
-thought_text = ""
 thought_lines = Array[String](["Ya está... Alice, solo tienes que quedarte aquí.", "Me siento cansada...  "])
 display_duration = 3.5
 
