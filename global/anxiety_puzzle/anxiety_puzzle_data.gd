@@ -21,3 +21,6 @@ extends Resource
 ## Tutorial: the first word of every answer blinks as soon as the puzzle
 ## opens, not only after a mistake. For the first puzzle of the game.
 @export var hint_from_start: bool = false
+## Rehearsal (the mirror in the apartment): no clock, no closing vignette and
+## no time lost on mistakes. Alice can only stop by choosing "(...)".
+@export var relaxed: bool = false

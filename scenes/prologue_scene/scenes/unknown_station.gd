@@ -9,8 +9,9 @@ extends Node2D
 @export var departure_fallback_time: float = 3.0
 
 ## "Rompecabezas de la Ansiedad" played from the timelines with
-## [signal arg="anxiety_puzzle:<id>"]. The worker's is the first one of the
-## game, an easy one that doubles as the tutorial before Leo's.
+## [signal arg="anxiety_puzzle:<id>"]. The worker's is the first real one: the
+## mirror rehearsal at home already taught the mechanic, so this one has a
+## clock, distractors and no hints from the start.
 const ANXIETY_PUZZLES := {
 	"station_worker": preload("res://scenes/prologue_scene/puzzles/station_worker.tres"),
 }

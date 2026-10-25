@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3]
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://204kv7aog78g"]
 
 [ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
 
@@ -8,7 +8,6 @@ phrases = {
 "ask": PackedStringArray("¿Qué", "estación", "es", "esta?"),
 "leave": PackedStringArray("Nada...", "perdón.")
 }
-extra_words = PackedStringArray("tren", "casa")
 prompt = "¿Le pregunto dónde estoy... o lo dejo estar?"
-time_limit = 25.0
-hint_from_start = true
+time_limit = 18.0
+mistake_penalty = 2.0

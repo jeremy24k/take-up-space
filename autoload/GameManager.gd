@@ -12,6 +12,11 @@ var prep_items_unlocked: bool = false
 # False once she realizes she left her phone on the train.
 var has_phone: bool = true
 
+# Bathroom mirror: she has looked at herself once ("Tienes ojeras"), and she
+# has rehearsed in front of it before leaving (the door waits for this).
+var mirror_seen: bool = false
+var mirror_practice_done: bool = false
+
 @export var quest_step: int = 0
 var collected_items: Array[String] = []  # List of collected item IDs
 
@@ -105,6 +110,10 @@ func _on_dialogic_signal(argument: String) -> void:
 			prep_items_unlocked = true
 		"no_phone":
 			has_phone = false
+		"mirror_seen":
+			mirror_seen = true
+		"mirror_practice_done":
+			mirror_practice_done = true
 		"step_4":
 			if quest_step == 3 and has_all_prep_items():  # All required items collected
 				set_quest_step(4)

@@ -3,6 +3,7 @@ leo: Hola. Soy Leo. Te saludé hace un rato, pero creo que no me escuchaste.
 join alice (nervous) leftmost
 alice: (con un hilo de voz) E-eh... hola. Yo soy Alice.
 leo: ¿Estás bien? Te veo un poco nerviosa.
+alice: (la pregunta del espejo... pero el espejo no la miraba así)
 leave alice
 [signal arg="anxiety_puzzle:leo_are_you_ok"]
 if {anxiety_result} == "truth":

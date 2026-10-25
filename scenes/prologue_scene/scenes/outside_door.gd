@@ -18,8 +18,8 @@ func _on_area_2d_body_entered(_body: Node2D) -> void:
 		return
 
 	# Having the three items is not enough: she leaves once she has packed
-	# them in the backpack, which is what moves the quest to step 4.
-	if GameManager.quest_step >= 4:
+	# them in the backpack (step 4) and rehearsed at the bathroom mirror.
+	if GameManager.quest_step >= 4 and GameManager.mirror_practice_done:
 		_trigger_exit_sequence()
 	else:
 		_trigger_missing_items_dialogue()

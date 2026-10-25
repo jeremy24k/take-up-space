@@ -8,5 +8,6 @@ phrases = {
 "ask": PackedStringArray("Oye,", "¿me", "das", "tu", "número?"),
 "leave": PackedStringArray("Bueno...", "gracias.")
 }
-extra_words = PackedStringArray("teléfono", "atún", "adiós")
 prompt = "¿Le pido su número... o me despido?"
+time_limit = 14.0
+mistake_penalty = 2.0

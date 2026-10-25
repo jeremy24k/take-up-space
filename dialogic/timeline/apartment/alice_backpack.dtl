@@ -28,6 +28,9 @@ if {GameManager.quest_step} == 3.0:
 		(Wilson maúlla, impaciente.)
 		update alice (neutral)
 		alice: No. Wilson me necesita. Lo voy a hacer.
+		update alice (nervous)
+		alice: Pero antes... (mira hacia el baño) un par de frases frente al espejo.
+		alice: Por si alguien me habla. Por si acaso.
 		leave alice
 		[signal arg="item_picked:alice_backpack"]
 		[signal arg="step_4"]

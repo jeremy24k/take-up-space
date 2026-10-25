@@ -171,7 +171,8 @@ func _matching_answer() -> String:
 ## scatters again. It also costs her a bit of time.
 func _stumble() -> void:
 	_accepting = false
-	_time_left -= _data.mistake_penalty
+	if not _data.relaxed:
+		_time_left -= _data.mistake_penalty
 	sentence_line.modulate = STUMBLE_COLOR
 	var start := sentence_line.position
 	var tween := create_tween()
@@ -224,7 +225,8 @@ func _process(delta: float) -> void:
 	if not _accepting:
 		return
 	_cooldown = maxf(_cooldown - delta, 0.0)
-	if not _clock_started:
+	# A rehearsal has no clock: no pressure, no closing vignette, no freezing.
+	if not _clock_started or _data.relaxed:
 		return
 	_time_left -= delta
 	var pressure := clampf(1.0 - _time_left / _data.time_limit, 0.0, 1.0)

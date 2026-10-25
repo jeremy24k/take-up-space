@@ -61,6 +61,14 @@ alcanza: si falta la mochila, `alice_cant_leave_yet` tiene una rama propia
 ("La mochila. Sigue en mi cuarto."). Antes la puerta miraba
 `has_all_prep_items()` y se podía salir sin pasar por la mochila.
 
+**Antes de salir, el espejo.** Al recoger la mochila, Alice dice "Pero
+antes... un par de frases frente al espejo. Por si alguien me habla." La
+puerta pide además `GameManager.mirror_practice_done`: si va sin ensayar,
+`alice_cant_leave_yet` dice "Todavía no. Primero el espejo." El espejo
+(`apartment/bathroom_glass`) tiene tres estados: antes de la mochila, las
+ojeras de siempre; con la mochila, el ensayo (ver `AnxietyPuzzle`); después,
+"Ya. Basta de practicar.", para que no se repita.
+
 Para que el jugador no tenga que descubrirlo en la puerta, **el tercer objeto
 que recoge avisa**: `alice_wallet`, `alice_headphones` y `alice_shoes` llevan,
 justo después de su `item_picked`, una rama `if
@@ -88,6 +96,8 @@ Estado que sobrevive entre escenas.
 | `prep_items_unlocked` | Alice ya miró la mochila. `apartment/alice_backpack` lo usa para no repetir el monólogo largo: las siguientes veces solo nombra lo que falta |
 | `target_door_id` | Por qué puerta subió al tren → dónde aparece dentro |
 | `has_phone` | Se pone en `false` vía `[signal arg="no_phone"]` en `unknown_station_lost_phone` |
+| `mirror_seen` | Ya se miró al espejo del baño ("Tienes ojeras"), señal `mirror_seen`. El ensayo la saluda con "Hola otra vez, Alice." |
+| `mirror_practice_done` | Ya ensayó frente al espejo, señal `mirror_practice_done`. La puerta del departamento no se abre sin esto |
 | `wilson` | Referencia al gato |
 
 Escucha `Dialogic.signal_event` y avanza `quest_step` con las señales
@@ -478,11 +488,35 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   `Dialogic.VAR.set_variable("anxiety_result", ...)` y reanuda.
 - **`hint_from_start`** (tutorial): la primera palabra de cada respuesta
   parpadea apenas abre el puzzle, no solo después de un error. Lo usa el
-  primero del juego, el del trabajador de la estación.
+  primer ensayo del espejo (`practice_store`).
   `anxiety_result` está declarada en las variables de Dialogic
   (`project.godot`).
 - Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
   1, así el clic no lo atrapa su capa de input) y por debajo del fundido.
+- **`relaxed`** (ensayo): sin reloj, sin viñeta que se cierra y sin perder
+  tiempo por error. Solo se sale eligiendo una frase o "(...)". Lo usan los
+  tres ensayos del espejo.
+- **El ensayo del espejo es el tutorial.** Antes de salir, Alice practica
+  frente al espejo del baño (`apartment/bathroom_glass`), con tres puzzles
+  `relaxed` en `scenes/prologue_scene/puzzles/practice_*.tres` que lanza
+  `apartment.gd`. Cada uno enseña una cosa y sube un poco la dificultad:
+  1. `practice_store`: "¿Tienen comida para gatos?". Tres palabras, sin
+     distractores, con `hint_from_start`. Enseña a armar una frase.
+  2. `practice_directions`: "Perdone, ¿dónde está el metro?", con
+     distractores y una respuesta torpe, `fumble` = "¿Dónde estoy yo?", a la
+     que Alice se ríe de sí misma. Enseña que equivocarse tiene respuesta.
+  3. `practice_are_you_ok`: "¿Estás bien?", con `truth` ("No mucho, la
+     verdad."), `lie` ("Sí, estoy bien.") y el silencio, que tiene su propia
+     respuesta ("Callarse también es una respuesta. Supongo."). Enseña que
+     callarse es una opción real, y anticipa la pregunta de Leo.
+- **Los puzzles reales son más difíciles** porque el espejo ya enseñó la
+  mecánica: el trabajador tiene 18 s, "¿Estás bien?" de Leo 15 s y el del
+  número 14 s, los tres con 2 s por error y dos distractores más que antes.
+  Si resultan demasiado duros, se ajustan en sus `.tres` (`time_limit`,
+  `mistake_penalty`, `extra_words`).
+- **Guiños al ensayo:** si falla con el trabajador, Alice piensa "En el
+  espejo era más fácil...". Cuando Leo pregunta "¿Estás bien?", antes del
+  puzzle: "(la pregunta del espejo... pero el espejo no la miraba así)".
 - **Cuándo usarlo** (regla de diseño): la primera interacción importante con
   cada personaje, las confesiones (pedir un número, admitir que no sabe su
   dirección) y la respuesta siguiente a un error social (si en un menú
@@ -853,15 +887,17 @@ func _on_worker_area_entered(area: Area2D) -> void:
         worker_interactable.interact()
 ```
 
-### El primer Rompecabezas de la Ansiedad (el trabajador)
-Es el **primer contacto de Alice con un desconocido** (regla 1 del puzzle) y
-hace de preámbulo y tutorial para los dos de Leo. Por eso es fácil:
-`scenes/prologue_scene/puzzles/station_worker.tres`.
+### El primer Rompecabezas de la Ansiedad de verdad (el trabajador)
+Es el **primer contacto de Alice con un desconocido** (regla 1 del puzzle).
+Ya no hace de tutorial: eso lo hace el ensayo frente al espejo del
+apartamento (sección 5, `AnxietyPuzzle`). Por eso ya tiene reloj y
+distractores: `scenes/prologue_scene/puzzles/station_worker.tres`.
 - Pista: "¿Le pregunto dónde estoy... o lo dejo estar?"
 - Respuestas: `ask` = "¿Qué estación es esta?" y `leave` = "Nada... perdón.",
-  más dos distractores ("tren", "casa") y "(...)".
-- 25 s (los de Leo tienen 20) y `hint_from_start`: "¿Qué" y "Nada..."
-  parpadean desde el principio.
+  más cuatro distractores ("tren", "casa", "salida" y "perdón" sin punto, que
+  se confunde con el de la respuesta) y "(...)".
+- 18 s y 2 s por error, sin `hint_from_start`.
+- Si falla, además de "Qué vergüenza" piensa "En el espejo era más fácil...".
 - `ask`: él contesta sin dejar sus papeles ("Terminal. Fin de línea." / "La
   salida, por las escaleras.") y ella, aliviada (`relaxed`): "Lo dije. Le
   pregunté a alguien." `leave` o silencio: el final de siempre, "Qué
