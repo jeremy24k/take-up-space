@@ -76,7 +76,7 @@ const CLUE_AREAS := {
 ## recognises the fruit poster once she has seen it on the delivery box).
 const CLUE_REACTIONS := {
 	"Shop": [["delivery_box", "store_flyer"], "street_shop_found"],
-	"GlassTower": [["overheard_store"], "street_glass_tower_clue"],
+	"GlassTower": [["overheard_store", "bus_stop_map"], "street_glass_tower_clue"],
 }
 
 # =========================
