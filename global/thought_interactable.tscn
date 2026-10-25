@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cdyfwwfe4on60"]
+
+[ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="3_thought"]
+
+[node name="ThoughtInteractable" unique_id=1434196728 instance=ExtResource("1_base")]
+
+[node name="ThoughtTrigger" parent="." index="2" unique_id=992309438 instance=ExtResource("3_thought")]
+monitoring = false
+monitorable = false
+thought_lines = null
+display_duration = null
+trigger_once = null
+wait_for_current = null
+
+[node name="CollisionShape2D" parent="ThoughtTrigger" index="0" unique_id=1377474002]
+disabled = true
+
+[editable path="ThoughtTrigger"]
