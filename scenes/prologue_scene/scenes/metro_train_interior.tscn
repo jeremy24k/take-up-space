@@ -324,7 +324,7 @@ offset = Vector2(0, -20)
 frame = 1
 
 [node name="CollisionShape2D" parent="Train/NPCS/ReadingSitDownNPC" index="1" unique_id=1201320476]
-position = Vector2(0, -18)
+position = Vector2(0, -5)
 
 [node name="VisibleOnScreenNotifier2D" parent="Train/NPCS/ReadingSitDownNPC" index="2" unique_id=1008644508]
 position = Vector2(0, -20)
