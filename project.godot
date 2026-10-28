@@ -11,20 +11,33 @@ config_version=5
 [application]
 
 config/name="Take Up Space"
-run/main_scene="uid://ceojf7y7lc232"
+run/main_scene="res://scenes/language_select/language_select.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout="uid://b4vfvcy6fnuoe"
 
 [autoload]
 
 Dialogic="*uid://ds2q0uclmolvu"
 GameManager="*uid://6hkqeuft1dyk"
 FadeTransition="*uid://cikuexy8o2qwo"
+ThoughtBox="*res://autoload/ThoughtBox.gd"
+AppExit="*res://autoload/AppExit.gd"
+Localization="*res://autoload/Localization.gd"
+SoundManager="*res://autoload/SoundManager.gd"
 
 [dialogic]
 
 directories/dch_directory={
 "alice": "res://dialogic/characters/alice.dch",
+"car_owner": "res://dialogic/characters/car_owner.dch",
+"couple_girl": "res://dialogic/characters/couple_girl.dch",
+"couple_guy": "res://dialogic/characters/couple_guy.dch",
+"grandma": "res://dialogic/characters/grandma.dch",
+"leo": "res://dialogic/characters/leo.dch",
 "metro_worker": "res://dialogic/characters/metro_worker.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
 }
@@ -37,40 +50,65 @@ directories/dtl_directory={
 "apartment/bathroom_glass": "res://dialogic/timeline/apartment/bathroom_glass.dtl",
 "apartment/bathtub": "res://dialogic/timeline/apartment/bathtub.dtl",
 "apartment/console_control": "res://dialogic/timeline/apartment/console_control.dtl",
-"apartment/elevator": "res://dialogic/timeline/apartment/elevator.dtl",
 "apartment/kitchen": "res://dialogic/timeline/apartment/kitchen.dtl",
 "apartment/laptop": "res://dialogic/timeline/apartment/laptop.dtl",
 "apartment/neighbor_boxes": "res://dialogic/timeline/apartment/neighbor_boxes.dtl",
 "apartment/notice_board": "res://dialogic/timeline/apartment/notice_board.dtl",
 "apartment/room_clock": "res://dialogic/timeline/apartment/room_clock.dtl",
 "apartment/room_desk": "res://dialogic/timeline/apartment/room_desk.dtl",
-"apartment/rotten_food": "res://dialogic/timeline/apartment/rotten_food.dtl",
-"apartment/test_tv": "res://dialogic/timeline/apartment/test_tv.dtl",
 "apartment/waiting_room_lamp": "res://dialogic/timeline/apartment/waiting_room_lamp.dtl",
 "apartment/wilson": "res://dialogic/timeline/apartment/wilson.dtl",
 "apartment/wilson_cushion": "res://dialogic/timeline/apartment/wilson_cushion.dtl",
 "apartment/wilson_plate": "res://dialogic/timeline/apartment/wilson_plate.dtl",
 "apartment/wilson_stay_home": "res://dialogic/timeline/apartment/wilson_stay_home.dtl",
+"elevator": "res://dialogic/timeline/apartment/elevator.dtl",
+"leo_store_after": "res://dialogic/timeline/leo_store/leo_store_after.dtl",
+"leo_store_checkout": "res://dialogic/timeline/leo_store/leo_store_checkout.dtl",
+"leo_store_counter_early": "res://dialogic/timeline/leo_store/leo_store_counter_early.dtl",
+"leo_store_farewell": "res://dialogic/timeline/leo_store/leo_store_farewell.dtl",
+"leo_store_fruit": "res://dialogic/timeline/leo_store/leo_store_fruit.dtl",
+"leo_store_greeting": "res://dialogic/timeline/leo_store/leo_store_greeting.dtl",
+"leo_store_shelf_canned": "res://dialogic/timeline/leo_store/leo_store_shelf_canned.dtl",
+"leo_store_shelf_cleaning": "res://dialogic/timeline/leo_store/leo_store_shelf_cleaning.dtl",
+"leo_store_shelf_done": "res://dialogic/timeline/leo_store/leo_store_shelf_done.dtl",
+"leo_store_shelf_drinks": "res://dialogic/timeline/leo_store/leo_store_shelf_drinks.dtl",
+"leo_store_shelf_pantry": "res://dialogic/timeline/leo_store/leo_store_shelf_pantry.dtl",
+"leo_store_shelf_snacks": "res://dialogic/timeline/leo_store/leo_store_shelf_snacks.dtl",
+"leo_store_tuna": "res://dialogic/timeline/leo_store/leo_store_tuna.dtl",
+"leo_store_tuna_again": "res://dialogic/timeline/leo_store/leo_store_tuna_again.dtl",
 "metro/important_man": "res://dialogic/timeline/metro/important_man.dtl",
 "metro/metro_notice_board": "res://dialogic/timeline/metro/metro_notice_board.dtl",
 "metro/ticket_store": "res://dialogic/timeline/metro/ticket_store.dtl",
 "metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
 "metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
 "metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
+"rotten_food": "res://dialogic/timeline/apartment/rotten_food.dtl",
+"street_ad_column": "res://dialogic/timeline/street/street_ad_column.dtl",
+"street_arrival": "res://dialogic/timeline/street/street_arrival.dtl",
 "street_atm": "res://dialogic/timeline/street/street_atm.dtl",
 "street_bakery": "res://dialogic/timeline/street/street_bakery.dtl",
-"street_boundary": "res://dialogic/timeline/street/street_boundary.dtl",
+"street_bus_stop": "res://dialogic/timeline/street/street_bus_stop.dtl",
+"street_cafe": "res://dialogic/timeline/street/street_cafe.dtl",
+"street_cafe_north": "res://dialogic/timeline/street/street_cafe_north.dtl",
+"street_car": "res://dialogic/timeline/street/street_car.dtl",
+"street_cat": "res://dialogic/timeline/street/street_cat.dtl",
+"street_cat_again": "res://dialogic/timeline/street/street_cat_again.dtl",
+"street_couple": "res://dialogic/timeline/street/street_couple.dtl",
+"street_delivery": "res://dialogic/timeline/street/street_delivery.dtl",
 "street_glass_tower": "res://dialogic/timeline/street/street_glass_tower.dtl",
-"street_headphones_guy": "res://dialogic/timeline/street/street_headphones_guy.dtl",
-"street_office_man": "res://dialogic/timeline/street/street_office_man.dtl",
+"street_glass_tower_clue": "res://dialogic/timeline/street/street_glass_tower_clue.dtl",
+"street_grandma": "res://dialogic/timeline/street/street_grandma.dtl",
 "street_payphone": "res://dialogic/timeline/street/street_payphone.dtl",
-"street_pedestrian_blonde": "res://dialogic/timeline/street/street_pedestrian_blonde.dtl",
-"street_pedestrian_cap": "res://dialogic/timeline/street/street_pedestrian_cap.dtl",
+"street_payphone_broken": "res://dialogic/timeline/street/street_payphone_broken.dtl",
+"street_pets_closed": "res://dialogic/timeline/street/street_pets_closed.dtl",
 "street_phone_girl": "res://dialogic/timeline/street/street_phone_girl.dtl",
+"street_pizza": "res://dialogic/timeline/street/street_pizza.dtl",
 "street_shop": "res://dialogic/timeline/street/street_shop.dtl",
-"street_student": "res://dialogic/timeline/street/street_student.dtl",
+"street_shop_found": "res://dialogic/timeline/street/street_shop_found.dtl",
 "street_subway_entrance": "res://dialogic/timeline/street/street_subway_entrance.dtl",
-"unknown_station_bench": "res://dialogic/timeline/metro/unknown_station_bench.dtl",
+"street_vending": "res://dialogic/timeline/street/street_vending.dtl",
+"street_vinyl": "res://dialogic/timeline/street/street_vinyl.dtl",
+"test_tv": "res://dialogic/timeline/apartment/test_tv.dtl",
 "unknown_station_listening_guy": "res://dialogic/timeline/metro/unknown_station_listening_guy.dtl",
 "unknown_station_lost_phone": "res://dialogic/timeline/metro/unknown_station_lost_phone.dtl",
 "unknown_station_map": "res://dialogic/timeline/metro/unknown_station_map.dtl",
@@ -80,9 +118,13 @@ directories/dtl_directory={
 "unknown_station_worker": "res://dialogic/timeline/metro/unknown_station_worker.dtl",
 "unknown_station_worker_dismissive": "res://dialogic/timeline/metro/unknown_station_worker_dismissive.dtl"
 }
-layout/style_directory={}
-layout/style_list=[]
-layout/default_style=""
+layout/style_directory={
+"": "res://dialogic/styles/dialogue_style.tres",
+"Dialogue": "res://dialogic/styles/dialogue_style.tres",
+"Thought": "res://dialogic/styles/thought_style.tres"
+}
+layout/style_list=["res://dialogic/styles/dialogue_style.tres", "res://dialogic/styles/thought_style.tres"]
+layout/default_style="res://dialogic/styles/dialogue_style.tres"
 text/letter_speed=0.01
 text/initial_text_reveal_skippable=true
 text/text_reveal_skip_delay=0.1
@@ -117,9 +159,21 @@ audio/channel_defaults={
 }
 glossary/default_case_sensitive=true
 variables={
+"anxiety_result": "",
 "elevator_interaction": 0,
 "lamp_is_on": true
 }
+animations/leave_default="recede out"
+translation/enabled=true
+translation/original_locale="es"
+translation/file_mode=0
+translation/save_mode=0
+translation/translation_folder="res://translations"
+translation/add_separator=true
+translation/intern/save_mode=0
+translation/intern/file_mode=0
+translation/intern/translation_folder="res://translations"
+translation/id_counter=555
 
 [display]
 
@@ -138,6 +192,38 @@ player="the main character (Alice)"
 
 [input]
 
+ui_left={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194319,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":13,"pressure":0.0,"pressed":false,"script":null)
+, Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":0,"axis_value":-1.0,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":65,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+ui_right={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194321,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":14,"pressure":0.0,"pressed":false,"script":null)
+, Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":0,"axis_value":1.0,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":68,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+ui_up={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194320,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":11,"pressure":0.0,"pressed":false,"script":null)
+, Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":1,"axis_value":-1.0,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":87,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+ui_down={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194322,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+, Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":12,"pressure":0.0,"pressed":false,"script":null)
+, Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":1,"axis_value":1.0,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":83,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 dialogic_default_action={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":16,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194309,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
@@ -147,6 +233,11 @@ dialogic_default_action={
 , Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":0,"button_index":0,"pressure":0.0,"pressed":false,"script":null)
 ]
 }
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://translations/dialogic_timeline_translations.es.translation", "res://translations/dialogic_timeline_translations.en.translation", "res://translations/dialogic_character_translations.es.translation", "res://translations/dialogic_character_translations.en.translation", "res://translations/game_text.en.translation")
+locale/fallback="es"
 
 [layer_names]
 

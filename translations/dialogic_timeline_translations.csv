@@ -1,0 +1,612 @@
+keys,es,en
+Text/11/text,Mochila... lista.,Backpack... ready.
+Text/12/text,(revisa el interior) Auriculares... no están.,(checks inside) Headphones... not here.
+Text/13/text,Cartera... no está.,Wallet... not here.
+Text/14/text,(mira sus pies descalzos) Zapatos... tampoco.,(looks at her bare feet) Shoes... not those either.
+Text/15/text,Voy a tener que buscarlos.,I'll have to look for them.
+Text/16/text,"Los auriculares suelen estar en mi habitación... La cartera, por la cocina...","The headphones are usually in my room... The wallet, somewhere in the kitchen..."
+Text/17/text,Y los zapatos...[pause=0.8] Ahora que lo pienso... no sé dónde están.,And the shoes...[pause=0.8] Now that I think about it... I have no idea where they are.
+Text/18/text,(mira a Wilson) Aunque alguien de por aquí siempre se los lleva al baño cuando se aburre.,(looks at Wilson) Though someone around here always drags them to the bathroom when he's bored.
+Text/19/text,(se cuelga la mochila al hombro) Me la llevo. Así no me olvido de ella.,(slings the backpack over her shoulder) I'll take it. That way I won't forget it.
+Text/1a/text,Bueno. Empezaré a buscar.,Okay. Let's start looking.
+Text/1b/text,Mi mochila... No necesito usarla ahora.,My backpack... I don't need it right now.
+Text/1c/text,No me gustaría salir hoy.,I'd rather not go out today.
+,,
+Text/1d/text,"(con la mano en el picaporte, duda) Todavía no.","(hand on the doorknob, she hesitates) Not yet."
+Text/1e/text,"Primero el espejo. Un par de frases, nada más.","The mirror first. A couple of lines, that's all."
+Text/227/text,(oye maullar a Wilson) Wilson está maullando... Debería ver qué le pasa.,(hears Wilson meowing) Wilson's meowing... I should see what's wrong.
+Text/228/text,Tengo que conseguir comida para Wilson.,I have to get food for Wilson.
+Text/229/text,(con la mano en el picaporte) Todavía no puedo. Aún necesito {GameManager.missing_prep_text}.,(hand on the doorknob) I can't yet. I still need {GameManager.missing_prep_text}.
+,,
+Text/22/text,(los ve encima de la cama) Ahí están.,(sees them on the bed) There they are.
+Text/23/text,"(los toma, los mira un momento) Mis auriculares.","(picks them up, looks at them for a moment) My headphones."
+Text/24/text,No salgo sin ellos. Con ellos es más fácil.,I don't go out without them. Everything's easier with them.
+Text/25/text,(se los cuelga al cuello) Bueno... no siempre. Pero casi.,(hangs them around her neck) Well... not everything. But almost.
+Text/26/text,"(ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.","(adjusts the backpack) Headphones, wallet, shoes... that's everything. Okay... time to go."
+Text/27/text,Ojalá me emocionara.,I wish I were excited.
+Text/28/text,"Quizás, si espero un poco...",Maybe if I wait a little...
+Text/29/text,"(Wilson maúlla, impaciente.)","(Wilson meows, impatient.)"
+Text/2a/text,No. Wilson me necesita. Lo voy a hacer.,No. Wilson needs me. I'm doing this.
+Text/2b/text,Pero antes... un par de frases frente al espejo del baño.,But first... a couple of lines in front of the bathroom mirror.
+Text/2c/text,Por si alguien me habla. Por si acaso.,In case someone talks to me. Just in case.
+Text/2d/text,Mis auriculares... todavía aquí.,My headphones... still here.
+Text/2e/text,Menos mal que no los perdí.,Good thing I didn't lose them.
+,,
+Text/2f/text,¿Qué hacen mis zapatos aquí?,What are my shoes doing here?
+Text/30/text,"(los mira, confundida) Wilson...","(looks at them, confused) Wilson..."
+Text/31/text,"(suspira, pero no con enfado) Siempre juegas con ellos, ¿verdad?","(sighs, but not angrily) You always play with them, don't you?"
+Text/32/text,¿Cuántas veces te he dicho que no son un juguete?,How many times have I told you they're not a toy?
+Text/33/text,"(Wilson la mira desde la puerta, con una expresión de ""no me arrepiento"".)","(Wilson watches her from the doorway with a look of ""no regrets"".)"
+Text/34/text,(sonríe a pesar de todo) Bueno. Al menos los encontré.,(smiles in spite of everything) Well. At least I found them.
+Text/35/text,"(ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.","(adjusts the backpack) Headphones, wallet, shoes... that's everything. Okay... time to go."
+Text/36/text,Ojalá me emocionara.,I wish I were excited.
+Text/37/text,"Quizás, si espero un poco...",Maybe if I wait a little...
+Text/38/text,"(Wilson maúlla, impaciente.)","(Wilson meows, impatient.)"
+Text/39/text,No. Wilson me necesita. Lo voy a hacer.,No. Wilson needs me. I'm doing this.
+Text/3a/text,Pero antes... un par de frases frente al espejo del baño.,But first... a couple of lines in front of the bathroom mirror.
+Text/3b/text,Por si alguien me habla. Por si acaso.,In case someone talks to me. Just in case.
+Text/3c/text,(ve los zapatos en el baño) Mis zapatos... ¿por qué están aquí?,(sees the shoes in the bathroom) My shoes... why are they here?
+Text/3d/text,"(piensa un momento) Ah, Wilson.",(thinks for a moment) Ah. Wilson.
+Text/3e/text,"(los mira, pero no se los pone) Supongo que los recogeré cuando los necesite.","(looks at them, but doesn't put them on) I guess I'll pick them up when I need them."
+,,
+Text/3f/text,(la ve sobre la mesa) La cartera.,(sees it on the table) My wallet.
+Text/40/text,"(la abre, mira el dinero) El dinero justo.","(opens it, looks at the money) Just enough."
+Text/41/text,No puedo perderlo. No puedo gastarlo en otra cosa.,I can't lose it. I can't spend it on anything else.
+Text/42/text,(se la guarda en el bolsillo) Solo lo justo para la comida de Wilson.,(puts it in her pocket) Just enough for Wilson's food.
+Text/43/text,"(ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.","(adjusts the backpack) Headphones, wallet, shoes... that's everything. Okay... time to go."
+Text/44/text,Ojalá me emocionara.,I wish I were excited.
+Text/45/text,"Quizás, si espero un poco...",Maybe if I wait a little...
+Text/46/text,"(Wilson maúlla, impaciente.)","(Wilson meows, impatient.)"
+Text/47/text,No. Wilson me necesita. Lo voy a hacer.,No. Wilson needs me. I'm doing this.
+Text/48/text,Pero antes... un par de frases frente al espejo del baño.,But first... a couple of lines in front of the bathroom mirror.
+Text/49/text,Por si alguien me habla. Por si acaso.,In case someone talks to me. Just in case.
+Text/4a/text,(ve la cartera sobre la mesa) Ahí está mi cartera.,(sees the wallet on the table) There's my wallet.
+Text/4b/text,El dinero justo... como siempre.,Just enough money... as always.
+Text/4c/text,Supongo que la necesitaré más tarde.,I guess I'll need it later.
+,,
+Text/4d/text,(mira su reflejo un segundo) Ya. Basta de practicar.,(looks at her reflection for a second) Okay. Enough practice.
+Text/4e/text,Wilson está esperando.,Wilson is waiting.
+Text/4f/text,"(vuelve al espejo) Hola otra vez, Alice.","(back at the mirror) Hi again, Alice."
+Text/50/text,"(se pone frente al espejo del lavamanos) Hola, Alice.","(stands in front of the sink mirror) Hi, Alice."
+Text/51/text,(respira hondo) Vale. Un par de frases. Como si fuera de verdad.,(takes a deep breath) Okay. A couple of lines. As if it were real.
+Text/52/text,Primero algo fácil. Entro a una tienda y...,Something easy first. I walk into a store and...
+Text/53/text,¿Tienen comida para gatos?,Do you have cat food?
+Text/54/text,(asiente a su reflejo) Eso no estuvo tan mal.,(nods at her reflection) That wasn't so bad.
+Text/55/text,(abre la boca... y la vuelve a cerrar),(opens her mouth... and closes it again)
+Text/56/text,"(se tapa la cara) Vamos, Alice. Era una frase.","(covers her face) Come on, Alice. It was one sentence."
+Text/57/text,Ahora... preguntar cómo llegar al metro. Por si me pierdo.,Now... asking how to get to the metro. In case I get lost.
+Text/58/text,"Perdone, ¿dónde está el metro?","Excuse me, where's the metro?"
+Text/59/text,(se endereza) Clara. Educada. Bien.,(stands up straight) Clear. Polite. Good.
+Text/5a/text,¿Dónde estoy yo?,Where am I?
+Text/5b/text,(se ríe sola) No. Así no se pregunta.,(laughs at herself) No. That's not how you ask.
+Text/5c/text,(se queda callada),(stays silent)
+Text/5d/text,Ni frente al espejo me sale...,I can't even do it in front of a mirror...
+Text/5e/text,Y si alguien me pregunta...,And if someone asks me...
+Text/5f/text,"""¿Estás bien?""","""Are you okay?"""
+Text/60/text,"No mucho, la verdad.","Not really, to be honest."
+Text/61/text,(sorprendida de sí misma) Al espejo sí se lo puedo decir.,"(surprised at herself) I can say it to the mirror, at least."
+Text/62/text,"Sí, estoy bien.","Yeah, I'm fine."
+Text/63/text,(su reflejo no parece muy convencido),(her reflection doesn't look very convinced)
+Text/64/text,"(se queda mirando su reflejo, sin decir nada)",(stares at her reflection without saying anything)
+Text/65/text,...Callarse también es una respuesta. Supongo.,...Saying nothing is an answer too. I guess.
+Text/66/text,(suspira) Bueno. Con eso alcanza.,(sighs) Okay. That'll do.
+Text/67/text,Allá afuera no va a ser igual. Pero algo es algo.,Out there it won't be the same. But it's something.
+Text/68/text,"(se acerca al espejo del lavamanos, mira su reflejo) Hola, Alice.","(leans toward the sink mirror and looks at her reflection) Hi, Alice."
+Text/69/text,"(se inclina un poco más, como si buscara algo en su rostro) Tienes ojeras.","(leans in a little closer, as if searching her face for something) You have dark circles."
+Text/6a/text,Otra vez.,Again.
+Text/6b/text,"(se endereza y se arregla un mechón de pelo) No dormiste bien, ¿verdad?","(straightens up and fixes a strand of hair) You didn't sleep well, did you?"
+Text/6c/text,(suspira) Bueno. Nadie va a mirarte tan de cerca hoy.,(sighs) Well. Nobody's going to look at you that closely today.
+Text/6d/text,O al menos eso espero.,Or at least I hope not.
+,,
+Text/6e/text,(ve la bañera con agua) El agua sigue ahí...,(sees the bathtub full of water) The water's still there...
+Text/6f/text,La dejé anoche y no la vacié.,I left it last night and never drained it.
+Text/70/text,(ve el patito de hule flotando) Y tú... sigues aquí también.,(sees the rubber duck floating) And you... you're still here too.
+Text/71/text,"(lo toma, lo mira un momento) No sé por qué no te tiro.","(picks it up, looks at it for a moment) I don't know why I don't throw you out."
+Text/72/text,(lo deja flotar de nuevo) Supongo que me gusta tenerte cerca.,(lets it float again) I guess I like having you around.
+,,
+Text/73/text,"(toma el control de la consola, lo mira un momento) Está polvoriento.","(picks up the game controller, looks at it for a moment) It's dusty."
+Text/74/text,No recuerdo la última vez que jugué.,I can't remember the last time I played.
+Text/75/text,Ojalá pudiera ahora. Desconectar un rato del mundo.,I wish I could now. Unplug from the world for a while.
+,,
+Text/76/text,Fuera de servicio.,Out of order.
+Text/77/text,Otra vez...,Again...
+Text/78/text,Supongo que hoy toca hacer un poco de ejercicio.,I guess today I'm getting some exercise.
+Text/79/text,Sigue sin funcionar.,Still not working.
+Text/7a/text,"No va a arreglarse por mirarlo otra vez, Alice.","Staring at it again won't fix it, Alice."
+Text/7b/text,Las escaleras están al final del pasillo.,The stairs are at the end of the hall.
+,,
+Text/7c/text,No hay nada aquí...,There's nothing here...
+Text/7d/text,(mirando la nevera vacía) Ni siquiera huevos. Ni leche. Ni una lata de sopa.,(looking into the empty fridge) Not even eggs. No milk. Not one can of soup.
+Text/7e/text,¿Cómo es posible que no tenga nada?,How can I have nothing?
+Text/7f/text,"(Wilson maúlla desde la entrada de la cocina, como si la estuviera apurando.)","(Wilson meows from the kitchen doorway, as if hurrying her up.)"
+Text/80/text,"Ya sé, ya sé.","I know, I know."
+Text/81/text,"(suspira) Vamos, Alice. No queda otra. Voy a tener que pedir a domicilio en la computadora.","(sighs) Come on, Alice. No way around it. I'll have to order delivery on the computer."
+Text/82/text,Sigo sin encontrar nada... No sé por qué sigo mirando. Ya sé que no hay comida.,Still nothing... I don't know why I keep looking. I know there's no food.
+Text/83/text,"(Wilson maúlla desde el pasillo, como si le dijera ""¿Y?"")","(Wilson meows from the hallway, as if saying ""So?"")"
+Text/84/text,"Ya voy, ya voy. Solo quiero asegurarme.","Coming, coming. I just want to make sure."
+Text/85/text,Pero no hay nada. Ni una miga.,But there's nothing. Not a crumb.
+Text/86/text,Mi refrigerador.,My fridge.
+Text/87/text,Hay un par de anotaciones en la puerta...,There are a couple of notes on the door...
+,,
+Text/88/text,Mi laptop... todavía abierta.,My laptop... still open.
+Text/89/text,Me quedé dormida trabajando anoche.,I fell asleep working last night.
+Text/8a/text,(la cierra despacio) Otra vez...,(closes it slowly) Again...
+Text/8b/text,"Nunca aprendo, ¿verdad?","I never learn, do I?"
+,,
+Text/8c/text,Otro paquete...,Another package...
+Text/8d/text,Siempre llegan paquetes aquí.,Packages are always showing up here.
+Text/8e/text,Yo nunca sé qué comprar.,I never know what to buy.
+Text/8f/text,"Bueno, sí sé qué comprar.","Well, I do know what to buy."
+Text/90/text,Solo que luego no lo compro.,I just never buy it.
+,,
+Text/91/text,"(mira el tablón de anuncios) Avisos, ofertas, números de teléfono...","(looks at the notice board) Notices, deals, phone numbers..."
+Text/92/text,"(lee un poco, sin mucho interés) Alguien organiza una comida entre vecinos.","(reads a bit, without much interest) Someone's organizing a neighborhood potluck."
+Text/93/text,Paso.,Pass.
+,,
+Text/94/text,(mira el reloj de la habitación) Las 6:00 AM...,(looks at the bedroom clock) 6:00 AM...
+Text/95/text,¿Ya son las 6? No puede ser.,It's 6 already? That can't be right.
+Text/96/text,"Alice, te quedaste dormida otra vez.","Alice, you overslept again."
+Text/97/text,(se pasa la mano por la cara) Anoche estaba tan cansada que ni siquiera lo noté.,(rubs her face) I was so tired last night I didn't even notice.
+,,
+Text/98/text,(mira la pantalla de la PC) ¿Qué...?,(looks at the PC screen) What...?
+Text/99/text,"(se inclina un poco más, como si no pudiera creer lo que ve) No hay servicio de delivery...","(leans in closer, as if she can't believe her eyes) No delivery service..."
+Text/9a/text,¿Cómo es posible que justo hoy...?,How can it be today of all days...?
+Text/9b/text,"(mira la puerta, luego a Wilson) Eso significa que voy a tener que salir.","(looks at the door, then at Wilson) That means I'll have to go out."
+Text/9c/text,"...[pause=0.8] Tranquila, Alice. Solo es salir a comprar comida. Nada más.","...[pause=0.8] Easy, Alice. It's just going out to buy food. That's all."
+Text/9d/text,...[pause=0.8] No quiero hacerlo. Pero Wilson me está mirando.,...[pause=0.8] I don't want to. But Wilson is looking at me.
+Text/9e/text,No me mires con esa carita...,Don't give me that little face...
+Text/9f/text,"(Wilson maúlla desde el suelo, con una mezcla de ternura y hambre.)","(Wilson meows from the floor, half sweetness, half hunger.)"
+Text/a0/text,Sabes que no puedo decirte que no cuando me miras así.,You know I can't say no when you look at me like that.
+Text/a1/text,Bueno... está bien. Por ti lo haré. Voy a salir a comprarte comida.,Okay... fine. I'll do it for you. I'll go out and buy you food.
+Text/a2/text,"(suspiro largo) No sé cómo voy a hacerlo, pero lo haré.","(long sigh) I don't know how I'm going to do it, but I will."
+Text/a3/text,Primero... ¿dónde dejé la mochila?,First... where did I leave my backpack?
+Text/a4/text,Aún no encuentro el delivery...,Still no delivery...
+Text/a5/text,Pero ya sé que no está. Solo estoy postergando lo inevitable.,But I already know there isn't any. I'm just putting off the inevitable.
+Text/a6/text,"El plato de Wilson sigue vacío. Y yo sigo aquí, mirando la pantalla.","Wilson's bowl is still empty. And I'm still here, staring at the screen."
+Text/a7/text,No puedo quedarme más tiempo.,I can't stay any longer.
+Text/a8/text,(mira la luz del sol entrando por la ventana) Qué linda mañana hace hoy.,(looks at the sunlight coming through the window) What a lovely morning.
+Text/a9/text,(mira su escritorio iluminado) El sol entra justo por aquí a esta hora.,(looks at her sunlit desk) The sun comes in right here at this hour.
+Text/aa/text,Mi café... todavía caliente.,My coffee... still hot.
+Text/ab/text,"(lo toma, lo mira) Debería esperar a que se enfríe un poco.","(picks it up, looks at it) I should wait for it to cool down a bit."
+Text/ac/text,Pero tengo ganas de beberlo ahora.,But I want to drink it now.
+Text/ad/text,(bebe un sorbo) Quema. Pero vale la pena.,(takes a sip) It burns. But it's worth it.
+,,
+Text/ae/text,Mi cena de ayer...,Yesterday's dinner...
+Text/af/text,"(se acerca, la mira) Debería haberla lavado anoche.","(walks over, looks at it) I should have washed it last night."
+Text/b0/text,Ya tiene moscas.,It's already got flies.
+,,
+Text/b1/text,Una TV común y corriente.,A plain old TV.
+Text/b2/text,"Apagada, como casi siempre.","Off, like almost always."
+,,
+Text/b3/text,La lámpara está encendida.,The lamp is on.
+Text/b4/text,"(mira la luz, como si dudara) ¿Debería apagarla?","(looks at the light, hesitating) Should I turn it off?"
+Choice/b5/text,"Sí, apágala.","Yes, turn it off."
+Choice/b5/disabled_text,,
+Text/b6/text,Mejor. No necesito tanta luz.,Better. I don't need that much light.
+Choice/b7/text,"No, déjala encendida.","No, leave it on."
+Choice/b7/disabled_text,,
+Text/b8/text,Mejor así. La luz me acompaña.,Better this way. The light keeps me company.
+Text/b9/text,La lámpara está apagada.,The lamp is off.
+Text/ba/text,La sombra se siente más profunda cuando no hay luz.,The shadows feel deeper when there's no light.
+Text/bb/text,¿Debería encenderla?,Should I turn it on?
+Choice/bc/text,"Sí, enciéndela.","Yes, turn it on."
+Choice/bc/disabled_text,,
+Text/bd/text,Un poco de luz. Siempre ayuda.,A little light. It always helps.
+Choice/be/text,"No, déjala apagada.","No, leave it off."
+Choice/be/disabled_text,,
+Text/bf/text,La oscuridad a veces es más cómoda.,Sometimes the dark is more comfortable.
+,,
+Text/c0/text,"¿Qué pasa, Wilson?","What is it, Wilson?"
+Text/c1/text,(Wilson la mira con los ojos muy abiertos y señala su plato vacío con el hocico.),(Wilson looks at her with wide eyes and nudges his empty bowl with his nose.)
+Text/c2/text,¿Tienes hambre?... Mmm... déjame buscarte algo en la cocina.,Are you hungry?... Mmm... let me find you something in the kitchen.
+Text/c3/text,"(Wilson mueve la cola y la sigue, confiado.)","(Wilson wags his tail and follows her, confident.)"
+Text/c4/text,"Wilson, ya sé que tienes hambre. Estoy yendo a la cocina.","Wilson, I know you're hungry. I'm going to the kitchen."
+Text/c5/text,"(Wilson maúlla, pero no se mueve.)","(Wilson meows, but doesn't move.)"
+Text/c6/text,¿Vas a venir o te quedas ahí?,Are you coming or staying there?
+Text/c7/text,(Wilson se levanta y la sigue lentamente.),(Wilson gets up and slowly follows her.)
+Text/22a/text,"Ya sé, Wilson, ya sé.","I know, Wilson, I know."
+Text/22b/text,Ahora mismo te pido algo por la computadora.,I'm ordering you something on the computer right now.
+Text/c8/text,Wilson... maúlla otra vez.,Wilson... meowing again.
+Text/c9/text,No te preocupes. Ya casi salgo.,Don't worry. I'm almost out the door.
+,,
+Text/ca/text,(ve el cojín de Wilson en el suelo) El cojín de Wilson... Aquí es donde duerme.,(sees Wilson's cushion on the floor) Wilson's cushion... This is where he sleeps.
+Text/cb/text,(lo toca con suavidad) Todavía está caliente.,(touches it gently) It's still warm.
+Text/cc/text,Estaba aquí hace un momento.,He was here a moment ago.
+Text/cd/text,Supongo que se cansó de esperarme.,I guess he got tired of waiting for me.
+,,
+Text/ce/text,El plato de Wilson...,Wilson's bowl...
+Text/cf/text,(lo ve vacío) Está vacío. Tengo que buscar algo en la cocina.,(sees it's empty) It's empty. I have to find something in the kitchen.
+Text/d0/text,"(Wilson la sigue y maúlla detrás de ella, como diciendo ""ya lo sabía"".)","(Wilson follows her and meows behind her, as if saying ""told you so"".)"
+Text/d1/text,El plato de Wilson... Ya lo revisé antes. Está vacío.,Wilson's bowl... I already checked it. It's empty.
+Text/d2/text,Tengo que ir a la cocina a buscar algo.,I have to go to the kitchen and find something.
+Text/d3/text,"(Wilson maúlla desde el suelo, como si la estuviera apurando.)","(Wilson meows from the floor, as if hurrying her up.)"
+Text/d4/text,"Ya voy, ya voy.","Coming, coming."
+Text/d5/text,El plato de Wilson...,Wilson's bowl...
+Text/d6/text,Está vacío.,It's empty.
+,,
+Text/d7/text,¡Miau!,Meow!
+Text/d8/text,"No, Wilson... tú te quedas aquí cuidando la casa.","No, Wilson... you stay here and look after the house."
+Text/d9/text,¿Miau...?,Meow...?
+Text/da/text,"Vuelvo pronto, te lo prometo. Pórtate bien.","I'll be back soon, I promise. Be good."
+,,
+Text/db/text,¿Se te olvidó algo?,Forget something?
+Text/dc/text,(niega con la cabeza) N-no. Ya me iba.,(shakes her head) N-no. I was just leaving.
+,,
+Text/dd/text,(se acerca al mostrador y deja la lata),(walks up to the counter and sets down the can)
+Text/de/text,"Hola. Soy Leo. Te saludé hace un rato, pero creo que no me escuchaste.","Hi. I'm Leo. I said hi a while ago, but I don't think you heard me."
+Text/df/text,(con un hilo de voz) E-eh... hola. Yo soy Alice.,(barely above a whisper) U-um... hi. I'm Alice.
+Text/e0/text,¿Estás bien? Te veo un poco nerviosa.,Are you okay? You seem a little nervous.
+Text/e1/text,(la pregunta del espejo... pero el espejo no la miraba así),(the question from the mirror... but the mirror didn't look at her like that)
+Text/e2/text,La verdad... no. Me perdí. Bajé del metro y ya no sé dónde estoy.,Honestly... no. I'm lost. I got off the metro and now I don't know where I am.
+Text/e3/text,(Leo no se ríe. Solo asiente.),(Leo doesn't laugh. He just nods.)
+Text/e4/text,"Ah, eso explica la cara de ""¿qué hago aquí?"". ¿Y viniste a comprar comida para gatos?","Ah, that explains the ""what am I doing here?"" face. And you came in for cat food?"
+Text/e5/text,(mira la lata de atún) Para mi gato. Wilson.,(looks at the can of tuna) For my cat. Wilson.
+Text/e6/text,Buen plan. Comida antes que orientación. Yo también tendría las prioridades así.,Good plan. Food before directions. I'd have the same priorities.
+Text/e7/text,"(suelta una risa corta, nerviosa)","(lets out a short, nervous laugh)"
+Text/e8/text,"N-no, estoy bien. Solo... no conocía esta tienda.","N-no, I'm fine. I just... didn't know this store."
+Text/e9/text,(Miente mal. Se le nota en la voz.),(She's a bad liar. You can hear it in her voice.)
+Text/ea/text,"Ah, claro. Es que te vi entrar como si el edificio estuviera en llamas.","Ah, sure. It's just that you came in like the building was on fire."
+Text/eb/text,(se queda en blanco),(goes completely blank)
+Text/ec/text,"(se ríe suave) Es broma. Pero en serio, ¿necesitas algo más que atún?","(laughs softly) Kidding. But seriously, do you need anything besides tuna?"
+Text/ed/text,En realidad... me perdí. Y no sé bien cómo volver.,Actually... I'm lost. And I'm not really sure how to get back.
+Text/ee/text,"Ahí está. Bueno, por algo se empieza.","There it is. Well, it's a start."
+Text/ef/text,"(abre la boca, pero no sale nada)","(opens her mouth, but nothing comes out)"
+Text/f0/text,¿Se te escapó la voz?,Lost your voice?
+Text/f1/text,(asiente),(nods)
+Text/f2/text,Me pasa a veces. Sobre todo antes del primer café.,Happens to me sometimes. Especially before my first coffee.
+Text/f3/text,(Leo no está molesto. Solo espera.),(Leo isn't annoyed. He just waits.)
+Text/f4/text,(más suave) ¿Perdida?,(more gently) Lost?
+Text/f5/text,(vuelve a asentir),(nods again)
+Text/f6/text,"Bueno, lo primero es lo primero. Déjame cobrarte el atún.","Well, first things first. Let me ring up the tuna."
+Text/f7/text,(Leo registra la compra con calma.),(Leo rings up the purchase calmly.)
+Text/f8/text,(saca las monedas de la cartera y las cuenta dos veces),(takes the coins out of her wallet and counts them twice)
+Text/f9/text,Justo. Ni una moneda más.,Exact. Not a coin more.
+Text/fa/text,(guarda la lata en la mochila),(puts the can in her backpack)
+Text/fb/text,"Para volver... el metro de esta calle es de la línea que termina aquí, en la terminal.","To get back... the metro on this street is the line that ends here, at the terminal."
+Text/fc/text,"Mejor camina derecho hasta la plaza. Ahí pasa la otra línea, la que va al centro. Desde ahí seguro te ubicas.","Better walk straight ahead to the plaza. The other line runs there, the one that goes downtown. From there you'll find your way for sure."
+Text/fd/text,(siente un alivio enorme),(feels an enormous wave of relief)
+Text/fe/text,Aunque... ¿sabes bien la dirección? Por si necesitas algo más exacto.,Although... do you know your address? In case you need something more exact.
+Text/ff/text,Eh... es un edificio gris. Con un balcón chiquito. Hay un árbol enfrente...,Um... it's a gray building. With a tiny balcony. There's a tree out front...
+Text/100/text,(sonríe) ¿No sabes el nombre de tu calle?,(smiles) You don't know the name of your street?
+Text/101/text,(niega con la cabeza; quiere que se la trague la tierra),(shakes her head; she wants the ground to swallow her)
+Text/102/text,"Bueno, con el metro llegas igual.","Well, the metro will get you there anyway."
+Text/103/text,(La conversación se acaba. Pero algo en Alice no quiere irse todavía.),(The conversation is over. But something in Alice doesn't want to leave yet.)
+Text/104/text,"(con la voz temblorosa) Oye, Leo... ¿puedo...? ¿Me das tu número?","(her voice shaking) Hey, Leo... can I...? Can I have your number?"
+Text/105/text,(Leo la mira sorprendido. Luego sonríe.),"(Leo looks at her, surprised. Then he smiles.)"
+Text/106/text,¿Mi número?,My number?
+Text/107/text,Por si... no sé. Por si me pierdo otra vez. O si Wilson se come toda la comida y necesito preguntarte si tienes más atún.,In case... I don't know. In case I get lost again. Or Wilson eats all the food and I need to ask if you have more tuna.
+Text/108/text,(se ríe) Buena excusa. Dame tu teléfono.,(laughs) Good excuse. Give me your phone.
+Text/109/text,Lo perdí. En el metro.,I lost it. On the metro.
+Text/10a/text,(Leo ni se inmuta. Saca un bolígrafo y escribe en el dorso del ticket.),(Leo doesn't even blink. He takes out a pen and writes on the back of the receipt.)
+Text/10b/text,¿Papel y bolígrafo te sirven?,Will pen and paper do?
+Text/10c/text,Bueno... gracias.,Well... thanks.
+Text/10d/text,(no dice nada),(says nothing)
+Text/10e/text,"(Leo la mira un momento, como si esperara algo.)","(Leo looks at her for a moment, as if waiting for something.)"
+Text/10f/text,Bueno...,Well...
+Text/110/text,(Leo saca un bolígrafo y escribe en el dorso del ticket.),(Leo takes out a pen and writes on the back of the receipt.)
+Text/111/text,Toma. Por si te pierdes otra vez y necesitas preguntarle a alguien que al menos sabe dónde queda esta tienda.,Here. In case you get lost again and need to ask someone who at least knows where this store is.
+Text/112/text,(parpadea) ¿En serio?,(blinks) Really?
+Text/113/text,"Para eso lo tengo. Pero si no quieres usarlo, no pasa nada.","That's what it's for. But if you don't want to use it, no big deal."
+Text/114/text,(Ahora Alice tiene el número de Leo. Podría darle el suyo.),(Now Alice has Leo's number. She could give him hers.)
+Choice/115/text,Darle su número,Give him her number
+Choice/115/disabled_text,,
+Text/116/text,(arranca una esquina del ticket y le pide el bolígrafo),(tears a corner off the receipt and asks for the pen)
+Text/117/text,Yo... tampoco tengo teléfono ahora. Pero si algún día... no sé.,I... don't have a phone right now either. But if someday... I don't know.
+Text/118/text,(escribe su número en el papelito y se lo da),(writes her number on the scrap of paper and hands it to him)
+Text/119/text,(Leo mira el papel. Luego la mira a ella.),(Leo looks at the paper. Then he looks at her.)
+Text/11a/text,"Alice-sin-nombre-de-calle, con número incluido. Me gusta.","Alice-with-no-street-name, number included. I like it."
+Text/11b/text,(Leo guarda el papel con cuidado.),(Leo puts the paper away carefully.)
+Text/11c/text,Yo... tampoco tengo teléfono ahora. Pero por si acaso...,I... don't have a phone right now either. But just in case...
+Text/11d/text,(escribe su número en el papelito y se lo da),(writes her number on the scrap of paper and hands it to him)
+Text/11e/text,"(Leo levanta una ceja, pero no dice nada. Guarda el papel.)","(Leo raises an eyebrow, but says nothing. He puts the paper away.)"
+Choice/11f/text,No darle su número,Don't give him her number
+Choice/11f/disabled_text,,
+Text/120/text,(guarda el ticket en la mochila) Gracias. En serio.,(puts the receipt in her backpack) Thank you. Really.
+Text/121/text,De nada.,You're welcome.
+Text/122/text,"(Leo la mira un momento, como si esperara algo más. Pero Alice ya está dando un paso atrás.)","(Leo looks at her for a moment, as if waiting for something more. But Alice is already stepping back.)"
+Text/123/text,De nada. Que encuentres el camino.,You're welcome. Hope you find your way.
+Text/124/text,(asiente y se gira hacia la puerta),(nods and turns toward the door)
+,,
+Text/125/text,(da un paso hacia el mostrador y se detiene),(takes a step toward the counter and stops)
+Text/126/text,Primero... la comida de Wilson.,First... Wilson's food.
+,,
+Text/127/text,(camina hacia la puerta; el corazón le late más rápido),(walks toward the door; her heart is beating faster)
+Text/128/text,"(camina hacia la puerta; quiere darse la vuelta, pero no se atreve)","(walks toward the door; she wants to turn around, but doesn't dare)"
+Text/129/text,"Oye, Alice.","Hey, Alice."
+Text/12a/text,(se gira),(turns around)
+Text/12b/text,"Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia.","Don't lose that number, okay? In case Wilson has another emergency."
+Text/12c/text,"Que no se te pierda el número, ¿sí? Por si tu gato tiene otra emergencia.","Don't lose that number, okay? In case your cat has another emergency."
+Text/12d/text,(Leo sonríe.),(Leo smiles.)
+Text/12e/text,"(asiente, con las mejillas ardiendo)","(nods, her cheeks burning)"
+Text/12f/text,Que encuentres el camino.,Hope you find your way.
+Text/130/text,(Leo sonríe. No dice nada más.),(Leo smiles. He doesn't say anything else.)
+Text/131/text,(asiente),(nods)
+,,
+Text/132/text,"(se acerca a las cajas de fruta) Manzanas, naranjas, limones...","(walks over to the fruit crates) Apples, oranges, lemons..."
+Text/133/text,Todo se ve tan fresco.,Everything looks so fresh.
+Text/134/text,"(toma una manzana, nota que Leo la está mirando y la devuelve rápido)","(picks up an apple, notices Leo watching and puts it back fast)"
+Text/135/text,...Solo estaba mirando.,...I was just looking.
+,,
+Text/136/text,¡Bienvenida!,Welcome!
+Text/137/text,(se queda paralizada en la entrada),(freezes in the doorway)
+Text/138/text,...,...
+Text/139/text,(Un chico de sonrisa fácil la mira desde el mostrador.),(A guy with an easy smile looks at her from the counter.)
+Text/13a/text,(siente que le arden las mejillas y se desvía hacia las góndolas),(feels her cheeks burn and veers off toward the aisles)
+,,
+Text/13b/text,(busca entre las latas) Tomate... maíz... garbanzos...,(searches through the cans) Tomatoes... corn... chickpeas...
+Text/13c/text,"Latas, sí. Pero ninguna para gatos.","Cans, yes. But none for cats."
+,,
+Text/13d/text,"(se esconde detrás de la góndola) Detergente, esponjas...","(hides behind the shelf) Detergent, sponges..."
+Text/13e/text,Aquí no es.,Not here.
+,,
+Text/13f/text,(aprieta la lata contra el pecho) Ya tengo lo que vine a buscar.,(hugs the can to her chest) I already have what I came for.
+,,
+Text/140/text,"(mira los refrigeradores) Leche, jugos, agua...","(looks at the fridges) Milk, juice, water..."
+Text/141/text,Nada para gatos.,Nothing for cats.
+,,
+Text/142/text,"(recorre el estante) Arroz, pasta, galletas...","(scans the shelf) Rice, pasta, cookies..."
+Text/143/text,"(devuelve un paquete que había tomado sin darse cuenta) No. Concéntrate, Alice.","(puts back a package she'd picked up without noticing) No. Focus, Alice."
+,,
+Text/144/text,(finge leer una etiqueta mientras mira hacia el mostrador),(pretends to read a label while glancing at the counter)
+Text/145/text,...¿Me estará mirando?,...Is he looking at me?
+Text/146/text,No. Busca la comida de Wilson.,No. Find Wilson's food.
+,,
+Text/147/text,"(por fin, las latas para gatos; agarra una de atún sin mirar)","(finally, the cat food; she grabs a can of tuna without looking)"
+Text/148/text,Atún. Sí. A Wilson le gusta el atún.,Tuna. Yes. Wilson likes tuna.
+Text/149/text,(mira de reojo hacia el mostrador),(glances sideways at the counter)
+,,
+Text/14a/text,(aprieta la lata contra el pecho) Ya la tengo.,(hugs the can to her chest) I've got it.
+,,
+Text/14b/text,"(ve a un hombre de corbata y maletín, quieto, moviendo el maletín) Lleva mucho rato ahí.","(sees a man in a tie, standing still, swinging his briefcase) He's been there a long time."
+Text/14c/text,¿Estará esperando a alguien? O quizá sabe algo que yo no sé.,Is he waiting for someone? Or maybe he knows something I don't.
+Text/14d/text,...[pause=0.6] Parece tranquilo.,...[pause=0.6] He looks calm.
+Text/14e/text,(mira sus propios auriculares) Yo también parezco tranquila.,(looks at her own headphones) I look calm too.
+Text/14f/text,Supongo.[pause=0.6] Si no me miran demasiado.,I guess.[pause=0.6] If nobody looks too closely.
+,,
+Text/150/text,Ahí viene.,Here it comes.
+Text/151/text,(se ajusta los auriculares) Vamos...,(adjusts her headphones) Come on...
+Text/152/text,Solo tengo que subir.,I just have to get on.
+,,
+Text/153/text,"(se acerca al tablón de anuncios) Avisos, horarios, ofertas de trabajo...","(walks up to the notice board) Notices, schedules, job offers..."
+Text/154/text,"(lee algunos, sin mucho interés) Se busca camarero... experiencia mínima.","(reads a few, without much interest) Waiter wanted... minimal experience."
+Text/155/text,Vendo bicicleta usada... casi nueva.,Used bike for sale... almost new.
+Text/156/text,Alguien perdió una mochila en el vagón tres.,Someone lost a backpack in car three.
+Text/157/text,(se queda mirando ese último) Ojalá la encuentre.,(keeps staring at that last one) I hope they find it.
+Text/158/text,Perder algo en el metro debe ser horrible.,Losing something on the metro must be awful.
+Text/159/text,"(se toca el bolsillo, donde está su teléfono) Yo siempre compruebo que lo llevo todo.","(touches her pocket, where her phone is) I always check that I have everything."
+Text/15a/text,Una vez. Luego otra.,Once. Then again.
+Text/15b/text,Bueno... a veces más de dos.,Well... sometimes more than twice.
+,,
+Text/15c/text,Ya estoy aquí...,I'm here...
+Text/15d/text,Hay menos gente de lo que esperaba. Menos mal.,Fewer people than I expected. Thank goodness.
+Text/15e/text,Bueno. Solo tengo que esperar el tren. No debería tardar mucho.,Okay. I just have to wait for the train. It shouldn't take long.
+Text/15f/text,(mira a su alrededor) Aunque... quizá debería haber salido antes.,(looks around) Although... maybe I should have left earlier.
+Text/160/text,"Tranquila, Alice. Compras la comida y vuelves a casa.","Easy, Alice. You buy the food and go home."
+Text/161/text,Nada más.,That's all.
+,,
+Text/162/text,(mira la ventanilla de tickets) Ha subido otra vez.,(looks at the ticket window) It went up again.
+Text/163/text,"El precio, digo. Como si no fuera ya bastante caro.","The price, I mean. As if it weren't expensive enough already."
+Text/164/text,(saca el ticket de su bolsillo) Menos mal que compré el mío antes.,(takes the ticket out of her pocket) Good thing I bought mine before.
+Text/165/text,"Si tuviera que pagarlo hoy, no me alcanzaría para la comida de Wilson.","If I had to pay for it today, I wouldn't have enough for Wilson's food."
+Text/166/text,"(guarda el ticket, junto a la cartera) Todo justo. Como siempre.","(puts the ticket away, next to her wallet) Just enough. As always."
+,,
+Text/167/text,(escucha a dos personas que hablan cerca),(listens to two people talking nearby)
+Text/168/text,¡No te digo! El último nivel es imposible.,I'm telling you! The last level is impossible.
+Text/169/text,"No es imposible, es que eres malo.","It's not impossible, you're just bad."
+Text/16a/text,Te apuesto a que no lo pasas ni en una semana.,Bet you can't beat it in a week.
+Text/16b/text,¿Una semana? Lo paso mañana.,A week? I'll beat it tomorrow.
+Text/16c/text,"(los mira un momento, sin que la vean) Yo también pasé ese nivel.","(watches them for a moment, unseen) I beat that level too."
+Text/16d/text,Bueno... casi.,Well... almost.
+Text/16e/text,Podría decir eso. Es una frase normal.,I could say that. It's a normal sentence.
+Text/16f/text,(se acerca un poco)[pause=0.8] ...,(steps a little closer)[pause=0.8] ...
+Text/170/text,No pasa nada. No tengo que hablar con todo el mundo.,It's okay. I don't have to talk to everyone.
+,,
+Text/171/text,"(ve a alguien tocando la guitarra, bajito, solo para él) Toca como si nadie lo estuviera escuchando.","(sees someone playing guitar, softly, just for himself) He plays like nobody's listening."
+Text/172/text,...[pause=0.6] Qué envidia.,...[pause=0.6] I'm jealous.
+,,
+Text/173/text,(se quita los auriculares y mira a su alrededor) ¿Eh...?,(takes off her headphones and looks around) Huh...?
+Text/174/text,(observa la estación) Esta no es mi parada...,(looks around the station) This isn't my stop...
+Text/175/text,(busca en sus bolsillos) Mi teléfono...,(searches her pockets) My phone...
+Text/176/text,"No.[pause=0.5] No, no, no...","No.[pause=0.5] No, no, no..."
+Text/177/text,(mira hacia las vías) Se fue.,(looks toward the tracks) It's gone.
+Text/178/text,Lo dejé en el tren.,I left it on the train.
+Text/179/text,"...[pause=0.8] Genial, Alice.","...[pause=0.8] Great, Alice."
+Text/17a/text,¿Y ahora qué hago?,What do I do now?
+,,
+Text/17b/text,"(se acerca al mapa de la estación, busca su parada) No reconozco ninguno de estos nombres.","(walks up to the station map, looks for her stop) I don't recognize any of these names."
+Text/17c/text,...[pause=0.6] (se aleja del mapa),...[pause=0.6] (steps away from the map)
+,,
+Text/17d/text,(Una chica mira su teléfono.),(A girl is looking at her phone.)
+Text/17e/text,Seguro que está mirando la hora... Yo también lo haría.,She's probably checking the time... I would too.
+Text/17f/text,Si tuviera mi teléfono.,If I had my phone.
+,,
+Text/180/text,(mira las vías) Ya se fue...,(looks at the tracks) It's gone...
+Text/181/text,Y yo aquí.,And here I am.
+,,
+Text/182/text,"(ve la máquina expendedora, mira el dinero que tiene) Es para Wilson. No puedo gastarlo en esto.","(sees the vending machine, looks at the money she has) It's for Wilson. I can't spend it on this."
+Text/183/text,(su estómago ruge)[pause=0.6] ...,(her stomach growls)[pause=0.6] ...
+,,
+Text/184/text,Oye... te quedaste dormida.,Hey... you fell asleep.
+Text/185/text,(despierta sobresaltada) ¡Ah!,(wakes up with a start) Ah!
+Text/186/text,Yo... lo siento.,I... I'm sorry.
+Text/187/text,No pasa nada. Pero tienes que bajar. Es la terminal.,It's fine. But you need to get off. This is the terminal.
+Text/188/text,¿La terminal...?,The terminal...?
+Text/189/text,Sí. Ya no sigue el tren.,Yeah. The train doesn't go any further.
+Text/18a/text,"(mira alrededor, todavía adormilada) Ah... claro...","(looks around, still drowsy) Oh... right..."
+Text/18b/text,"Vamos, tengo que cerrar el vagón.","Come on, I have to lock up the car."
+Text/18c/text,"Sí. Sí, claro. Perdón.","Yes. Yes, of course. Sorry."
+Text/18d/text,No te preocupes.,Don't worry about it.
+,,
+Text/18e/text,"(se acerca al trabajador, susurrando) Disculpe...","(walks up to the worker, whispering) Excuse me..."
+Text/18f/text,...[pause=0.8] Eh... disculpe.,...[pause=0.8] Um... excuse me.
+Text/190/text,(levanta la vista de sus papeles) ¿Sí?,(looks up from his papers) Yes?
+Text/191/text,¿Qué... estación es esta?,What... station is this?
+Text/192/text,Terminal. Fin de línea.,Terminal. End of the line.
+Text/193/text,"(vuelve a sus papeles) La salida, por las escaleras.",(goes back to his papers) Exit's up the stairs.
+Text/194/text,G-gracias.,Th-thanks.
+Text/195/text,(suelta el aire) Lo dije. Le pregunté a alguien.,(lets out a breath) I said it. I asked someone.
+Text/196/text,Nada... perdón.,Nothing... sorry.
+Text/197/text,"(abre la boca, pero no le sale nada)","(opens her mouth, but nothing comes out)"
+Text/198/text,(la mira un segundo y vuelve a sus papeles),(looks at her for a second and goes back to his papers)
+Text/199/text,(se aleja rápidamente),(hurries away)
+Text/19a/text,En el espejo era más fácil...,It was easier in the mirror...
+Text/19b/text,(suspira) Qué vergüenza.,(sighs) How embarrassing.
+,,
+Text/19c/text,"(Un volante pegado en la columna, con unas frutas dibujadas.)","(A flyer stuck to the column, with some fruit drawn on it.)"
+Text/19d/text,"""Minimercado. Frutas, verduras... y mascotas.""","""Mini-market. Fruit, vegetables... and pet supplies."""
+Text/19e/text,...[pause=0.6] Tiene que estar cerca.,...[pause=0.6] It has to be close.
+,,
+Text/19f/text,"(mira a su alrededor, abrumada) ...No es mi calle.","(looks around, overwhelmed) ...This isn't my street."
+Text/1a0/text,No reconozco nada...,I don't recognize anything...
+Text/1a1/text,¿Dónde estoy?,Where am I?
+Text/1a2/text,(Pausa),(Pause)
+Text/1a3/text,Tengo que buscar una tienda. Wilson me está esperando.,I have to find a store. Wilson is waiting for me.
+,,
+Text/1a4/text,(se detiene frente al cajero),(stops in front of the ATM)
+Text/1a5/text,Solo tengo efectivo. No hay tarjeta.,I only have cash. No card.
+Text/1a6/text,Y aunque la tuviera... este banco no lo conozco.,And even if I had one... I don't know this bank.
+Text/1a7/text,Mejor no arriesgarme.,Better not risk it.
+,,
+Text/1a8/text,(se detiene junto a la panadería),(stops by the bakery)
+Text/1a9/text,Mmm... huele bien.,Mmm... smells good.
+Text/1aa/text,(mira el pan en el escaparate),(looks at the bread in the window)
+Text/1ab/text,Podría comprar uno...,I could buy one...
+Text/1ac/text,(mira las monedas que lleva),(looks at the coins she has)
+Text/1ad/text,No. El dinero es justo.,No. The money is just enough.
+,,
+Text/1ae/text,"(mira el mapa de rutas) ""Usted está aquí.""","(looks at the route map) ""You are here."""
+Text/1af/text,"(sigue las calles con el dedo) Hay tiendas pasando una ""torre de cristal"".","(traces the streets with her finger) There are stores past a ""glass tower""."
+Text/1b0/text,¿Una torre de cristal?,A glass tower?
+Text/1b1/text,¿Dónde podría estar?,Where could that be?
+,,
+Text/1b2/text,(mira por el cristal; hay gente riendo en una mesa) Aquí no venden comida para gatos.,(looks through the glass; people are laughing at a table) They don't sell cat food here.
+Text/1b3/text,"Igual, no entraría. Hay mucha gente.",I wouldn't go in anyway. Too many people.
+,,
+Text/1b4/text,(huele a pan tostado) Antes venía a sitios así. Con un libro. Sola.,(it smells like toast) I used to come to places like this. With a book. Alone.
+Text/1b5/text,Me gustaba. Creo.,I liked it. I think.
+,,
+Text/1b6/text,"(Un coche negro aparcado. En la ventanilla oscura, Alice se ve reflejada.)","(A black car is parked here. In the dark window, Alice sees her reflection.)"
+Text/1b7/text,(se detiene y mira a los lados. No hay nadie.),(stops and looks both ways. Nobody's around.)
+Text/1b8/text,(se acerca un poco y se arregla el pelo en el reflejo) Así... un poco mejor.,(leans in a little and fixes her hair in the reflection) There... a little better.
+Text/1b9/text,¿Todo bien?,Everything okay?
+Text/1ba/text,"(se queda helada, con la mano todavía en el pelo)","(freezes, her hand still in her hair)"
+Text/1bb/text,S-solo me estaba... arreglando el pelo. Perdón.,I-I was just... fixing my hair. Sorry.
+Text/1bc/text,(se ríe) Tranquila. Yo también lo hago en todos los coches.,(laughs) Relax. I do it in every car too.
+Text/1bd/text,"Perdón, perdón.","Sorry, sorry."
+Text/1be/text,(sonríe) ¿Perdón por qué? ¿Por mirarte en mi ventanilla? Yo lo hago en todos los coches.,(smiles) Sorry for what? For looking at yourself in my window? I do it in every car.
+Text/1bf/text,(se pone roja; no le sale nada),(turns red; nothing comes out)
+Text/1c0/text,"(sonríe) Tranquila, mujer. Yo también me miro en todos los coches.","(smiles) Relax, girl. I check myself out in every car too."
+Text/1c1/text,"Bueno, me voy, que llego tarde.","Well, I'm off, I'm running late."
+Text/1c2/text,(se va casi corriendo) ...Quiero que me trague la tierra.,(walks off almost running) ...I want the ground to swallow me.
+Text/1c3/text,Pero se rió conmigo. No de mí.,But she laughed with me. Not at me.
+,,
+Text/1c4/text,(Se agacha despacio),(She crouches down slowly)
+Text/1c5/text,"Hola, gatito...","Hi, kitty..."
+Text/1c6/text,Tienes la misma cara que pone Wilson cuando quiere algo.,You have the same face Wilson makes when he wants something.
+Text/1c7/text,(Pausa),(Pause)
+Text/1c8/text,...Wilson.,...Wilson.
+Text/1c9/text,"Seguro sigue en la puerta, esperándome.","He's probably still by the door, waiting for me."
+Text/1ca/text,(Se levanta rápido),(She gets up quickly)
+Text/1cb/text,Tengo que darme prisa.,I have to hurry.
+,,
+Text/1cc/text,"(el gato se deja mirar, pero no se acerca) Tú también tienes a dónde ir, ¿verdad?","(the cat lets her look, but doesn't come closer) You've got somewhere to be too, huh?"
+,,
+Text/1cd/text,(Una pareja discute al pie del paso de cebra. Tapan todo el paso.),(A couple is arguing at the foot of the crosswalk. They're blocking the whole way.)
+Text/1ce/text,¡Siempre haces lo mismo! ¡Siempre!,You always do the same thing! Always!
+Text/1cf/text,¿Yo? ¡Fuiste tú la que dijo que no venía!,Me? You're the one who said you weren't coming!
+Text/1d0/text,"(se queda a un paso, sin saber dónde ponerse)","(stands a step away, not knowing where to put herself)"
+Label/1d1/display_name,,
+Text/1d2/text,Perdón... ¿me dejan pasar?,Sorry... can I get past?
+Text/1d3/text,(Se callan de golpe. Los dos la miran.),(They go suddenly quiet. Both of them look at her.)
+Text/1d4/text,Ay... perdona. Claro.,Oh... sorry. Of course.
+Text/1d5/text,"(se aparta, incómodo) Perdón, perdón.","(steps aside, awkward) Sorry, sorry."
+Text/1d6/text,(con la cara ardiendo) ...Lo dije.,(her face burning) ...I said it.
+Text/1d7/text,(muy bajito) Ya terminarán...,(very quietly) They'll be done soon...
+Text/1d8/text,¡Y encima invitaste a tu ex al cumpleaños de MI hermana!,And on top of that you invited your ex to MY sister's birthday!
+Text/1d9/text,¡Es amiga de tu hermana! ¿Qué querías que hiciera?,She's your sister's friend! What did you want me to do?
+Text/1da/text,(abre mucho los ojos) ...¿A su ex?,(her eyes go wide) ...His ex?
+Text/1db/text,No debería estar escuchando esto.,I shouldn't be listening to this.
+Text/1dc/text,¿Y lo del perro? ¿También es culpa mía lo del perro?,And the dog? Is the dog my fault too?
+Text/1dd/text,"¡Se comió mis zapatos nuevos, Marcos!","He ate my new shoes, Marcos!"
+Text/1de/text,"(piensa en sus zapatos, tirados en el baño) Igual que en casa...","(thinks of her own shoes, left in the bathroom) Just like at home..."
+Text/1df/text,...Sigo sin moverme. Y sigo escuchando.,...I'm still not moving. And I'm still listening.
+Text/1e0/text,¡No me hables así delante de la gente!,Don't talk to me like that in front of people!
+Text/1e1/text,¿Qué gente? ¡Si no hay nadie!,What people? There's nobody here!
+Text/1e2/text,(mira a su alrededor) ...Estoy yo.,(looks around) ...There's me.
+Text/1e3/text,"(abre la boca, pero no le sale nada)","(opens her mouth, but nothing comes out)"
+Text/1e4/text,(Siguen discutiendo. Ni la han visto.),(They keep arguing. They haven't even noticed her.)
+Text/1e5/text,¿Lo intento otra vez?,Should I try again?
+Choice/1e6/text,Intentar hablarles otra vez,Try talking to them again
+Choice/1e6/disabled_text,,
+Choice/1e7/text,Cruzar por el otro paso,Use the other crosswalk
+Choice/1e7/disabled_text,,
+Text/1e8/text,Mejor cruzo por el otro lado.,I'd better cross on the other side.
+,,
+Text/1e9/text,"(Un repartidor descansa con una caja en brazos. La caja dice ""Minimercado"" y tiene unas frutas dibujadas.)","(A delivery guy is taking a break, holding a box. The box says ""Mini-market"" and has some fruit drawn on it.)"
+Text/1ea/text,"Un minimercado...[pause=0.6] Ahí venden de todo, ¿no?","A mini-market...[pause=0.6] They sell everything there, right?"
+,,
+Text/1eb/text,(levanta la vista) Nunca había visto un edificio así.,(looks up) I've never seen a building like that.
+Text/1ec/text,"(ve su reflejo, pequeño, en los cristales) Desde aquí parezco una hormiga.","(sees her reflection, tiny, in the glass) From here I look like an ant."
+,,
+Text/1ed/text,(levanta la vista) Nunca había visto un edificio así.,(looks up) I've never seen a building like that.
+Text/1ee/text,"(ve su reflejo, pequeño, en los cristales) Desde aquí parezco una hormiga.","(sees her reflection, tiny, in the glass) From here I look like an ant."
+Text/1ef/text,"...[pause=0.6] ""Junto a la torre de cristal"", decía. Aquí delante no hay nada. ¿Al otro lado de la avenida?","...[pause=0.6] ""Next to the glass tower,"" it said. There's nothing here in front. Across the avenue?"
+,,
+Text/1f0/text,Ella también tiene gato...,She has a cat too...
+Text/1f1/text,¿Dónde las habrá comprado?,Where did she buy those?
+Text/1f2/text,"(la mira, amable) ¿Buscas algo, jovencita?","(looks at her kindly) Looking for something, dear?"
+Text/1f3/text,(se sobresalta) Eh... sí. Comida para gatos. ¿Sabe dónde puedo comprar?,(startled) Um... yes. Cat food. Do you know where I can buy some?
+Text/1f4/text,Claro. Hay un minimercado justo detrás de la torre de cristal. No tiene pérdida.,Of course. There's a mini-market right behind the glass tower. You can't miss it.
+Text/1f5/text,Mmm G-Gracias...,Mmm Th-thank you...
+,,
+Text/1f6/text,(mira el teléfono público),(looks at the payphone)
+Text/1f7/text,Al menos este parece funcionar.,At least this one seems to work.
+Text/1f8/text,Podría llamar a alguien...,I could call someone...
+Text/1f9/text,(se queda pensando),(stops to think)
+Text/1fa/text,...No me sé ningún número de memoria.,...I don't know a single number by heart.
+Text/1fb/text,(baja la mirada),(looks down)
+Text/1fc/text,Ni siquiera el mío.,Not even my own.
+,,
+Text/1fd/text,(levanta el auricular) ...No hay tono.,(picks up the receiver) ...No dial tone.
+Text/1fe/text,(lo cuelga) Tampoco sabría a quién llamar.,(hangs it up) I wouldn't know who to call anyway.
+,,
+Text/1ff/text,(ve una tienda de mascotas) ¡Aquí!,(sees a pet shop) Here!
+Text/200/text,"(Un cartel en la puerta dice ""Cerrado por reformas"".)","(A sign on the door says ""Closed for renovations"".)"
+Text/201/text,...[pause=0.6] Claro.,...[pause=0.6] Of course.
+Text/202/text,"(Debajo hay un papelito escrito a mano: ""Mientras tanto, comida para mascotas en el minimercado detrás de la torre"".)","(Below it there's a handwritten note: ""In the meantime, pet food at the mini-market behind the tower"".)"
+Text/203/text,Por lo menos alguien pensó en gente como yo.,At least somebody thought of people like me.
+,,
+Text/204/text,(Una chica escucha un audio en altavoz.),(A girl is playing a voice message on speaker.)
+Text/205/text,"(alcanza a oír) ""...sí, en el minimercado ese, junto a la torre de cristal...""","(catches a bit of it) ""...yeah, at that mini-market, next to the glass tower..."""
+Text/206/text,¿Un minimercado? ¿Junto a la torre?,A mini-market? Next to the tower?
+Text/207/text,(pausa) Quizá ahí vendan comida para gatos.,(pause) Maybe they sell cat food there.
+Text/208/text,(pausa) ...Debería ir a mirar.,(pause) ...I should go take a look.
+Text/209/text,(busca su teléfono por costumbre),(reaches for her phone out of habit)
+Text/20a/text,... Ah. Es verdad. No tengo.,... Oh. Right. I don't have it.
+,,
+Text/20b/text,Huele a pizza.,Smells like pizza.
+Text/20c/text,Qué hambre...,I'm so hungry...
+,,
+Text/20d/text,"(se acerca al escaparate) Fruta, verduras...","(walks up to the shop window) Fruit, vegetables..."
+Text/20e/text,"(busca algo entre los productos expuestos) Ahí, al fondo.","(looks through the products on display) There, in the back."
+Text/20f/text,Comida para gatos.,Cat food.
+Text/210/text,"(suspira, aliviada) Por fin.",(sighs with relief) Finally.
+,,
+Text/211/text,(se acerca al escaparate) El cartel de frutas...,(walks up to the shop window) The fruit sign...
+Text/212/text,Es aquí.,This is it.
+Text/213/text,"(busca algo entre los productos expuestos) Ahí, al fondo. Comida para gatos.","(looks through the products on display) There, in the back. Cat food."
+Text/214/text,"(suspira, aliviada) Por fin.",(sighs with relief) Finally.
+,,
+Text/215/text,(mira las escaleras que bajan al metro) Podría volver por donde vine.,(looks at the stairs down to the metro) I could go back the way I came.
+Text/216/text,...[pause=0.6] Pero no sé a dónde me llevaría.,...[pause=0.6] But I don't know where it would take me.
+Text/217/text,Y volver con las manos vacías no es una opción.,And going back empty-handed isn't an option.
+,,
+Text/218/text,(mira las máquinas expendedoras),(looks at the vending machines)
+Text/219/text,"Agua, chicles, papas fritas...","Water, gum, chips..."
+Text/21a/text,(busca entre los botones),(scans the buttons)
+Text/21b/text,...Comida para gatos. Claro. Obviamente no hay.,...Cat food. Sure. Obviously not.
+,,
+Text/21c/text,¿Quién compra discos hoy en día?,Who buys records these days?
+Text/21d/text,(ve a una chica en el mostrador comprando uno),(sees a girl at the counter buying one)
+Text/21e/text,Supongo que gente cool... No como yo.,"Cool people, I guess... Not like me."
+,,

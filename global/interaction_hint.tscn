@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://c1vt0yrj87cuu" path="res://global/interaction_hint.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b5qhqlpqr6fwy" path="res://global/interaction_hint.aseprite" id="2_bubble"]
+
+[node name="InteractionHint" type="Sprite2D"]
+z_index = 10
+texture_filter = 1
+position = Vector2(0, -38)
+texture = ExtResource("2_bubble")
+script = ExtResource("1_script")

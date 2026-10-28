@@ -23,24 +23,46 @@ func _ready() -> void:
 
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
+	# No prompt stays on screen over a dialogue, not even another area's.
+	Dialogic.timeline_started.connect(_on_dialogue_started)
+	Dialogic.timeline_ended.connect(_on_dialogue_ended)
 
 # =========================
 # Prompt visibility
 # =========================
-func _on_area_entered(_area: Area2D) -> void:
-	if not _interaction_enabled:
+## Only Alice's InteractionDetector counts. Other areas on layer 4 (e.g. a
+## pedestrian's talk area walking past) must not show or hide this prompt.
+func _is_player_detector(area: Area2D) -> bool:
+	return area.get_parent() is Player
+
+func _on_area_entered(area: Area2D) -> void:
+	if not _interaction_enabled or not _is_player_detector(area):
 		return
 
 	update_label_text()  # Calls child version if it exists
-	if label:
+	if label and Dialogic.current_timeline == null:
 		label.show()
 
-func _on_area_exited(_area: Area2D) -> void:
-	if not _interaction_enabled:
+func _on_area_exited(area: Area2D) -> void:
+	if not _interaction_enabled or not _is_player_detector(area):
 		return
 
 	if label:
 		label.hide()
+
+func _on_dialogue_started() -> void:
+	if label:
+		label.hide()
+
+## Brings the prompt back if Alice is still standing at this area.
+func _on_dialogue_ended() -> void:
+	if not label or not _interaction_enabled or not monitoring:
+		return
+	for area in get_overlapping_areas():
+		if _is_player_detector(area):
+			update_label_text()
+			label.show()
+			return
 
 # =========================
 # Virtual methods (to override in child classes)

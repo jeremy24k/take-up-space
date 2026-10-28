@@ -1,8 +1,7 @@
-alice: (una chica escribe en su teléfono muy rápido)
-alice: Está hablando con alguien.
-alice: Sonríe a la pantalla.
-alice: (busca su teléfono por costumbre)
-alice: ...
-alice: Ah. Es verdad.
-alice: Wilson debe tener hambre.
-alice: Tengo que encontrar una tienda.
+(Una chica escucha un audio en altavoz.) #id:204
+alice: (alcanza a oír) "...sí, en el minimercado ese, junto a la torre de cristal..." #id:205
+alice: ¿Un minimercado? ¿Junto a la torre? #id:206
+alice: (pausa) Quizá ahí vendan comida para gatos. #id:207
+alice: (pausa) ...Debería ir a mirar. #id:208
+alice: (busca su teléfono por costumbre) #id:209
+alice: ... Ah. Es verdad. No tengo. #id:20a

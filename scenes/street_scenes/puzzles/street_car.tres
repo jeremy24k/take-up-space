@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://c8im65c2f20nu"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://fdci30rfx1pd" path="res://scenes/street_scenes/puzzles/street_car_en.tres" id="2_en"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"explain": PackedStringArray("Solo...", "me estaba...", "arreglando", "el pelo."),
+"sorry": PackedStringArray("Perdón,", "perdón.")
+}
+extra_words = PackedStringArray("mirando", "coche", "nada", "robar")
+prompt = "¿Le explico qué hacía... o pido perdón y me voy?"
+time_limit = 15.0
+mistake_penalty = 2.0
+translations = {
+"en": ExtResource("2_en")
+}

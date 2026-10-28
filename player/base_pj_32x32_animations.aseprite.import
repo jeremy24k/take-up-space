@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://cvqepsk0xiq65"
+path="res://.godot/imported/base_pj_32x32_animations.aseprite-fc385b0399fef6b79662226acf6c93a2.res"
+
+[deps]
+
+source_file="res://player/base_pj_32x32_animations.aseprite"
+dest_files=["res://.godot/imported/base_pj_32x32_animations.aseprite-fc385b0399fef6b79662226acf6c93a2.res"]
+
+[params]
+

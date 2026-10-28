@@ -1,0 +1,106 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/demo_end/demo_end.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_m3x6"]
+[ext_resource type="Script" path="res://global/scene_audio.gd" id="sa_script"]
+[ext_resource type="AudioStream" path="res://audio/music/demo_end_breeze.ogg" id="sa_music"]
+[ext_resource type="Texture2D" path="res://ui/cover.aseprite" id="cover_art"]
+
+[node name="DemoEnd" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Cover" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0)
+texture_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("cover_art")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Box" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ToBeContinued" type="Label" parent="Center/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 64
+text = "Continuará..."
+horizontal_alignment = 1
+
+[node name="Gap" type="Control" parent="Center/Box"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+
+[node name="Thanks" type="Label" parent="Center/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.72, 1, 1)
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 48
+text = "Gracias por jugar"
+horizontal_alignment = 1
+
+[node name="Comment" type="Label" parent="Center/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.55, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 32
+text = "Si te gustó, no olvides dejar un comentario abajo. ¡Me ayudaría mucho! :)"
+horizontal_alignment = 1
+
+[node name="Gap2" type="Control" parent="Center/Box"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Options" type="VBoxContainer" parent="Center/Box"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Restart" type="Label" parent="Center/Box/Options"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 48
+text = "Empezar de nuevo"
+horizontal_alignment = 1
+
+[node name="Quit" type="Label" parent="Center/Box/Options"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_m3x6")
+theme_override_font_sizes/font_size = 48
+text = "Salir"
+horizontal_alignment = 1
+
+[node name="SceneAudio" type="Node" parent="."]
+script = ExtResource("sa_script")
+music = ExtResource("sa_music")

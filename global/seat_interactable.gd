@@ -18,7 +18,7 @@ var sequence_started: bool = false
 # =========================
 func update_label_text() -> void:
 	if label:
-		label.text = "[Espacio] Sentarse"
+		label.text = tr("[Espacio] Sentarse")
 
 # =========================
 # Interaction action

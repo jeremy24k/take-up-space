@@ -1,7 +1,4 @@
-alice: (ve el cojín de Wilson en el suelo)
-alice: El cojín de Wilson...
-alice: Aquí es donde duerme.
-alice: (lo toca con suavidad)
-alice: Todavía está caliente.
-alice: Estaba aquí hace un momento.
-alice: Supongo que se cansó de esperarme.
+alice: (ve el cojín de Wilson en el suelo) El cojín de Wilson... Aquí es donde duerme. #id:ca
+alice: (lo toca con suavidad) Todavía está caliente. #id:cb
+alice: Estaba aquí hace un momento. #id:cc
+alice: Supongo que se cansó de esperarme. #id:cd

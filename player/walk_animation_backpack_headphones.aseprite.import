@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://csnc43xvqlwj0"
+path="res://.godot/imported/walk_animation_backpack_headphones.aseprite-235673c1f4e5c5ccc40ea0f918ef3654.res"
+
+[deps]
+
+source_file="res://player/walk_animation_backpack_headphones.aseprite"
+dest_files=["res://.godot/imported/walk_animation_backpack_headphones.aseprite-235673c1f4e5c5ccc40ea0f918ef3654.res"]
+
+[params]
+

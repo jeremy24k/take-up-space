@@ -1,18 +1,21 @@
 if {GameManager.quest_step} == 0.0:
-	alice: ¿Qué pasa, Wilson?
-	wilson: la mira con los ojos muy abiertos, como si quisiera decirle algo.
-	wilson: señala su plato vacío con el hocico.
-	alice: ¿Tienes hambre?...
-	alice: Mmm... déjame buscarte algo en la cocina.
-	wilson: mueve la cola y la sigue, confiado.
+	alice: ¿Qué pasa, Wilson? #id:c0
+	(Wilson la mira con los ojos muy abiertos y señala su plato vacío con el hocico.) #id:c1
+	alice: ¿Tienes hambre?... Mmm... déjame buscarte algo en la cocina. #id:c2
+	(Wilson mueve la cola y la sigue, confiado.) #id:c3
 	[signal arg="step_1"]
 	[signal arg="wilson_start_follow"]
 elif {GameManager.quest_step}  ==  1.0:
-	alice: Wilson, ya sé que tienes hambre.
-	alice: Estoy yendo a la cocina.
-	wilson: maúlla, pero no se mueve.
-	alice: ¿Vas a venir o te quedas ahí?
-	wilson: se levanta y la sigue lentamente.
+	alice: Wilson, ya sé que tienes hambre. Estoy yendo a la cocina. #id:c4
+	[signal arg="sfx:meow"]
+	(Wilson maúlla, pero no se mueve.) #id:c5
+	alice: ¿Vas a venir o te quedas ahí? #id:c6
+	(Wilson se levanta y la sigue lentamente.) #id:c7
+elif {GameManager.quest_step}  ==  2.0:
+	[signal arg="sfx:meow"]
+	alice: Ya sé, Wilson, ya sé. #id:22a
+	alice: Ahora mismo te pido algo por la computadora. #id:22b
 else:
-	alice: Wilson... maúlla otra vez.
-	alice: No te preocupes. Ya casi salgo.
+	[signal arg="sfx:meow"]
+	alice: Wilson... maúlla otra vez. #id:c8
+	alice: No te preocupes. Ya casi salgo. #id:c9

@@ -16,8 +16,9 @@ extends Node2D
 @export var asleep_animation: String = "sit_asleep"
 ## Time between sitting down and the first sleepy frame.
 @export var sleepy_delay: float = 2.0
-## Time between the sleepy frame and the asleep one.
-@export var asleep_delay: float = 1.5
+## Full cycles of the sleepy (nodding) animation before her head drops. Whole
+## cycles, not seconds: a fixed time cut the nod off halfway.
+@export var sleepy_loops: int = 2
 ## How long the screen, the lights and the sound take to fade out.
 @export var darkening_duration: float = 3.5
 ## Color the scene fades to while Alice falls asleep.
@@ -29,9 +30,11 @@ extends Node2D
 # Awakening configuration
 # =========================
 @export_group("Awakening")
-## Animation played once Alice opens her eyes, signaled by the worker's
-## dialogue (a [signal arg="alice_wakes_up"] event mid-timeline).
+## Animation played backwards, once, when Alice opens her eyes, signaled by
+## the worker's dialogue (a [signal arg="alice_wakes_up"] event mid-timeline).
 @export var awakening_animation: String = "sit_down"
+## Pose she holds afterwards: awake, still sitting.
+@export var awake_animation: String = "sit_down"
 ## Cold tone of the stopped, powered down train car.
 @export var awakening_color: Color = Color(0.28, 0.33, 0.46, 1.0)
 ## How long the car takes to come back into view as she opens her eyes.
@@ -48,8 +51,10 @@ signal player_fell_asleep
 # Emitted once Alice is awake and back in control.
 signal player_woke_up
 
-@onready var camera: Camera2D = $Player/Camera2D
-@onready var player: Player = $Player
+## Alice lives in the y-sorted NPCS container, so she sorts against the
+## worker and the passengers instead of always drawing over them.
+@onready var camera: Camera2D = $Train/NPCS/Player/Camera2D
+@onready var player: Player = $Train/NPCS/Player
 @onready var thought_trigger: ThoughtTrigger = $ThoughtTriggers/InitialThoughtTrigger
 @onready var seat_thought_trigger: ThoughtTrigger = $ThoughtTriggers/SeatThoughtTrigger
 @onready var interactive_container: Node2D = $InteractiveContainer
@@ -74,8 +79,7 @@ func _ready() -> void:
 func _setup_boarding_mode() -> void:
 	# The worker and the open door only exist once the train has stopped.
 	_set_worker_active(false)
-	exit_door.hide()
-	exit_door.set_deferred("monitoring", false)
+	_set_area_active(exit_door, false)
 
 	# Place the player at the door used to enter the train.
 	var door_spawn := get_node_or_null("SpawnContainers/DoorSpawn_%d" % GameManager.target_door_id) as Marker2D
@@ -113,15 +117,17 @@ func _on_player_sat_down(seated_player: Player) -> void:
 	_fall_asleep(seated_player)
 
 func _fall_asleep(seated_player: Player) -> void:
-	# 1. What she thinks once she is settled in the seat.
+	# 1. What she thinks once she is settled in the seat. Then the headphones
+	# go from her neck to her head: she shuts the world out and dozes off.
 	await seat_thought_trigger.show_thought(seated_player)
+	GameManager.set_headphones_on_head(true)
 
 	# 2. Alice starts to nod off.
 	await get_tree().create_timer(sleepy_delay).timeout
 	seated_player.play_animation(sleepy_animation)
 
-	# 3. Her head drops.
-	await get_tree().create_timer(asleep_delay).timeout
+	# 3. Her head drops, at the end of a nod.
+	await seated_player.wait_animation_loops(sleepy_loops)
 	seated_player.play_animation(asleep_animation)
 
 	# 4. Image, shake and sound fade out together.
@@ -158,12 +164,12 @@ func _setup_awakening_mode() -> void:
 	_empty_the_car()
 	interactive_container.hide()
 	for seat in interactive_container.get_children():
-		seat.set_deferred("monitoring", false)
+		if seat is Area2D:
+			_set_area_active(seat, false)
 
 	# The worker steps in and the door opens once the train has stopped.
 	_set_worker_active(true)
-	exit_door.show()
-	exit_door.set_deferred("monitoring", true)
+	_set_area_active(exit_door, true)
 
 func _wake_up(sleeping_player: Player) -> void:
 	# She is already locked from sitting down, and re-locking here would reset
@@ -185,7 +191,8 @@ func _wake_up(sleeping_player: Player) -> void:
 	# her eyes open - a [signal arg="alice_wakes_up"] event mid-timeline.
 	Dialogic.start(worker_timeline)
 	await _wait_for_signal("alice_wakes_up")
-	sleeping_player.play_animation_backwards(awakening_animation)
+	# Not awaited: the conversation goes on while she comes to.
+	_come_to(sleeping_player)
 
 	await Dialogic.timeline_ended
 
@@ -193,6 +200,15 @@ func _wake_up(sleeping_player: Player) -> void:
 	sleeping_player.face_direction(Vector2.DOWN)
 	sleeping_player.unlock_control()
 	player_woke_up.emit()
+
+## The nod played backwards, a single time (it is a looping animation), then
+## she stays sitting, awake.
+func _come_to(waking_player: Player) -> void:
+	waking_player.play_animation_backwards(awakening_animation)
+	await waking_player.wait_animation_loops(1)
+	# Unless the scene already moved her on (e.g. she stood up).
+	if waking_player.player_animation.animation == awakening_animation:
+		waking_player.play_animation(awake_animation)
 
 ## Waits for a specific Dialogic [signal] event, ignoring any other signal
 ## that might fire in the meantime (Dialogic.signal_event is global).
@@ -204,11 +220,11 @@ func _wait_for_signal(expected_argument: String) -> void:
 # =========================
 # Passenger helpers
 # =========================
-## The worker shares the NPCS container with the passengers, so the car is
-## emptied one by one: hiding the container would take him down with it.
+## The worker and Alice share the NPCS container with the passengers, so the
+## car is emptied one by one: hiding the container would take them with it.
 func _empty_the_car() -> void:
 	for passenger in npcs.get_children():
-		if passenger == worker_npc:
+		if passenger == worker_npc or passenger == player:
 			continue
 
 		passenger.hide()
@@ -218,6 +234,18 @@ func _empty_the_car() -> void:
 		var passenger_collision := passenger.get_node_or_null("CollisionShape2D") as CollisionShape2D
 		if passenger_collision:
 			passenger_collision.set_deferred("disabled", true)
+
+# =========================
+# Area helper
+# =========================
+## Hiding an area, or turning its monitoring off, does not stop Alice from
+## using it: her InteractionDetector still finds it while it is monitorable.
+## That let her press Space at the hidden exit while boarding and skip the
+## whole nap (and sit down again after waking up). All three go together.
+func _set_area_active(area: Area2D, is_active: bool) -> void:
+	area.visible = is_active
+	area.set_deferred("monitoring", is_active)
+	area.set_deferred("monitorable", is_active)
 
 # =========================
 # Worker visibility helper

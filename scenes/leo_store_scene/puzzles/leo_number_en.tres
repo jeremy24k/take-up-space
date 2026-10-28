@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dd5gvbo08cmxv"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Hey,", "can I", "have", "your", "number?"),
+"leave": PackedStringArray("Well...", "thanks.")
+}
+extra_words = PackedStringArray("phone", "tuna", "bye", "tomorrow")
+prompt = "Do I ask for his number... or say goodbye?"
+time_limit = 14.0
+mistake_penalty = 2.0

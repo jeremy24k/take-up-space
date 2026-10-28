@@ -1,6 +1,10 @@
-join alice 1
-alice: No puedo irme todavía. Siento que se me olvida algo importante...
-alice: (mira hacia el interior del apartamento)
-alice: Wilson está bien. La casa también.
-alice: Solo voy a echar otro vistazo.
-alice: Después salgo.
+if {GameManager.quest_step} >= 4.0 and GameManager.mirror_practice_done == false:
+	alice: (con la mano en el picaporte, duda) Todavía no. #id:1d
+	alice: Primero el espejo. Un par de frases, nada más. #id:1e
+elif {GameManager.quest_step} == 0.0:
+	[signal arg="sfx:meow"]
+	alice: (oye maullar a Wilson) Wilson está maullando... Debería ver qué le pasa. #id:227
+elif {GameManager.quest_step} < 3.0:
+	alice: Tengo que conseguir comida para Wilson. #id:228
+else:
+	alice: (con la mano en el picaporte) Todavía no puedo. Aún necesito {GameManager.missing_prep_text}. #id:229

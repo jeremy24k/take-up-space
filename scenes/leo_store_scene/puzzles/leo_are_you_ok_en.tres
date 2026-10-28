@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dpv3vbgy7u5pu"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"lie": PackedStringArray("N-no,", "I\'m", "fine."),
+"truth": PackedStringArray("To be", "honest...", "no.", "I", "got lost.")
+}
+extra_words = PackedStringArray("Yes...", "metro", "sorry", "cat")
+prompt = "Do I tell him the truth... or that I'm fine?"
+time_limit = 15.0
+mistake_penalty = 2.0

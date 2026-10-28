@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="1_base"]
+[ext_resource type="Script" path="res://global/remark_interactable.gd" id="2_script"]
+
+[node name="RemarkInteractable" instance=ExtResource("1_base")]
+script = ExtResource("2_script")

@@ -1,4 +1,3 @@
-alice: Mi cena de ayer...
-alice: (se acerca, lo mira)
-alice: Debería haberla lavado anoche.
-alice: Ya tiene moscas.
+alice: Mi cena de ayer... #id:ae
+alice: (se acerca, la mira) Debería haberla lavado anoche. #id:af
+alice: Ya tiene moscas. #id:b0

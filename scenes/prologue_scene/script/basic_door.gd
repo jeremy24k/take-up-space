@@ -10,6 +10,13 @@ extends StaticBody2D
 @onready var detector_area: Area2D = $DetectorArea
 
 # =========================
+# Sound
+# =========================
+## Played every time the door opens. Empty = a silent door.
+@export var open_sound: AudioStream = preload("res://audio/sfx/door_open.ogg")
+@export_range(-40.0, 12.0, 0.5, "suffix:dB") var open_volume_db: float = -8.0
+
+# =========================
 # Runtime state guards
 # =========================
 # Track how many bodies are inside to handle multiple characters.
@@ -37,7 +44,8 @@ func _on_area_2d_body_entered(_body: Node2D) -> void:
 
 	# Open door if it was closed (first body enters).
 	if bodies_inside == 1:
-		sprite_door.play("open_door") 
+		sprite_door.play("open_door")
+		play_open_sound()
 		collision_door.set_deferred("disabled", true)
 		print("Door opened by: ", _body.name)
 
@@ -54,6 +62,10 @@ func _on_area_2d_body_exited(_body: Node2D) -> void:
 		sprite_door.play("closed_door") 
 		collision_door.set_deferred("disabled", false)
 		print("Door closed")
+
+func play_open_sound() -> void:
+	if open_sound:
+		SoundManager.play_sfx(open_sound, open_volume_db)
 
 # =========================
 # Body filter helper

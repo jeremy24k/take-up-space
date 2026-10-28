@@ -1,7 +1,7 @@
 {
 "@path": "res://addons/dialogic/Resources/character.gd",
 "@subpath": NodePath(""),
-&"_translation_id": "",
+&"_translation_id": "21f",
 &"color": Color(0.75686276, 0.5411765, 0.92156863, 1),
 &"custom_info": {
 "prefix": "",
@@ -10,12 +10,67 @@
 "style": "",
 "suffix": ""
 },
-&"default_portrait": "",
+&"default_portrait": "nervous",
 &"description": "",
 &"display_name": "Alice",
 &"mirror": false,
 &"nicknames": [""],
 &"offset": Vector2(0, 0),
-&"portraits": {},
+&"portraits": {
+"nervous": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_nervous.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"neutral": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_neutral.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"relaxed": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_relaxed.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"scared": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_scared.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"shocked": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_shocked.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"worried": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/alice/alice_worried.png\""
+},
+"mirror": false,
+"offset": Vector2(40, 0),
+"scale": 0.832,
+"scene": ""
+}
+},
 &"scale": 1.0
 }

@@ -1,6 +1,9 @@
 join wilson 3
-wilson: ¡Miau!
-join alice 1
-alice: No, Wilson... tú te quedas aquí cuidando la casa.
-wilson: ¿Miau...?
-alice: Vuelvo pronto, te lo prometo. Pórtate bien.
+[signal arg="sfx:meow"]
+wilson: ¡Miau! #id:d7
+join alice (worried) leftmost
+alice: No, Wilson... tú te quedas aquí cuidando la casa. #id:d8
+[signal arg="sfx:meow"]
+wilson: ¿Miau...? #id:d9
+alice: Vuelvo pronto, te lo prometo. Pórtate bien. #id:da
+leave alice

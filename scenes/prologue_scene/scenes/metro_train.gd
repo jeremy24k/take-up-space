@@ -4,6 +4,10 @@ extends Node2D
 # Train movement configuration
 # =========================
 @export var arrival_time: float = 4.0
+## Seconds after pulling away before fading to next_scene_path. Alice is
+## already on board and out of sight, so waiting for the whole departure
+## (arrival_time * 1.5) left ~10 s of empty platform that looked like a hang.
+@export var fade_after_leaving: float = 1.2
 @export var station_position_x: float = 0.0
 ## Scene loaded once the train pulls away. Leave empty to just depart with
 ## no follow-up (e.g. an already-boarded train leaving an arrival platform).
@@ -60,7 +64,7 @@ func close_doors() -> void:
 	interactive_areas.visible = false
 
 	# Wait for the doors to close.
-	await get_tree().create_timer(2.0).timeout
+	await get_tree().create_timer(1.0).timeout
 	leave_station()
 
 func leave_station() -> void:
@@ -71,10 +75,13 @@ func leave_station() -> void:
 
 	tween.tween_property(self, "position:x", leave_station_position_x, arrival_time * 1.5)
 
+	# With Alice on board, cut to the next scene as soon as the train moves.
+	if next_scene_path != "":
+		await get_tree().create_timer(fade_after_leaving).timeout
+		train_leaving_station.emit()
+		FadeTransition.transition_to_scene(next_scene_path)
+		return
+
 	await tween.finished
 	train_leaving_station.emit()
-
 	print("Train has left the station.")
-
-	if next_scene_path != "":
-		FadeTransition.transition_to_scene(next_scene_path)

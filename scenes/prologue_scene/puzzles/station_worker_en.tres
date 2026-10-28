@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://b12wd4pkrcv4t"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("What", "station", "is", "this?"),
+"leave": PackedStringArray("Nothing...", "sorry.")
+}
+extra_words = PackedStringArray("train", "home", "asleep")
+prompt = "Do I ask where I am... or let it go?"
+time_limit = 18.0
+mistake_penalty = 2.0

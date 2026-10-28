@@ -1,19 +1,28 @@
 if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
-	alice: ¿Qué hacen mis zapatos aquí?
-	alice: (los mira, confundida)
-	alice: Wilson...
-	alice: (suspira, pero no con enfado)
-	alice: Siempre juegas con ellos, ¿verdad?
-	alice: ¿Cuántas veces te he dicho que no son un juguete?
-	wilson: la mira desde la puerta, con una expresión de "no me arrepiento".
-	alice: (sonríe a pesar de todo)
-	alice: Bueno. Al menos los encontré.
-	alice: Listo. Ahora sí.
+	alice: ¿Qué hacen mis zapatos aquí? #id:2f
+	alice: (los mira, confundida) Wilson... #id:30
+	alice: (suspira, pero no con enfado) Siempre juegas con ellos, ¿verdad? #id:31
+	alice: ¿Cuántas veces te he dicho que no son un juguete? #id:32
+	(Wilson la mira desde la puerta, con una expresión de "no me arrepiento".) #id:33
+	join alice (relaxed) leftmost
+	alice: (sonríe a pesar de todo) Bueno. Al menos los encontré. #id:34
+	leave alice
 	[signal arg="item_picked:alice_shoes"]
+	if GameManager.has_all_prep_items():
+		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme. #id:35
+		join alice (worried) leftmost
+		alice: Ojalá me emocionara. #id:36
+		alice: Quizás, si espero un poco... #id:37
+		[signal arg="sfx:meow"]
+		(Wilson maúlla, impaciente.) #id:38
+		update alice (neutral)
+		alice: No. Wilson me necesita. Lo voy a hacer. #id:39
+		update alice (nervous)
+		alice: Pero antes... un par de frases frente al espejo del baño. #id:3a
+		alice: Por si alguien me habla. Por si acaso. #id:3b
+		leave alice
+		[signal arg="step_4"]
 else:
-	alice: (ve los zapatos en el baño)
-	alice: Mis zapatos... ¿por qué están aquí?
-	alice: (piensa un momento)
-	alice: Ah, Wilson.
-	alice: (los mira, pero no se los pone)
-	alice: Supongo que los recogeré cuando los necesite.
+	alice: (ve los zapatos en el baño) Mis zapatos... ¿por qué están aquí? #id:3c
+	alice: (piensa un momento) Ah, Wilson. #id:3d
+	alice: (los mira, pero no se los pone) Supongo que los recogeré cuando los necesite. #id:3e

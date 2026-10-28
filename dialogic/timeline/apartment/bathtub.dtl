@@ -1,9 +1,7 @@
-alice: (ve la bañera con agua)
-alice: El agua sigue ahí...
-alice: La dejé anoche y no la vacié.
-alice: (ve el patito de hule flotando)
-alice: Y tú... sigues aquí también.
-alice: (lo toma, lo mira un momento)
-alice: No sé por qué no te tiro.
-alice: (lo deja flotar de nuevo)
-alice: Supongo que me gusta tenerte cerca.
+alice: (ve la bañera con agua) El agua sigue ahí... #id:6e
+alice: La dejé anoche y no la vacié. #id:6f
+alice: (ve el patito de hule flotando) Y tú... sigues aquí también. #id:70
+join alice (relaxed) leftmost
+alice: (lo toma, lo mira un momento) No sé por qué no te tiro. #id:71
+alice: (lo deja flotar de nuevo) Supongo que me gusta tenerte cerca. #id:72
+leave alice

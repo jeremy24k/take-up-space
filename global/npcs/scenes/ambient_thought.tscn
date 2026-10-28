@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://global/remark_interactable.tscn" id="1_remark"]
+[ext_resource type="Script" path="res://global/npcs/scripts/ambient_thought.gd" id="2_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_reach"]
+radius = 16.0
+
+[node name="AmbientThought" instance=ExtResource("1_remark")]
+script = ExtResource("2_script")
+
+[node name="CollisionShape2D" parent="." index="0"]
+shape = SubResource("CircleShape2D_reach")

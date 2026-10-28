@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.spriteframes-split-layer"
+type="SpriteFrames"
+uid="uid://bbv0ya3gr5npt"
+path="res://.godot/imported/alice_headphones_head.ase_layer-96a57b11db1ac86ecf5549c2ede4f80e.res"
+
+[deps]
+
+source_file="res://player/alice_layers/alice_headphones_head.ase_layer"
+dest_files=["res://.godot/imported/alice_headphones_head.ase_layer-96a57b11db1ac86ecf5549c2ede4f80e.res"]
+
+[params]
+

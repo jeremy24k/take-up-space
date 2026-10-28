@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="RemarkPool" format=3 uid="uid://dph764nuocydh"]
+
+[ext_resource type="Script" uid="uid://r4s4jtq4upd" path="res://global/remark_pool.gd" id="1_pool"]
+
+[resource]
+script = ExtResource("1_pool")
+lines = Array[String](["Está en lo suyo.", "Mejor no molesto.", "Ni me ha mirado.", "Parece que tiene prisa.", "No... mejor no.", "No sabría qué decir.", "Mejor no interrumpo.", "Otro día, quizás."])

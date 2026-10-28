@@ -1,10 +1,23 @@
-alice: (se acerca al trabajador)
-alice: (susurrando) Disculpe...
-alice: ...
-alice: Eh... disculpe.
-metro_worker: (levanta la vista, confundido)
-metro_worker: ¿Qué?
-alice: Nada... perdón.
-alice: (se aleja rápidamente)
-alice: (suspira)
-alice: Qué vergüenza.
+alice: (se acerca al trabajador, susurrando) Disculpe... #id:18e
+alice: ...[pause=0.8] Eh... disculpe. #id:18f
+metro_worker: (levanta la vista de sus papeles) ¿Sí? #id:190
+[signal arg="anxiety_puzzle:station_worker"]
+if {anxiety_result} == "ask":
+	alice: ¿Qué... estación es esta? #id:191
+	metro_worker: Terminal. Fin de línea. #id:192
+	metro_worker: (vuelve a sus papeles) La salida, por las escaleras. #id:193
+	join alice (relaxed) leftmost
+	alice: G-gracias. #id:194
+	alice: (suelta el aire) Lo dije. Le pregunté a alguien. #id:195
+	leave alice
+else:
+	if {anxiety_result} == "leave":
+		alice: Nada... perdón. #id:196
+	else:
+		alice: (abre la boca, pero no le sale nada) #id:197
+		metro_worker: (la mira un segundo y vuelve a sus papeles) #id:198
+	join alice (nervous) leftmost
+	alice: (se aleja rápidamente) #id:199
+	alice: En el espejo era más fácil... #id:19a
+	alice: (suspira) Qué vergüenza. #id:19b
+	leave alice

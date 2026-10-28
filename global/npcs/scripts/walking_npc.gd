@@ -35,14 +35,56 @@ var facing: Vector2 = Vector2.DOWN
 ## When on, the owning scene freezes this NPC while Alice talks to it. Turn
 ## it off for passers-by that should keep walking as if they never noticed her.
 @export var stops_when_talked_to: bool = true
+## Animation played while it is stopped for a dialogue (e.g. the street cat's
+## "meow"). Empty = it just freezes on its current frame.
+@export var talk_animation: String = ""
+## Distance (px) at which it stops walking and turns to Alice, so a passer-by
+## gives the player time to press Space. It walks on once she is a bit
+## further away. 0 = never stops.
+@export var pause_near_player: float = 0.0
+
+## Extra distance before walking on again, so it does not stutter at the edge.
+const PAUSE_HYSTERESIS: float = 12.0
+
+var _walk_tween: Tween
+var _walk_direction := Vector2.ZERO
+var _paused_for_player: bool = false
 
 # =========================
-# Route configuration
+# Pausing near Alice
 # =========================
-## Waypoints walked in order (drag Marker2D nodes here, reorder freely) before
-## reaching the final destination - lets a route step around a corner or a
-## wall instead of cutting through it. Leave empty for a straight line.
-@export var route_waypoints: Array[Marker2D] = []
+func _physics_process(_delta: float) -> void:
+	if pause_near_player <= 0.0 or _walk_tween == null or not _walk_tween.is_valid():
+		return
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		return
+	var distance := global_position.distance_to(player.global_position)
+	if not _paused_for_player and distance <= pause_near_player:
+		_paused_for_player = true
+		_walk_tween.pause()
+		face_direction(global_position.direction_to(player.global_position))
+	elif _paused_for_player and distance <= pause_near_player + PAUSE_HYSTERESIS:
+		# Keeps looking at her if she walks around it.
+		face_direction(global_position.direction_to(player.global_position))
+	elif _paused_for_player:
+		_paused_for_player = false
+		_play_animation("walk_" + _direction_suffix(_walk_direction))
+		_walk_tween.play()
+
+# =========================
+# Patrol configuration
+# =========================
+@export_group("Patrol")
+## Points walked in order, then back, forever, once the scene calls
+## start_patrol(). Drag Marker2D nodes here (two or more) and reorder freely;
+## each leg is a straight line, so add a point to go round a corner. Keep the
+## markers outside the NPC (e.g. a PedestrianRoutes folder): as its children
+## they would move with it.
+@export var patrol_points: Array[Marker2D] = []
+@export var patrol_speed: float = 28.0
+## Seconds it rests at each end of the route, facing the camera.
+@export var patrol_pause: float = 2.5
 
 # =========================
 # Facing and animation
@@ -58,7 +100,16 @@ func face_direction(direction: Vector2) -> void:
 	if direction == Vector2.ZERO:
 		return
 	facing = direction
-	_play_animation("idle_" + _direction_suffix(direction))
+	var idle := "idle_" + _direction_suffix(direction)
+	if sprite.sprite_frames.has_animation(idle):
+		sprite.play(idle)
+	elif sprite.sprite_frames.has_animation("idle_front"):
+		# Several sprites only have a front idle (e.g. the street pedestrians):
+		# standing still facing the camera beats sliding in a walk cycle.
+		sprite.flip_h = false
+		sprite.play("idle_front")
+	else:
+		sprite.stop()
 
 func _direction_suffix(direction: Vector2) -> String:
 	# Side movement has priority and controls horizontal flip.
@@ -108,15 +159,28 @@ func walk_path(points: Array[Vector2], speed: float = DEFAULT_WALK_SPEED) -> voi
 		face_direction(last_direction)
 	collision_layer = SOLID_COLLISION_LAYER
 
-## Walks through route_waypoints (in the order set in the inspector), then to
-## target_position. With no waypoints, this is the same as walk_to().
-func walk_route(target_position: Vector2, speed: float = DEFAULT_WALK_SPEED) -> void:
+## Walks patrol_points forward, then backwards, forever, resting
+## patrol_pause seconds at each end. Starts at the first point. Does nothing
+## with fewer than two points.
+func start_patrol() -> void:
 	var points: Array[Vector2] = []
-	for waypoint in route_waypoints:
-		if waypoint:
-			points.append(waypoint.global_position)
-	points.append(target_position)
-	await walk_path(points, speed)
+	for marker in patrol_points:
+		if marker:
+			points.append(marker.global_position)
+	if points.size() < 2:
+		return
+	global_position = points[0]
+	var forward := true
+	while is_inside_tree():
+		var leg: Array[Vector2] = points.duplicate()
+		if not forward:
+			leg.reverse()
+		leg.remove_at(0)
+		await walk_path(leg, patrol_speed)
+		# Walkers only walk sideways; they rest facing the camera.
+		face_direction(Vector2.DOWN)
+		await get_tree().create_timer(patrol_pause).timeout
+		forward = not forward
 
 ## One leg of movement: tweens straight to target_position while playing the
 ## matching walk animation. Returns the direction walked (Vector2.ZERO if
@@ -126,11 +190,22 @@ func _walk_leg(target_position: Vector2, speed: float) -> Vector2:
 	if direction == Vector2.ZERO:
 		return Vector2.ZERO
 
-	_play_animation("walk_" + _direction_suffix(direction))
+	_walk_direction = direction
+	if _paused_for_player:
+		# A new leg started while she was standing next to it: start it paused.
+		face_direction(global_position.direction_to(_player_position()))
+	else:
+		_play_animation("walk_" + _direction_suffix(direction))
 
 	var distance := global_position.distance_to(target_position)
-	var tween := create_tween()
-	tween.tween_property(self, "global_position", target_position, distance / speed)
-	await tween.finished
+	_walk_tween = create_tween()
+	_walk_tween.tween_property(self, "global_position", target_position, distance / speed)
+	if _paused_for_player:
+		_walk_tween.pause()
+	await _walk_tween.finished
 
 	return direction
+
+func _player_position() -> Vector2:
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	return player.global_position if player else global_position + _walk_direction

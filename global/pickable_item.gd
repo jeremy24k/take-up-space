@@ -23,9 +23,9 @@ func _ready() -> void:
 func update_label_text() -> void:
 	if label:
 		if GameManager.quest_step >= 3 and _can_be_interacted_with():
-			label.text = "[Recoger]"
+			label.text = tr("[Recoger]")
 		else:
-			label.text = "[Espacio]"
+			label.text = tr("[Espacio]")
 
 func interact() -> void:
 	# Always allow the dialogue to explain why the item is unavailable.
@@ -34,7 +34,9 @@ func interact() -> void:
 func _can_be_interacted_with() -> bool:
 	if GameManager.quest_step < 3:
 		return false
-	return item_id == "alice_backpack" or GameManager.are_prep_items_unlocked()
+	# Every prep item, the backpack included, is picked up once Alice has
+	# checked the backpack (she slings it on right then).
+	return GameManager.are_prep_items_unlocked()
 
 # =========================
 # Dialogic event handling

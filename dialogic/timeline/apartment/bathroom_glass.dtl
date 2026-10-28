@@ -1,11 +1,69 @@
-alice: (se acerca al espejo del lavamanos)
-alice: (mira su reflejo)
-alice: Hola, Alice.
-alice: (se inclina un poco más, como si buscara algo en su rostro)
-alice: Tienes ojeras.
-alice: Otra vez.
-alice: (se endereza y se arregla un mechón de pelo)
-alice: No dormiste bien, ¿verdad?
-alice: (suspira)
-alice: Bueno. Nadie va a mirarte tan de cerca hoy.
-alice: O al menos eso espero.
+if GameManager.mirror_practice_done:
+	alice: (mira su reflejo un segundo) Ya. Basta de practicar. #id:4d
+	alice: Wilson está esperando. #id:4e
+elif {GameManager.quest_step} >= 4.0:
+	if GameManager.mirror_seen:
+		alice: (vuelve al espejo) Hola otra vez, Alice. #id:4f
+	else:
+		alice: (se pone frente al espejo del lavamanos) Hola, Alice. #id:50
+	join alice (nervous) leftmost
+	alice: (respira hondo) Vale. Un par de frases. Como si fuera de verdad. #id:51
+	alice: Primero algo fácil. Entro a una tienda y... #id:52
+	leave alice
+	[signal arg="anxiety_puzzle:practice_store"]
+	if {anxiety_result} == "ask":
+		alice: ¿Tienen comida para gatos? #id:53
+		join alice (relaxed) leftmost
+		alice: (asiente a su reflejo) Eso no estuvo tan mal. #id:54
+	else:
+		alice: (abre la boca... y la vuelve a cerrar) #id:55
+		join alice (nervous) leftmost
+		alice: (se tapa la cara) Vamos, Alice. Era una frase. #id:56
+	alice: Ahora... preguntar cómo llegar al metro. Por si me pierdo. #id:57
+	leave alice
+	[signal arg="anxiety_puzzle:practice_directions"]
+	if {anxiety_result} == "ask":
+		alice: Perdone, ¿dónde está el metro? #id:58
+		join alice (relaxed) leftmost
+		alice: (se endereza) Clara. Educada. Bien. #id:59
+	elif {anxiety_result} == "fumble":
+		alice: ¿Dónde estoy yo? #id:5a
+		join alice (relaxed) leftmost
+		alice: (se ríe sola) No. Así no se pregunta. #id:5b
+	else:
+		alice: (se queda callada) #id:5c
+		join alice (nervous) leftmost
+		alice: Ni frente al espejo me sale... #id:5d
+	alice: Y si alguien me pregunta... #id:5e
+	update alice (worried)
+	alice: "¿Estás bien?" #id:5f
+	leave alice
+	[signal arg="anxiety_puzzle:practice_are_you_ok"]
+	if {anxiety_result} == "truth":
+		alice: No mucho, la verdad. #id:60
+		join alice (shocked) leftmost
+		alice: (sorprendida de sí misma) Al espejo sí se lo puedo decir. #id:61
+	elif {anxiety_result} == "lie":
+		alice: Sí, estoy bien. #id:62
+		join alice (worried) leftmost
+		alice: (su reflejo no parece muy convencido) #id:63
+	else:
+		alice: (se queda mirando su reflejo, sin decir nada) #id:64
+		join alice (worried) leftmost
+		alice: ...Callarse también es una respuesta. Supongo. #id:65
+	update alice (nervous)
+	alice: (suspira) Bueno. Con eso alcanza. #id:66
+	alice: Allá afuera no va a ser igual. Pero algo es algo. #id:67
+	leave alice
+	[signal arg="mirror_practice_done"]
+else:
+	alice: (se acerca al espejo del lavamanos, mira su reflejo) Hola, Alice. #id:68
+	join alice (scared) leftmost
+	alice: (se inclina un poco más, como si buscara algo en su rostro) Tienes ojeras. #id:69
+	alice: Otra vez. #id:6a
+	alice: (se endereza y se arregla un mechón de pelo) No dormiste bien, ¿verdad? #id:6b
+	update alice (nervous)
+	alice: (suspira) Bueno. Nadie va a mirarte tan de cerca hoy. #id:6c
+	alice: O al menos eso espero. #id:6d
+	leave alice
+	[signal arg="mirror_seen"]

@@ -1,23 +1,38 @@
 class_name ThoughtTrigger
 extends Area2D
 
-@export var thought_text: String = "I'm thinking..."
+# =========================
+# Thought configuration
+# =========================
+## A spontaneous thought of Alice's: it fires when she steps on the area (or
+## from code with show_thought) and shows in the thought cloud at the top of
+## the screen (ThoughtBox, the Dialogic "thought" style). It never stops her.
+@export var thought_text: String = ""
 @export var thought_lines: Array[String] = []
-@export var display_duration: float = 2.5
+## Base seconds each line stays up (plus a little per character).
+@export var display_duration: float = ThoughtBox.DEFAULT_HOLD_BASE
 @export var trigger_once: bool = true
+## If another thought is still on screen, wait for it to end instead of
+## cutting it off (by default a new thought replaces the current one).
+@export var wait_for_current: bool = false
+## Walks in that are ignored before the thought fires: 1 = only from the
+## second time she passes ("Ya pasé por aquí. Creo.").
+@export var skip_visits: int = 0
 
-@onready var label_template: Label = $Label
+var _visits: int = 0
 
-# Shared by every trigger, so a new thought can cancel the one still running.
-static var active_sequence_id: int = 0
-
+# =========================
+# Lifecycle
+# =========================
 func _ready() -> void:
-	label_template.hide()
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node2D) -> void:
 	var player := body as Player
 	if not player:
+		return
+	_visits += 1
+	if _visits <= skip_visits:
 		return
 
 	if trigger_once:
@@ -26,77 +41,23 @@ func _on_body_entered(body: Node2D) -> void:
 
 	show_thought(player)
 
-# Coroutine: can be awaited to know when every thought line is over.
-func show_thought(player_node: Player) -> void:
+# =========================
+# Showing the thought
+# =========================
+## Coroutine: can be awaited to know when every line is over. The player is
+## not used by the cloud itself; it stays in the signature for the callers
+## (and for effects tied to Alice later on).
+func show_thought(_player_node: Player = null) -> void:
 	var lines: Array[String] = []
 	if thought_lines.is_empty():
 		lines.append(thought_text)
 	else:
 		lines = thought_lines
-	await _play_thought_sequence(player_node, lines)
 
-func _play_thought_sequence(player_node: Player, lines: Array[String]) -> void:
-	# 1. Take ownership: any sequence still running on Alice is now stale.
-	active_sequence_id += 1
-	var sequence_id: int = active_sequence_id
+	if wait_for_current:
+		while ThoughtBox.is_showing():
+			await get_tree().process_frame
+			if not is_inside_tree():
+				return
 
-	# 2. Remove the thought bubble Alice may already be showing.
-	_clear_active_bubble(player_node)
-
-	# Create one bubble and reuse it for every line.
-	var new_label: Label = label_template.duplicate() as Label
-	new_label.name = "ThoughtBubble"
-	
-	# Add the copy directly as a child of Alice.
-	player_node.add_child(new_label)
-	
-	# 3. Size and word wrapping setup.
-	var max_width: float = 110.0
-	new_label.custom_minimum_size = Vector2(max_width, 0.0)
-	new_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	new_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	
-	# Force the real size to be recalculated from the number of lines.
-	new_label.reset_size()
-	
-	# 4. Dynamic positioning ABOVE the character.
-	# Subtracting new_label.size.y keeps the BOTTOM of the text above her head.
-	var base_height_above_head: float = 24.0 # Height of the bubble above the character.
-	new_label.position = Vector2(-max_width / 2.0, -new_label.size.y - base_height_above_head)
-	
-	# Show each line in order using the same bubble.
-	for line in lines:
-		if line.is_empty():
-			continue
-
-		new_label.text = line
-		new_label.reset_size()
-		new_label.position = Vector2(-max_width / 2.0, -new_label.size.y - base_height_above_head)
-		new_label.show()
-		new_label.modulate.a = 0.0
-
-		var tween := player_node.create_tween()
-		tween.tween_property(new_label, "modulate:a", 1.0, 0.3)
-		tween.tween_interval(display_duration)
-		tween.tween_property(new_label, "modulate:a", 0.0, 0.4)
-		await tween.finished
-
-		# A newer thought took over while this line was playing, and it already
-		# freed this bubble. Leaving now avoids touching a dead instance.
-		if sequence_id != active_sequence_id:
-			return
-
-	new_label.queue_free()
-
-# =========================
-# Bubble cleanup
-# =========================
-func _clear_active_bubble(player_node: Player) -> void:
-	var bubble := player_node.get_node_or_null("ThoughtBubble")
-	if not bubble:
-		return
-
-	# Detaching first releases the name, so the next bubble can reuse it
-	# instead of being renamed to "ThoughtBubble2" by the engine.
-	player_node.remove_child(bubble)
-	bubble.queue_free()
+	await ThoughtBox.say(lines, false, display_duration)

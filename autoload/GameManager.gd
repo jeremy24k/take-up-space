@@ -12,6 +12,11 @@ var prep_items_unlocked: bool = false
 # False once she realizes she left her phone on the train.
 var has_phone: bool = true
 
+# Bathroom mirror: she has looked at herself once ("Tienes ojeras"), and she
+# has rehearsed in front of it before leaving (the door waits for this).
+var mirror_seen: bool = false
+var mirror_practice_done: bool = false
+
 @export var quest_step: int = 0
 var collected_items: Array[String] = []  # List of collected item IDs
 
@@ -23,6 +28,68 @@ var missing_prep_items: Array[String] = [  # Items needed before the quest can s
 
 var wilson: Wilson = null
 
+# =========================
+# Street clues
+# =========================
+# IDs of the clues about Leo's store Alice has already seen (e.g. "delivery").
+var found_clues: Array[String] = []
+## Street beats that play only once, even if Alice comes back from Leo's store.
+var street_arrival_seen: bool = false
+var glass_tower_seen: bool = false
+## The arguing couple stepped aside: the zebra crossing by the café stays free.
+var street_couple_cleared: bool = false
+## Times Alice chose to wait at the couple: each wait overhears a new bit of
+## their fight (street_couple.dtl branches on it).
+var street_couple_waits: int = 0
+## The dusty car's owner drove off with Alice's cat drawing: the car is gone.
+var street_car_gone: bool = false
+
+# Emitted the first time each clue is found (the street's "lost" reminder
+# restarts its clock on it).
+signal clue_added(clue_id: String)
+
+func add_clue(clue_id: String) -> void:
+	if not found_clues.has(clue_id):
+		found_clues.append(clue_id)
+		clue_added.emit(clue_id)
+
+func has_any_clue(clue_ids: Array[String]) -> bool:
+	for clue_id in clue_ids:
+		if found_clues.has(clue_id):
+			return true
+	return false
+
+# =========================
+# Seen object types
+# =========================
+# RemarkInteractable group ids (e.g. "vending") Alice has already looked at,
+# in any scene. The first one of a type gets its full scene, the rest a
+# one-line remark ("Otra máquina...").
+var seen_object_groups: Array[String] = []
+
+func has_seen_group(group_id: String) -> bool:
+	return seen_object_groups.has(group_id)
+
+func mark_group_seen(group_id: String) -> void:
+	if not seen_object_groups.has(group_id):
+		seen_object_groups.append(group_id)
+
+# =========================
+# Leo's store
+# =========================
+var leo_greeted: bool = false
+var leo_crush_thought_shown: bool = false
+var leo_has_tuna: bool = false
+var leo_talk_done: bool = false
+## Trust Alice builds with Leo through her choices. Saved for later scenes.
+var leo_confidence: int = 0
+## True if Alice asked for Leo's number herself instead of waiting for him.
+var leo_alice_took_initiative: bool = false
+## True if Alice gave Leo her own number.
+var leo_gave_number: bool = false
+## True once Alice told Leo her cat is called Wilson.
+var leo_knows_wilson: bool = false
+
 # Emitted every time the quest step changes.
 signal quest_step_changed(new_step: int)
 
@@ -31,6 +98,29 @@ signal quest_step_changed(new_step: int)
 # =========================
 func _ready() -> void:
 	Dialogic.signal_event.connect(_on_dialogic_signal)
+
+# =========================
+# New game
+# =========================
+## Not state: a live node and a computed text.
+const NOT_RESET: PackedStringArray = ["wilson", "missing_prep_text"]
+
+## Puts every piece of state back to how a new game starts (the demo end's
+## "Empezar de nuevo"). The defaults come from a fresh copy of this script
+## (Script.get_property_default_value only knows @export ones), so a variable
+## added later is reset too without touching this.
+func reset() -> void:
+	var fresh: Node = get_script().new()
+	for property in get_script().get_script_property_list():
+		if not property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE or property.name in NOT_RESET:
+			continue
+		var value: Variant = fresh.get(property.name)
+		if value is Array or value is Dictionary:
+			value = value.duplicate(true)
+		set(property.name, value)
+	fresh.free()
+	quest_step_changed.emit(quest_step)
+	outfit_changed.emit()
 
 # =========================
 # Dialogic event handling
@@ -50,9 +140,37 @@ func _on_dialogic_signal(argument: String) -> void:
 			prep_items_unlocked = true
 		"no_phone":
 			has_phone = false
+		"mirror_seen":
+			mirror_seen = true
+		"mirror_practice_done":
+			mirror_practice_done = true
 		"step_4":
 			if quest_step == 3 and has_all_prep_items():  # All required items collected
 				set_quest_step(4)
+		"leo_greeted":
+			leo_greeted = true
+		"leo_tuna_taken":
+			leo_has_tuna = true
+		"leo_took_initiative":
+			leo_alice_took_initiative = true
+		"leo_number":
+			add_item("leo_number")
+		"leo_gave_number":
+			leo_gave_number = true
+		"leo_knows_wilson":
+			leo_knows_wilson = true
+		"leo_talk_done":
+			leo_talk_done = true
+		"couple_waited":
+			street_couple_waits += 1
+		"headphones_on":
+			set_headphones_on_head(true)
+		"headphones_off":
+			set_headphones_on_head(false)
+		_:
+			# "leo_confidence:<amount>", e.g. "leo_confidence:-1".
+			if argument.begins_with("leo_confidence:"):
+				leo_confidence += int(argument.get_slice(":", 1))
 
 # =========================
 # Quest progression
@@ -69,8 +187,26 @@ func add_item(item_id: String) -> void:
 	if not collected_items.has(item_id):
 		collected_items.append(item_id)
 		print("Item added to GameManager: ", item_id)
-		get_missing_items_count()
 		print("Missing items: ", get_missing_items_count())
+		outfit_changed.emit()
+
+# =========================
+# Outfit
+# =========================
+## What Alice wears follows what she picked up (shoes, backpack, headphones).
+## The headphones hang around her neck, and only go on her head at specific
+## moments: she puts them on to sleep on the train and takes them off when she
+## gets off, lost. Dialogic: [signal arg="headphones_on"] / "headphones_off".
+var headphones_on_head: bool = false
+
+## Emitted when anything Alice wears changes; the Player redraws its layers.
+signal outfit_changed
+
+func set_headphones_on_head(on_head: bool) -> void:
+	if headphones_on_head == on_head:
+		return
+	headphones_on_head = on_head
+	outfit_changed.emit()
 
 func is_item_collected(item_id: String) -> bool:
 	return collected_items.has(item_id)
@@ -87,5 +223,40 @@ func has_all_prep_items() -> bool:
 			return false
 	return true
 
+## What Alice still lacks to leave, in words for the blocked front door
+## (alice_cant_leave_yet.dtl: {GameManager.missing_prep_text}). Before she
+## opens the backpack she only knows she needs the backpack; after, the items
+## still missing ("la cartera y los zapatos"). In the player's language.
+var missing_prep_text: String:
+	get:
+		var names: Array[String] = []
+		if not prep_items_unlocked:
+			names.append(_prep_item_name("alice_backpack"))
+		else:
+			for item_id in missing_prep_items:
+				if not is_item_collected(item_id):
+					names.append(_prep_item_name(item_id))
+		if names.size() <= 1:
+			return "".join(names)
+		return "%s %s %s" % [", ".join(names.slice(0, -1)), tr("y"), names[-1]]
+
+func _prep_item_name(item_id: String) -> String:
+	match item_id:
+		"alice_backpack":
+			return tr("la mochila")
+		"alice_wallet":
+			return tr("la cartera")
+		"alice_headphones":
+			return tr("los auriculares")
+		"alice_shoes":
+			return tr("los zapatos")
+	return item_id
+
+## Counts only the prep items still missing. The backpack (and any other item)
+## also lands in collected_items, so subtracting sizes went negative.
 func get_missing_items_count() -> int:
-	return missing_prep_items.size() - collected_items.size()
+	var missing: int = 0
+	for item_id in missing_prep_items:
+		if not is_item_collected(item_id):
+			missing += 1
+	return missing

@@ -1,0 +1,10 @@
+[signal arg="leo_wave"]
+leo: ¡Bienvenida! #id:136
+join alice (nervous) leftmost
+alice: (se queda paralizada en la entrada) #id:137
+alice: ... #id:138
+(Un chico de sonrisa fácil la mira desde el mostrador.) #id:139
+[signal arg="leo_wave_end"]
+alice: (siente que le arden las mejillas y se desvía hacia las góndolas) #id:13a
+leave alice
+[signal arg="leo_greeted"]

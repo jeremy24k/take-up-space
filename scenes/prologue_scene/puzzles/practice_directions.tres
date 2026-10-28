@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://0bpjamngq0jh"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://cmw36eveesd85" path="res://scenes/prologue_scene/puzzles/practice_directions_en.tres" id="2_en"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Perdone,", "¿dónde", "está", "el metro?"),
+"fumble": PackedStringArray("¿Dónde", "estoy", "yo?")
+}
+extra_words = PackedStringArray("calle", "gato")
+prompt = "Preguntar cómo llegar al metro. Con calma."
+relaxed = true
+translations = {
+"en": ExtResource("2_en")
+}

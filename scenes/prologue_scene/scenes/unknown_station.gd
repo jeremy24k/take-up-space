@@ -4,6 +4,22 @@ extends Node2D
 @onready var train_trigger_area: Area2D = $InteractableDetectors/TrainTriggerArea
 @onready var worker_interactable: InteractableArea = $MiddleLayer/NPCS/WorkerNPC/InteractableArea
 @export var wait_time_for_phone_missing: float = 1
+## If Alice stands still after getting off, the train leaves anyway after this
+## many seconds, so the lost-phone scene never depends on stepping on the trigger.
+@export var departure_fallback_time: float = 3.0
+## The train pulling out, motor first: it starts as the train moves. It
+## rides on the train (pans and fades with the distance) and fades out over
+## the time the train takes to leave, so it is gone when the train is.
+const TRAIN_DEPARTURE_SOUND := preload("res://audio/sfx/train_departure.ogg")
+const DEPARTURE_HEARING_DISTANCE: float = 900.0
+
+## "Rompecabezas de la Ansiedad" played from the timelines with
+## [signal arg="anxiety_puzzle:<id>"]. The worker's is the first real one: the
+## mirror rehearsal at home already taught the mechanic, so this one has a
+## clock, distractors and no hints from the start.
+const ANXIETY_PUZZLES := {
+	"station_worker": preload("res://scenes/prologue_scene/puzzles/station_worker.tres"),
+}
 
 var train_has_left: bool = false
 var worker_dialogue_started: bool = false
@@ -15,12 +31,22 @@ func _ready() -> void:
 	train_trigger_area.body_entered.connect(_on_train_trigger_area_body_entered)
 	worker_interactable.interacted.connect(_on_worker_interacted)
 	worker_interactable.area_entered.connect(_on_worker_area_entered)
+	Dialogic.signal_event.connect(_on_dialogic_signal)
+	_depart_after_fallback()
 
 # =========================
 # Train departure sequence
 # =========================
 func _on_train_trigger_area_body_entered(body: Node2D) -> void:
-	if train_has_left or not body.is_in_group("player"):
+	if body.is_in_group("player"):
+		_start_departure()
+
+func _depart_after_fallback() -> void:
+	await get_tree().create_timer(departure_fallback_time).timeout
+	_start_departure()
+
+func _start_departure() -> void:
+	if train_has_left:
 		return
 
 	print("Train has left the station.")
@@ -32,11 +58,39 @@ func _depart_train() -> void:
 	# The train pulls away while Alice is still in control for a beat, so the
 	# player can walk around the platform and feel the disorientation before the
 	# phone revelation lands.
+	_play_departure_sound()
 	metro_train.leave_station()
 	await get_tree().create_timer(wait_time_for_phone_missing).timeout # Wait a beat before the phone revelation lands.
 
+	# She may already be reading something; let it finish instead of cutting it.
+	if Dialogic.current_timeline != null:
+		await Dialogic.timeline_ended
 	Dialogic.start("unknown_station_lost_phone")
 	await Dialogic.timeline_ended
+
+func _play_departure_sound() -> void:
+	var sound := AudioStreamPlayer2D.new()
+	sound.stream = TRAIN_DEPARTURE_SOUND
+	sound.bus = &"SFX"
+	sound.max_distance = DEPARTURE_HEARING_DISTANCE
+	metro_train.add_child(sound)
+	sound.play()
+	# Same duration as metro_train.leave_station(): arrival_time * 1.5.
+	var fade := create_tween()
+	fade.tween_property(sound, "volume_db", -60.0, metro_train.arrival_time * 1.5) 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	fade.tween_callback(sound.queue_free)
+
+# =========================
+# Anxiety puzzle
+# =========================
+func _on_dialogic_signal(argument: Variant) -> void:
+	if not (argument is String and argument.begins_with("anxiety_puzzle:")):
+		return
+	var data: AnxietyPuzzleData = ANXIETY_PUZZLES.get(argument.get_slice(":", 1))
+	if data == null:
+		push_warning("Unknown anxiety puzzle '%s'" % argument)
+		return
+	AnxietyPuzzle.play_from_dialogic(self, data)
 
 # =========================
 # Worker conversation

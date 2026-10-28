@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dltn4vcas02ka"
+path="res://.godot/imported/walk_animation_backpack_shoes.aseprite-28599fa1e7cbbcd4773940c2083b3742.res"
+
+[deps]
+
+source_file="res://player/walk_animation_backpack_shoes.aseprite"
+dest_files=["res://.godot/imported/walk_animation_backpack_shoes.aseprite-28599fa1e7cbbcd4773940c2083b3742.res"]
+
+[params]
+

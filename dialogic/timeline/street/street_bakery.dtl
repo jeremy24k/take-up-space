@@ -1,6 +1,6 @@
-alice: (se detiene junto a la panadería)
-alice: Mmm... huele bien.
-alice: (mira el pan en el escaparate)
-alice: Podría comprar uno...
-alice: (mira las monedas que lleva)
-alice: No. Es para Wilson.
+alice: (se detiene junto a la panadería) #id:1a8
+alice: Mmm... huele bien. #id:1a9
+alice: (mira el pan en el escaparate) #id:1aa
+alice: Podría comprar uno... #id:1ab
+alice: (mira las monedas que lleva) #id:1ac
+alice: No. El dinero es justo. #id:1ad

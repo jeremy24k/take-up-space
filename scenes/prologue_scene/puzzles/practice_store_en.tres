@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dc41semyvighr"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Do you", "have", "cat food?")
+}
+prompt = "Something easy first: asking in a store."
+hint_from_start = true
+relaxed = true

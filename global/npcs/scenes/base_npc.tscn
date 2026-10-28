@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://f54bis3wl1kc" path="res://global/npcs/scripts/base_npc.gd" id="1_xvse1"]
 [ext_resource type="Texture2D" uid="uid://dgtd48eg1i1pj" path="res://global/npcs/assets/npcs_sprite_sheet.aseprite" id="2_55e2e"]
+[ext_resource type="PackedScene" path="res://global/character_shadow.tscn" id="character_shadow"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
 size = Vector2(14, 28)
@@ -43,6 +44,8 @@ metadata/_aseprite_wizard_config_ = {
 "source_uid": 7619853968993649295
 }
 metadata/_aseprite_wizard_source_file_hash_ = "83b3d0f9a180b67d2e0db06a7f5044a2"
+
+[node name="Shadow" parent="Sprite2D" instance=ExtResource("character_shadow")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1201320476]
 position = Vector2(0, 1)

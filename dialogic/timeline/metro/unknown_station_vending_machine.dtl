@@ -1,5 +1,2 @@
-alice: (ve la máquina expendedora)
-alice: (mira el dinero que tiene)
-alice: Es para Wilson. No puedo gastarlo en esto.
-alice: (su estómago ruge)
-alice: ...
+alice: (ve la máquina expendedora, mira el dinero que tiene) Es para Wilson. No puedo gastarlo en esto. #id:182
+alice: (su estómago ruge)[pause=0.6] ... #id:183

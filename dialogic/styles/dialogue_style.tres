@@ -1,0 +1,49 @@
+[gd_resource type="Resource" script_class="DialogicStyle" format=3 uid="uid://cg3ogcdt886ob"]
+
+[ext_resource type="Script" uid="uid://dv08k6ljua6fm" path="res://addons/dialogic/Resources/dialogic_style.gd" id="1_style"]
+[ext_resource type="Script" uid="uid://bwg6yncmh2cml" path="res://addons/dialogic/Resources/dialogic_style_layer.gd" id="2_layer"]
+[ext_resource type="Resource" uid="uid://8t1mr302tmqs" path="res://addons/dialogic/Modules/DefaultLayoutParts/Style_VN_Default/default_vn_style.tres" id="3_parent"]
+
+[sub_resource type="Resource" id="Layer_base"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_10"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_11"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_12"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_13"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_14"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_15"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_16"]
+script = ExtResource("2_layer")
+
+[sub_resource type="Resource" id="Layer_17"]
+script = ExtResource("2_layer")
+
+[resource]
+script = ExtResource("1_style")
+name = "Dialogue"
+inherits = ExtResource("3_parent")
+layer_list = Array[String](["10", "11", "12", "13", "14", "15", "16", "17"])
+layer_info = {
+"": SubResource("Layer_base"),
+"10": SubResource("Layer_10"),
+"11": SubResource("Layer_11"),
+"12": SubResource("Layer_12"),
+"13": SubResource("Layer_13"),
+"14": SubResource("Layer_14"),
+"15": SubResource("Layer_15"),
+"16": SubResource("Layer_16"),
+"17": SubResource("Layer_17")
+}
