@@ -35,6 +35,12 @@ addons/        Dialogic, AsepriteWizard, TileMapDual
 El juego arranca en la pantalla de idioma (`scenes/language_select/`, §12),
 que pasa al apartamento.
 
+**Las líneas al salir del edificio** están en `apartment.gd` (`LEAVING_LINES`),
+que las pone en la escalera al cargar, y no en la escena: un editor con una
+copia vieja de `apartment.tscn` las borró varias veces al guardar (Godot guarda
+las escenas abiertas al darle a Ejecutar). Para cambiar el texto, edita ese
+array (y su fila en `game_text.csv`).
+
 **La portada** (`ui/cover.aseprite`, la ilustración del título) aparece a
 pantalla completa al salir del edificio: la escalera del apartamento tiene
 `interlude_image` y `interlude_image_before_line = 2`, así que

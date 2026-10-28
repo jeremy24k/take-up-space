@@ -69,3 +69,16 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 32
 text = "[Espacio / Space]"
 horizontal_alignment = 1
+
+[node name="ControlsGap" type="Control" parent="Center/Box"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Controls" type="Label" parent="Center/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.5, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 32
+text = "Flechas o WASD: moverse      Espacio: interactuar
+Arrows or WASD: move      Space: interact"
+horizontal_alignment = 1
