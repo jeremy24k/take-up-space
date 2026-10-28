@@ -40,6 +40,10 @@ var _accepting: bool = false
 ## "Continuará..." (Lía's scene is next and does not exist yet) over the
 ## dimmed cover, then the thanks, then two options: play again or close.
 func _ready() -> void:
+	# In a browser the game cannot close its own tab: no "Salir" there.
+	if OS.has_feature("web"):
+		$Center/Box/Options/Quit.hide()
+		options.erase($Center/Box/Options/Quit)
 	for label in options:
 		_option_names.append(label.text)
 	for node: CanvasItem in [to_be_continued, thanks, comment, options_box]:
