@@ -163,7 +163,8 @@ func say(lines: Array[String], close_on_move := false, hold_base := DEFAULT_HOLD
 	var clean: Array[String] = []
 	for line in lines:
 		if not line.strip_edges().is_empty():
-			clean.append(line)
+			# Lines come in Spanish from the scenes; game_text.csv has the rest.
+			clean.append(tr(line))
 	if clean.is_empty():
 		return
 

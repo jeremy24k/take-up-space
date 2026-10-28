@@ -1,4 +1,4 @@
-alice: (se detiene frente al cajero) 
-alice: Solo tengo efectivo. No hay tarjeta.
-alice: Y aunque la tuviera... este banco no lo conozco.
-alice: Mejor no arriesgarme.
+alice: (se detiene frente al cajero) #id:1a4
+alice: Solo tengo efectivo. No hay tarjeta. #id:1a5
+alice: Y aunque la tuviera... este banco no lo conozco. #id:1a6
+alice: Mejor no arriesgarme. #id:1a7

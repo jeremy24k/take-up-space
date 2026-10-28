@@ -1,14 +1,14 @@
 [signal arg="headphones_off"]
-alice: (se quita los auriculares y mira a su alrededor) ¿Eh...?
+alice: (se quita los auriculares y mira a su alrededor) ¿Eh...? #id:173
 join alice (worried) leftmost
-alice: (observa la estación) Esta no es mi parada...
-alice: (busca en sus bolsillos) Mi teléfono...
+alice: (observa la estación) Esta no es mi parada... #id:174
+alice: (busca en sus bolsillos) Mi teléfono... #id:175
 [signal arg="no_phone"]
 update alice (scared)
-alice: No.[pause=0.5] No, no, no...
-alice: (mira hacia las vías) Se fue.
-alice: Lo dejé en el tren.
+alice: No.[pause=0.5] No, no, no... #id:176
+alice: (mira hacia las vías) Se fue. #id:177
+alice: Lo dejé en el tren. #id:178
 update alice (worried)
-alice: ...[pause=0.8] Genial, Alice.
-alice: ¿Y ahora qué hago?
+alice: ...[pause=0.8] Genial, Alice. #id:179
+alice: ¿Y ahora qué hago? #id:17a
 leave alice

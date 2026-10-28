@@ -33,6 +33,9 @@
 [ext_resource type="SpriteFrames" uid="uid://4y7io8i5sb1n" path="res://scenes/street_scenes/assets/couple_argue.aseprite" id="couple_argue"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 [ext_resource type="PackedScene" path="res://global/remark_interactable.tscn" id="remark_interactable"]
+[ext_resource type="AudioStream" uid="uid://c8um8odkwev65" path="res://audio/ambience/street.ogg" id="sa_ambience"]
+[ext_resource type="AudioStream" uid="uid://bg6lkjj5h0re1" path="res://audio/music/lost_melancholic.ogg" id="sa_music"]
+[ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
 [ext_resource type="SpriteFrames" uid="uid://dm7qwiqtnsv06" path="res://global/npcs/assets/street_cat.aseprite" id="street_cat"]
 [ext_resource type="Texture2D" uid="uid://cd0cj73bhbbf7" path="res://scenes/street_scenes/assets/vehicles.aseprite" id="vehicles"]
 
@@ -4554,6 +4557,8 @@ animation = &"idle_side"
 [node name="Shadow" parent="MiddleLayer/Player/AnimatedSprite2D" index="0"]
 position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="ParkedCar" type="Node2D" parent="MiddleLayer" unique_id=662200529]
 position = Vector2(505, 839)
@@ -4612,6 +4617,8 @@ frame = 17
 [node name="Shadow" parent="MiddleLayer/NPCS/OfficeManNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/OfficeManNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4633,6 +4640,8 @@ frame = 2
 [node name="Shadow" parent="MiddleLayer/NPCS/StudentNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/StudentNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4664,6 +4673,8 @@ frame = 18
 [node name="Shadow" parent="MiddleLayer/NPCS/CarOwnerNPC/Sprite2D" index="0"]
 position = Vector2(0, 14)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/CarOwnerNPC" index="1" unique_id=1201320476]
 position = Vector2(4, 3)
@@ -4684,6 +4695,8 @@ frame = 3
 [node name="Shadow" parent="MiddleLayer/NPCS/PhoneGirlNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/PhoneGirlNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4703,6 +4716,8 @@ offset = Vector2(0, -16)
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchNewspaperNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/BenchNewspaperNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4725,6 +4740,8 @@ frame = 9
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchSittingNPC/Sprite2D" index="0"]
 position = Vector2(0, -9)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/BenchSittingNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4747,6 +4764,8 @@ frame = 13
 [node name="Shadow" parent="MiddleLayer/NPCS/VinylWindowNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/VinylWindowNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4768,6 +4787,8 @@ frame = 14
 [node name="Shadow" parent="MiddleLayer/NPCS/DeliveryNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/DeliveryNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4789,6 +4810,8 @@ frame = 15
 [node name="Shadow" parent="MiddleLayer/NPCS/BusStopGrandmaNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/BusStopGrandmaNPC" index="1" unique_id=1201320476]
 position = Vector2(0, -4)
@@ -4813,6 +4836,8 @@ offset = Vector2(0, -16)
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianA/AnimatedSprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/PedestrianA" index="1" unique_id=1090796085]
 position = Vector2(0, -4)
@@ -4842,6 +4867,8 @@ offset = Vector2(0, -16)
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianB/AnimatedSprite2D" index="0"]
 position = Vector2(0, -2)
 texture = ExtResource("18_ia8eo")
+centered = false
+offset = Vector2(-7, -3)
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/PedestrianB" index="1" unique_id=1090796085]
 position = Vector2(0, -4)
@@ -4871,7 +4898,10 @@ autoplay = "idle_front"
 offset = Vector2(0, -8)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/StreetCat/AnimatedSprite2D" index="0"]
+position = Vector2(0, 6)
 texture = ExtResource("26_3ceu0")
+centered = false
+offset = Vector2(-5, -3)
 small = true
 
 [node name="CollisionShape2D" parent="MiddleLayer/NPCS/StreetCat" index="1" unique_id=1090796085]
@@ -5446,6 +5476,12 @@ position = Vector2(1233, 242)
 
 [node name="Point2" type="Marker2D" parent="PedestrianRoutes/StreetCat" unique_id=1786988767]
 position = Vector2(145, 240)
+
+[node name="SceneAudio" type="Node" parent="." unique_id=1689936149]
+script = ExtResource("sa_script")
+ambience = ExtResource("sa_ambience")
+music = ExtResource("sa_music")
+music_volume_db = -12.0
 
 [editable path="MiddleLayer/Player"]
 [editable path="MiddleLayer/NPCS/OfficeManNPC"]

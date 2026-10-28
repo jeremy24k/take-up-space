@@ -6,7 +6,11 @@
 
 ## Language
 - Code, comments, and identifiers are in **English**.
-- Everything the player sees is in **Spanish**: Dialogic timelines, prompt labels, and thought bubbles.
+- Everything the player sees is written in **Spanish**: Dialogic timelines, prompt labels, and thought bubbles. It is translated to **English** through CSV files in `translations/` (DOCS.md §12):
+  - Dialogue lines carry a `#id:xx` suffix in the `.dtl`: that is their translation key. Keep it when editing a line and never copy it to another line.
+  - Other text (thoughts, remarks, prompts, labels, code constants) is keyed by its Spanish text in `game_text.csv`. `ThoughtBox.say()` runs `tr()`; Labels translate themselves. New player-facing text shown any other way needs `tr()`.
+  - After adding text, update the CSVs (Dialogic's "Update CSV files" + `global/localization/update_translations.gd`, or `update_translations_cli.gd` headless with the editor closed) and fill the `en` column.
+  - Anxiety puzzles have a `*_en.tres` per puzzle, linked in its `translations`; answer keys must match.
 
 ## Commands
 There is no test suite, linter, or build script. The editor binary is `/Applications/Godot.app/Contents/MacOS/Godot`; `godot` is not on PATH.
@@ -15,7 +19,7 @@ There is no test suite, linter, or build script. The editor binary is `/Applicat
 GODOT=/Applications/Godot.app/Contents/MacOS/Godot
 $GODOT --headless --path . --import              # reimport + surface parse/load errors (an "ObjectDB instances leaked" warning at exit is normal)
 $GODOT --headless --path . --check-only --script res://path/to/file.gd   # parse-check one script
-$GODOT --path .                                  # run the game (main scene = apartment)
+$GODOT --path .                                  # run the game (main scene = language screen)
 $GODOT --path . res://scenes/prologue_scene/scenes/unknown_station.tscn  # run one scene directly
 ```
 
@@ -24,7 +28,11 @@ $GODOT --path . res://scenes/prologue_scene/scenes/unknown_station.tscn  # run o
 ## Layout
 ```
 autoload/          GameManager (quest state), FadeTransition (scene changes),
-                   ThoughtBox (Alice's thoughts in the "thought" Dialogic style)
+                   ThoughtBox (Alice's thoughts in the "thought" Dialogic style),
+                   Localization (chosen language, saved in user://settings.cfg),
+                   SoundManager (music/ambience cross-fades, one-shot sounds)
+audio/             Ambience, music and sfx (.ogg), plus CREDITS.md
+translations/      Translation CSVs (Dialogic timelines/characters + game_text)
 player/            Alice: class_name Player, group "player"
 global/            Reusable pieces: InteractableArea and its subclasses, ExitArea,
                    ThoughtTrigger, stairs/, npcs/ (BaseNPC sprite-sheet column, WalkingNPC)
@@ -38,7 +46,7 @@ addons/            Third-party: dialogic, AsepriteWizard, TileMapDual. Do not mo
   dialogic_additions/TakeUpSpace/   Ours: Dialogic extension (custom portrait animations)
 ```
 
-Scene flow: `apartment` → (stairs, needs wallet/headphones/shoes) → `metro_stations` → (train door) → `metro_train_interior` → `unknown_station` → `ExitToStreet`/`ExitToStreet2`. The exits point back to `apartment.tscn` **on purpose** as a placeholder until the street scene exists.
+Scene flow: `language_select` (main scene) → `apartment` → (stairs, needs wallet/headphones/shoes) → `metro_stations` → (train door) → `metro_train_interior` → `unknown_station` → `ExitToStreet`/`ExitToStreet2`. The exits point back to `apartment.tscn` **on purpose** as a placeholder until the street scene exists.
 
 ## Architecture essentials
 - **Scene changes always go through `FadeTransition.transition_to_scene(path)`**, either directly or via `SceneTransitionArea` (you interact to use it) or `ExitArea` (it fires when you walk in). Never call `get_tree().change_scene_to_file()` directly.
@@ -47,6 +55,7 @@ Scene flow: `apartment` → (stairs, needs wallet/headphones/shoes) → `metro_s
 - **Player cutscene API:** use `lock_control()` / `unlock_control()`, `play_animation(name, fallback)`, `play_animation_backwards(...)`, `face_direction(dir)`, `wait_animation_loops(count)` (move on at the end of a loop), and `pan_camera_to(world_point, time)` / `reset_camera(time)` to show something (the glass tower, the arriving train). Don't touch the `AnimatedSprite2D` from outside. The player locks and unlocks itself around every Dialogic timeline, but a `lock_control()` lock stays in place after a dialogue ends.
 - **Alice's sprite is layered** (`player/alice.aseprite`, imported split by layer into `player/alice_layers/`): the body `AnimatedSprite2D` plus child layers for backpack, shoes and headphones (neck/head). Code drives only the body; layers mirror it. What shows follows `GameManager.collected_items` and `headphones_on_head` (`[signal arg="headphones_on"]`/`"headphones_off"`).
 - **Every character has a `CharacterShadow`** (`global/character_shadow.tscn`) as a child of its sprite, already in the player, `base_npc`, `walking_npc` and Wilson templates: it draws behind the sprite and places itself at the feet from the sprite's offset. Set `small = true` for cats.
+- **Sound** (DOCS.md §13): audio lives in `audio/{ambience,music,sfx}` (sources in `audio/CREDITS.md`), on the `Music`/`Ambience`/`SFX` buses. Each scene has a `SceneAudio` node (`global/scene_audio.gd`) with its ambience and music; the `SoundManager` autoload cross-fades between scenes and plays one-shots (`SoundManager.play_sfx(stream_or_name)`, or `[signal arg="sfx:<name>"]` from a timeline). Loops need **Loop** on in their import settings.
 - **Animation names** are built from a prefix and a direction: `idle_`/`walk_` + `front`/`back`/`side`. `side` uses `flip_h`. `Player` and `WalkingNPC` use the same scheme. Code guards with `has_animation()` because several sprites are still placeholders.
 
 ## Two visual languages

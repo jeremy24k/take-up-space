@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://c676xief6b0td"]
 
 [ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://dpv3vbgy7u5pu" path="res://scenes/leo_store_scene/puzzles/leo_are_you_ok_en.tres" id="2_en"]
 
 [resource]
 script = ExtResource("1_data")
@@ -12,3 +13,6 @@ extra_words = PackedStringArray("Sí...", "metro", "perdón", "gato")
 prompt = "¿Le digo la verdad... o que estoy bien?"
 time_limit = 15.0
 mistake_penalty = 2.0
+translations = {
+"en": ExtResource("2_en")
+}

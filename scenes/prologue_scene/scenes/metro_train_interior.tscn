@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="10_interact"]
 [ext_resource type="Script" uid="uid://bj7xcwcnyc5a0" path="res://global/scene_transition_area.gd" id="11_exit"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/ambient_thought.tscn" id="ambient_thought"]
+[ext_resource type="Script" path="res://global/scene_audio.gd" id="sa_script"]
+[ext_resource type="AudioStream" path="res://audio/ambience/train_ride.ogg" id="sa_train"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8w0r3"]
 size = Vector2(31, 18)
@@ -623,6 +625,8 @@ energy = 0.0
 texture = SubResource("GradientTexture2D_fvjbq")
 
 [node name="TrainAmbience" type="AudioStreamPlayer" parent="." unique_id=2072911592]
+stream = ExtResource("sa_train")
+bus = &"Ambience"
 
 [node name="ExitDoorArea" parent="." unique_id=2072911596 instance=ExtResource("10_interact")]
 position = Vector2(268, 16)
@@ -657,3 +661,6 @@ display_duration = 3.5
 [editable path="Train/NPCS/WorkerNPC"]
 [editable path="Train/NPCS/Player"]
 [editable path="ExitDoorArea"]
+
+[node name="SceneAudio" type="Node" parent="." unique_id=1891289555]
+script = ExtResource("sa_script")

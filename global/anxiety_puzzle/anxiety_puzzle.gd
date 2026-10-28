@@ -32,6 +32,15 @@ const ARROW_ACTIONS: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"u
 const WORD_FONT_SIZE: int = 64
 const WORD_OUTLINE_SIZE: int = 10
 const WORD_OUTLINE_COLOR := Color(0.04, 0.01, 0.07)
+## Alice's body under the clock: her heartbeat speeds up and gets louder as
+## the time runs out, and her breathing comes in during the second half.
+## Only in real puzzles; the mirror rehearsal stays quiet.
+const HEARTBEAT := preload("res://audio/sfx/heartbeat_loop.ogg")
+const BREATHING := preload("res://audio/sfx/breathing_loop.ogg")
+const HEARTBEAT_DB := Vector2(-20.0, -6.0)  # calm -> about to freeze
+const HEARTBEAT_PITCH := Vector2(1.0, 1.4)
+const BREATHING_DB := Vector2(-40.0, -12.0)
+const SILENT_DB: float = -60.0
 
 @onready var root: Control = $Root
 @onready var vignette: ColorRect = $Root/Vignette
@@ -49,6 +58,8 @@ var _time_left: float = 0.0
 var _cooldown: float = 0.0
 var _accepting: bool = false
 var _done: bool = false
+var _heartbeat: AudioStreamPlayer
+var _breathing: AudioStreamPlayer
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -62,13 +73,20 @@ signal finished(result: String)
 ## var result := await puzzle.run(data)  # "truth", "lie", ... or "silence"
 ## [/codeblock]
 func run(data: AnxietyPuzzleData) -> String:
+	# The words are the puzzle, so each language has its own version.
+	data = data.for_current_language()
 	_data = data
+	# The world goes muffled, as if under water, while she is stuck here.
+	SoundManager.set_muffled(true)
 	# Saving the .tres from the editor has dropped extra_words more than once,
 	# silently: say so instead of quietly playing an easier puzzle.
 	if not data.relaxed and data.extra_words.is_empty():
 		push_warning("Anxiety puzzle '%s' has no extra_words (distractors)" % data.resource_path)
 	_time_left = data.time_limit
 	prompt_label.text = data.prompt
+	if not data.relaxed:
+		_heartbeat = _make_loop(HEARTBEAT)
+		_breathing = _make_loop(BREATHING)
 	_spawn_words()
 	root.modulate.a = 0.0
 	var tween := create_tween()
@@ -256,6 +274,10 @@ func _process(delta: float) -> void:
 	vignette.material.set_shader_parameter("pressure", pressure)
 	for word in _words:
 		word.pressure = pressure
+	_heartbeat.volume_db = lerpf(HEARTBEAT_DB.x, HEARTBEAT_DB.y, pressure)
+	_heartbeat.pitch_scale = lerpf(HEARTBEAT_PITCH.x, HEARTBEAT_PITCH.y, pressure)
+	var breath := clampf(pressure * 2.0 - 1.0, 0.0, 1.0)
+	_breathing.volume_db = lerpf(BREATHING_DB.x, BREATHING_DB.y, breath)
 	if _time_left <= 0.0:
 		_finish(SILENCE)
 
@@ -267,8 +289,24 @@ func _finish(result: String) -> void:
 		return
 	_done = true
 	_accepting = false
-	var tween := create_tween()
+	SoundManager.set_muffled(false)
+	var tween := create_tween().set_parallel(true)
 	tween.tween_property(root, "modulate:a", 0.0, FADE_TIME)
+	for loop_player in [_heartbeat, _breathing]:
+		if loop_player:
+			tween.tween_property(loop_player, "volume_db", SILENT_DB, FADE_TIME)
 	await tween.finished
 	finished.emit(result)
 	queue_free()
+
+# =========================
+# Body sounds
+# =========================
+func _make_loop(stream: AudioStream) -> AudioStreamPlayer:
+	var player := AudioStreamPlayer.new()
+	player.stream = stream
+	player.bus = &"SFX"
+	player.volume_db = SILENT_DB
+	add_child(player)
+	player.play()
+	return player

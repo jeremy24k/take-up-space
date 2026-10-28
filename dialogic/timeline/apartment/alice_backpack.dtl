@@ -1,19 +1,19 @@
 if {GameManager.quest_step} == 3.0:
-	alice: Mochila... lista.
+	alice: Mochila... lista. #id:11
 	join alice (nervous) leftmost
-	alice: (revisa el interior) Auriculares... no están.
-	alice: Cartera... no está.
-	alice: (mira sus pies descalzos) Zapatos... tampoco.
-	alice: Voy a tener que buscarlos.
-	alice: Los auriculares suelen estar en mi habitación... La cartera, por la cocina...
-	alice: Y los zapatos...[pause=0.8] Ahora que lo pienso... no sé dónde están.
-	alice: (mira a Wilson) Aunque alguien de por aquí siempre se los lleva al baño cuando se aburre.
+	alice: (revisa el interior) Auriculares... no están. #id:12
+	alice: Cartera... no está. #id:13
+	alice: (mira sus pies descalzos) Zapatos... tampoco. #id:14
+	alice: Voy a tener que buscarlos. #id:15
+	alice: Los auriculares suelen estar en mi habitación... La cartera, por la cocina... #id:16
+	alice: Y los zapatos...[pause=0.8] Ahora que lo pienso... no sé dónde están. #id:17
+	alice: (mira a Wilson) Aunque alguien de por aquí siempre se los lleva al baño cuando se aburre. #id:18
 	update alice (relaxed)
-	alice: (se cuelga la mochila al hombro) Me la llevo. Así no me olvido de ella.
+	alice: (se cuelga la mochila al hombro) Me la llevo. Así no me olvido de ella. #id:19
 	leave alice
-	alice: Bueno. Empezaré a buscar.
+	alice: Bueno. Empezaré a buscar. #id:1a
 	[signal arg="prep_items_unlocked"]
 	[signal arg="item_picked:alice_backpack"]
 else:
-	alice: Mi mochila... No necesito usarla ahora.
-	alice: No me gustaría salir hoy.
+	alice: Mi mochila... No necesito usarla ahora. #id:1b
+	alice: No me gustaría salir hoy. #id:1c

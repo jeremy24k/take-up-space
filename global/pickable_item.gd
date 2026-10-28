@@ -23,9 +23,9 @@ func _ready() -> void:
 func update_label_text() -> void:
 	if label:
 		if GameManager.quest_step >= 3 and _can_be_interacted_with():
-			label.text = "[Recoger]"
+			label.text = tr("[Recoger]")
 		else:
-			label.text = "[Espacio]"
+			label.text = tr("[Espacio]")
 
 func interact() -> void:
 	# Always allow the dialogue to explain why the item is unavailable.

@@ -32,7 +32,22 @@ var last_direction: Vector2 = Vector2.DOWN  # Face down by default while idle.
 const HINT_OVER_MEOW := Vector2(0, -26)
 const HINT_OVER_HEAD := Vector2(0, -21)
 
+## While he meows (the "MEOW!" animation loops), a real meow now and then:
+## every loop would be too much.
+const MEOW_SOUND := preload("res://audio/sfx/meow.ogg")
+@export var meow_interval: float = 3.0
+@export_range(-40.0, 12.0, 0.5, "suffix:dB") var meow_volume_db: float = -8.0
+## The meow comes from where he is: it fades as Alice walks away and is gone
+## past this distance (px), so it never follows her out of the apartment.
+@export var meow_hearing_distance: float = 260.0
+## Meows left once Alice has said goodbye (stay_home): a couple, then quiet.
+@export var meows_after_goodbye: int = 2
+
 var is_following: bool = false
+var _seconds_since_meow: float = INF
+## -1 = no limit (before the goodbye).
+var _meows_left: int = -1
+var _meow_player: AudioStreamPlayer2D
 
 # =========================
 # Setup
@@ -44,6 +59,13 @@ func _ready() -> void:
 		target = get_tree().get_first_node_in_group("player")
 
 	Dialogic.signal_event.connect(_on_dialogic_signal)
+	animate_sprite.animation_looped.connect(_on_animation_looped)
+	_meow_player = AudioStreamPlayer2D.new()
+	_meow_player.stream = MEOW_SOUND
+	_meow_player.bus = &"SFX"
+	_meow_player.volume_db = meow_volume_db
+	_meow_player.max_distance = meow_hearing_distance
+	add_child(_meow_player)
 
 	call_deferred("actor_setup")
 
@@ -146,6 +168,28 @@ func process_animation_state() -> void:
 		talk_area.set_hint_position(hint_height)
 
 	animate_sprite.play(animate_sprite.animation)
+
+# =========================
+# Meow sound
+# =========================
+func _process(delta: float) -> void:
+	_seconds_since_meow += delta
+
+func _on_animation_looped() -> void:
+	if animate_sprite.animation != "meowing" or _seconds_since_meow < meow_interval:
+		return
+	if _meows_left == 0:
+		return
+	_seconds_since_meow = 0.0
+	_meow_player.play()
+	if _meows_left > 0:
+		_meows_left -= 1
+
+## Alice leaves without him: he stops following and meows a couple of times
+## at the door, then goes quiet.
+func stay_home() -> void:
+	is_following = false
+	_meows_left = meows_after_goodbye
 
 # =========================
 # Direction utilities

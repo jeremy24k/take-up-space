@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3]
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dtgm0h0vd18qa"]
 
 [ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://dc41semyvighr" path="res://scenes/prologue_scene/puzzles/practice_store_en.tres" id="2_en"]
 
 [resource]
 script = ExtResource("1_data")
@@ -10,3 +11,6 @@ phrases = {
 prompt = "Primero algo fácil: pedir en una tienda."
 hint_from_start = true
 relaxed = true
+translations = {
+"en": ExtResource("2_en")
+}

@@ -1,24 +1,25 @@
 if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
-	alice: (los ve encima de la cama) Ahí están.
+	alice: (los ve encima de la cama) Ahí están. #id:22
 	join alice (neutral) leftmost
-	alice: (los toma, los mira un momento) Mis auriculares.
-	alice: No salgo sin ellos. Con ellos es más fácil.
-	alice: (se los cuelga al cuello) Bueno... no siempre. Pero casi.
+	alice: (los toma, los mira un momento) Mis auriculares. #id:23
+	alice: No salgo sin ellos. Con ellos es más fácil. #id:24
+	alice: (se los cuelga al cuello) Bueno... no siempre. Pero casi. #id:25
 	leave alice
 	[signal arg="item_picked:alice_headphones"]
 	if GameManager.has_all_prep_items():
-		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.
+		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme. #id:26
 		join alice (worried) leftmost
-		alice: Ojalá me emocionara.
-		alice: Quizás, si espero un poco...
-		(Wilson maúlla, impaciente.)
+		alice: Ojalá me emocionara. #id:27
+		alice: Quizás, si espero un poco... #id:28
+		[signal arg="sfx:meow"]
+		(Wilson maúlla, impaciente.) #id:29
 		update alice (neutral)
-		alice: No. Wilson me necesita. Lo voy a hacer.
+		alice: No. Wilson me necesita. Lo voy a hacer. #id:2a
 		update alice (nervous)
-		alice: Pero antes... un par de frases frente al espejo del baño.
-		alice: Por si alguien me habla. Por si acaso.
+		alice: Pero antes... un par de frases frente al espejo del baño. #id:2b
+		alice: Por si alguien me habla. Por si acaso. #id:2c
 		leave alice
 		[signal arg="step_4"]
 else:
-	alice: Mis auriculares... todavía aquí.
-	alice: Menos mal que no los perdí.
+	alice: Mis auriculares... todavía aquí. #id:2d
+	alice: Menos mal que no los perdí. #id:2e

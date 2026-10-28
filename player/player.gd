@@ -15,6 +15,18 @@ const INTERACTION_DISTANCE: float = 16.0
 ## lamp post, the corner of a crosswalk) instead of stopping dead on it.
 const CORNER_CORRECTION: int = 8
 const CORNER_SLIDE_SPEED: float = 60.0
+## One of these plays, a little higher or lower each time, whenever a foot
+## lands in a walk animation (step_frames).
+const FOOTSTEPS: Array[AudioStream] = [
+	preload("res://audio/sfx/footstep_1.ogg"),
+	preload("res://audio/sfx/footstep_2.ogg"),
+	preload("res://audio/sfx/footstep_3.ogg"),
+	preload("res://audio/sfx/footstep_4.ogg"),
+]
+const FOOTSTEP_PITCH_RANGE := Vector2(0.92, 1.08)
+## No two steps closer than this (s): a quick turn could still land on a step
+## frame right after the last step.
+const FOOTSTEP_MIN_GAP: float = 0.25
 
 @onready var player_animation: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interaction_detector: Area2D = $InteractionDetector
@@ -26,6 +38,20 @@ const CORNER_SLIDE_SPEED: float = 60.0
 @onready var headphones_neck_layer: AnimatedSprite2D = $AnimatedSprite2D/HeadphonesNeck
 @onready var headphones_head_layer: AnimatedSprite2D = $AnimatedSprite2D/HeadphonesHead
 @onready var outfit_layers: Array[AnimatedSprite2D] = [backpack_layer, shoes_layer, headphones_neck_layer, headphones_head_layer]
+
+# =========================
+# Footsteps
+# =========================
+## Frames of walk_front/back/side where a foot touches the ground.
+@export var step_frames: Array[int] = [0, 3]
+@export_range(-40.0, 12.0, 0.5, "suffix:dB") var footstep_volume_db: float = -12.0
+
+var _footstep_player: AudioStreamPlayer
+var _last_footstep: int = -1
+var _last_footstep_time: float = -INF
+## Set while a turn swaps the walk: the swap passes through frame 0 for an
+## instant, and that must not count as a step.
+var _switching_walk: bool = false
 
 var current_state: State = State.IDLE
 var last_direction: Vector2 = Vector2.DOWN # Face down by default while idle.
@@ -44,6 +70,13 @@ func _ready() -> void:
 	# frame behind on every pose change and flicker.
 	player_animation.frame_changed.connect(_sync_outfit)
 	player_animation.animation_changed.connect(_sync_outfit)
+	player_animation.frame_changed.connect(_on_frame_changed)
+	_footstep_player = AudioStreamPlayer.new()
+	_footstep_player.bus = &"SFX"
+	_footstep_player.volume_db = footstep_volume_db
+	# A new step never cuts the tail of the previous one.
+	_footstep_player.max_polyphony = 2
+	add_child(_footstep_player)
 	_refresh_outfit()
 
 ## Flip has no signal; it is set in _physics_process, before this runs.
@@ -157,6 +190,30 @@ func unlock_control() -> void:
 	can_move = true
 
 # =========================
+# Footstep sound
+# =========================
+## A step on each landing frame of a walk, never the same sample twice in a
+## row. Only while she really walks: cutscene animations are not "walk_".
+func _on_frame_changed() -> void:
+	if _switching_walk:
+		return
+	if not player_animation.animation.begins_with("walk_") or not player_animation.is_playing():
+		return
+	if not player_animation.frame in step_frames:
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	if now - _last_footstep_time < FOOTSTEP_MIN_GAP:
+		return
+	_last_footstep_time = now
+	var index := randi() % FOOTSTEPS.size()
+	if index == _last_footstep:
+		index = (index + 1) % FOOTSTEPS.size()
+	_last_footstep = index
+	_footstep_player.stream = FOOTSTEPS[index]
+	_footstep_player.pitch_scale = randf_range(FOOTSTEP_PITCH_RANGE.x, FOOTSTEP_PITCH_RANGE.y)
+	_footstep_player.play()
+
+# =========================
 # Outfit layers
 # =========================
 ## Shows the pieces Alice has picked up. The headphones are either around her
@@ -240,7 +297,26 @@ func process_animation_state() -> void:
 
 		State.WALKING:
 			var direccion_suffix: String = get_direction_suffix(last_direction)
-			player_animation.animation = "walk_" + direccion_suffix
+			_switch_walk_animation("walk_" + direccion_suffix)
+
+## Turning while walking keeps the stride where it was: the new walk starts
+## at the same frame and progress instead of frame 0, which is a step frame
+## (a step sounded at once and cut the one playing). All walks share frame
+## count and cycle length (0.8 s), so the frames line up.
+func _switch_walk_animation(walk_name: String) -> void:
+	var previous := player_animation.animation
+	if previous == walk_name:
+		return
+	if not previous.begins_with("walk_") or not player_animation.sprite_frames.has_animation(walk_name):
+		player_animation.animation = walk_name
+		return
+	var frame := player_animation.frame
+	var progress := player_animation.frame_progress
+	_switching_walk = true
+	player_animation.animation = walk_name
+	if frame < player_animation.sprite_frames.get_frame_count(walk_name):
+		player_animation.set_frame_and_progress(frame, progress)
+	_switching_walk = false
 
 
 ## Plays an animation only if it exists, so sequences keep working while

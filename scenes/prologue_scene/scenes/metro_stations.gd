@@ -14,6 +14,10 @@ const TRAIN_PAN_TIME: float = 1.0
 ## Seconds held after the train stops: the doors open 1 s after it does.
 const TRAIN_HOLD_TIME: float = 1.6
 const TRAIN_RETURN_TIME: float = 0.8
+## Starts with the train already braking: it comes in in 4 s, then the doors.
+const TRAIN_ARRIVAL_SOUND := preload("res://audio/sfx/train_arrival.ogg")
+## The chime when the doors open and close.
+const TRAIN_CHIME_SOUND := preload("res://audio/sfx/train_chime.ogg")
 
 @onready var player: Player = $MiddleLayer/Player
 @onready var metro_train = $MiddleLayer/MetroTrain
@@ -28,6 +32,8 @@ var _train_in: bool = false
 # =========================
 func _ready() -> void:
 	Dialogic.start("metro_station")
+	metro_train.doors_opened.connect(SoundManager.play_sfx.bind(TRAIN_CHIME_SOUND))
+	metro_train.doors_closed.connect(SoundManager.play_sfx.bind(TRAIN_CHIME_SOUND))
 	metro_train_area.body_entered.connect(_on_train_entered)
 	platform_area.body_entered.connect(_on_platform_entered)
 
@@ -60,6 +66,7 @@ func _call_train() -> void:
 		await Dialogic.timeline_ended
 	player.lock_control()
 	metro_train.train_arrived.connect(func() -> void: _train_in = true, CONNECT_ONE_SHOT)
+	SoundManager.play_sfx(TRAIN_ARRIVAL_SOUND)
 	metro_train.enter_in_station()
 
 	var stop := Vector2(metro_train.station_position_x, metro_train.global_position.y)

@@ -1,43 +1,43 @@
-(Una pareja discute al pie del paso de cebra. Tapan todo el paso.)
-couple_girl: ¡Siempre haces lo mismo! ¡Siempre!
-couple_guy: ¿Yo? ¡Fuiste tú la que dijo que no venía!
-alice: (se queda a un paso, sin saber dónde ponerse)
-label try
+(Una pareja discute al pie del paso de cebra. Tapan todo el paso.) #id:1cd
+couple_girl: ¡Siempre haces lo mismo! ¡Siempre! #id:1ce
+couple_guy: ¿Yo? ¡Fuiste tú la que dijo que no venía! #id:1cf
+alice: (se queda a un paso, sin saber dónde ponerse) #id:1d0
+label try #id:1d1
 [signal arg="anxiety_puzzle:street_couple"]
 if {anxiety_result} == "ask":
-	alice: Perdón... ¿me dejan pasar?
-	(Se callan de golpe. Los dos la miran.)
-	couple_girl: Ay... perdona. Claro.
-	couple_guy: (se aparta, incómodo) Perdón, perdón.
+	alice: Perdón... ¿me dejan pasar? #id:1d2
+	(Se callan de golpe. Los dos la miran.) #id:1d3
+	couple_girl: Ay... perdona. Claro. #id:1d4
+	couple_guy: (se aparta, incómodo) Perdón, perdón. #id:1d5
 	[signal arg="couple_step_aside"]
 	join alice (relaxed) leftmost
-	alice: (con la cara ardiendo) ...Lo dije.
+	alice: (con la cara ardiendo) ...Lo dije. #id:1d6
 	leave alice
 else:
 	if {anxiety_result} == "wait":
-		alice: (muy bajito) Ya terminarán...
+		alice: (muy bajito) Ya terminarán... #id:1d7
 		[signal arg="couple_waited"]
 		if {GameManager.street_couple_waits} == 1:
-			couple_girl: ¡Y encima invitaste a tu ex al cumpleaños de MI hermana!
-			couple_guy: ¡Es amiga de tu hermana! ¿Qué querías que hiciera?
-			alice: (abre mucho los ojos) ...¿A su ex?
-			alice: No debería estar escuchando esto.
+			couple_girl: ¡Y encima invitaste a tu ex al cumpleaños de MI hermana! #id:1d8
+			couple_guy: ¡Es amiga de tu hermana! ¿Qué querías que hiciera? #id:1d9
+			alice: (abre mucho los ojos) ...¿A su ex? #id:1da
+			alice: No debería estar escuchando esto. #id:1db
 		elif {GameManager.street_couple_waits} == 2:
-			couple_guy: ¿Y lo del perro? ¿También es culpa mía lo del perro?
-			couple_girl: ¡Se comió mis zapatos nuevos, Marcos!
-			alice: (piensa en sus zapatos, tirados en el baño) Igual que en casa...
-			alice: ...Sigo sin moverme. Y sigo escuchando.
+			couple_guy: ¿Y lo del perro? ¿También es culpa mía lo del perro? #id:1dc
+			couple_girl: ¡Se comió mis zapatos nuevos, Marcos! #id:1dd
+			alice: (piensa en sus zapatos, tirados en el baño) Igual que en casa... #id:1de
+			alice: ...Sigo sin moverme. Y sigo escuchando. #id:1df
 		else:
-			couple_girl: ¡No me hables así delante de la gente!
-			couple_guy: ¿Qué gente? ¡Si no hay nadie!
-			alice: (mira a su alrededor) ...Estoy yo.
+			couple_girl: ¡No me hables así delante de la gente! #id:1e0
+			couple_guy: ¿Qué gente? ¡Si no hay nadie! #id:1e1
+			alice: (mira a su alrededor) ...Estoy yo. #id:1e2
 	else:
-		alice: (abre la boca, pero no le sale nada)
-		(Siguen discutiendo. Ni la han visto.)
-	alice: ¿Lo intento otra vez?
-	- Intentar hablarles otra vez
+		alice: (abre la boca, pero no le sale nada) #id:1e3
+		(Siguen discutiendo. Ni la han visto.) #id:1e4
+	alice: ¿Lo intento otra vez? #id:1e5
+	- Intentar hablarles otra vez #id:1e6
 		jump try
-	- Cruzar por el otro paso
+	- Cruzar por el otro paso #id:1e7
 		join alice (nervous) leftmost
-		alice: Mejor cruzo por el otro lado.
+		alice: Mejor cruzo por el otro lado. #id:1e8
 		leave alice

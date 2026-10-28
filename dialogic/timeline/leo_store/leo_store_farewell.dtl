@@ -1,17 +1,17 @@
 if {GameManager.leo_gave_number}:
-	alice: (camina hacia la puerta; el corazón le late más rápido)
+	alice: (camina hacia la puerta; el corazón le late más rápido) #id:127
 else:
-	alice: (camina hacia la puerta; quiere darse la vuelta, pero no se atreve)
-leo: Oye, Alice.
-alice: (se gira)
+	alice: (camina hacia la puerta; quiere darse la vuelta, pero no se atreve) #id:128
+leo: Oye, Alice. #id:129
+alice: (se gira) #id:12a
 if {GameManager.leo_gave_number}:
 	if {GameManager.leo_knows_wilson}:
-		leo: Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia.
+		leo: Que no se te pierda el número, ¿sí? Por si Wilson tiene otra emergencia. #id:12b
 	else:
-		leo: Que no se te pierda el número, ¿sí? Por si tu gato tiene otra emergencia.
-	(Leo sonríe.)
-	alice: (asiente, con las mejillas ardiendo)
+		leo: Que no se te pierda el número, ¿sí? Por si tu gato tiene otra emergencia. #id:12c
+	(Leo sonríe.) #id:12d
+	alice: (asiente, con las mejillas ardiendo) #id:12e
 else:
-	leo: Que encuentres el camino.
-	(Leo sonríe. No dice nada más.)
-	alice: (asiente)
+	leo: Que encuentres el camino. #id:12f
+	(Leo sonríe. No dice nada más.) #id:130
+	alice: (asiente) #id:131

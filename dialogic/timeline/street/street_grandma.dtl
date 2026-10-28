@@ -1,6 +1,6 @@
-alice: Ella también tiene gato...
-alice: ¿Dónde las habrá comprado?
-grandma: (la mira, amable) ¿Buscas algo, jovencita?
-alice: (se sobresalta) Eh... sí. Comida para gatos. ¿Sabe dónde puedo comprar?
-grandma: Claro. Hay un minimercado justo detrás de la torre de cristal. No tiene pérdida.
-alice: Mmm G-Gracias...
+alice: Ella también tiene gato... #id:1f0
+alice: ¿Dónde las habrá comprado? #id:1f1
+grandma: (la mira, amable) ¿Buscas algo, jovencita? #id:1f2
+alice: (se sobresalta) Eh... sí. Comida para gatos. ¿Sabe dónde puedo comprar? #id:1f3
+grandma: Claro. Hay un minimercado justo detrás de la torre de cristal. No tiene pérdida. #id:1f4
+alice: Mmm G-Gracias... #id:1f5

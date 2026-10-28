@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://cmw36eveesd85"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Excuse me,", "where\'s", "the metro?"),
+"fumble": PackedStringArray("Where", "am", "I?")
+}
+extra_words = PackedStringArray("street", "cat")
+prompt = "Asking how to get to the metro. Calmly."
+relaxed = true

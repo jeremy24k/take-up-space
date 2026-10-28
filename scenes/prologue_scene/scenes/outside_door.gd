@@ -54,7 +54,8 @@ func _on_goodbye_finished() -> void:
 	bodies_inside = 1
 
 	if GameManager.wilson:
-		GameManager.wilson.is_following = false
+		GameManager.wilson.stay_home()
 
 	sprite_door.play("open_door")
+	play_open_sound()
 	collision_door.set_deferred("disabled", true)

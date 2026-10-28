@@ -5,7 +5,7 @@ extends Node2D
 # =========================
 @export_group("Stair Movement")
 @export var first_step_vector: Vector2 = Vector2(-32, 0)   # First segment (left)
-@export var second_step_vector: Vector2 = Vector2(0, 48)   # Second segment (down)
+@export var second_step_vector: Vector2 = Vector2(0, 72)   # Second segment (down)
 
 @export_group("Animations")
 @export var first_anim: String = "walk_side"
@@ -25,6 +25,10 @@ extends Node2D
 ## Lines shown on the black screen between both scenes (FadeTransition
 ## interlude). Empty = a plain fade.
 @export var interlude_lines: PackedStringArray = []
+## Optional picture shown full screen during the interlude (the cover when
+## Alice leaves her building), before line number interlude_image_before_line.
+@export var interlude_image: Texture2D
+@export var interlude_image_before_line: int = 2
 
 @onready var stair_area: Area2D = $Area2D
 
@@ -65,8 +69,9 @@ func _on_stairs_area_body_entered(body: Node2D) -> void:
 	# Play final idle animation
 	player.play_animation(final_anim)
 
-	if next_scene_path != "" and not interlude_lines.is_empty():
-		FadeTransition.transition_with_interlude(next_scene_path, interlude_lines)
+	if next_scene_path != "" and (not interlude_lines.is_empty() or interlude_image):
+		FadeTransition.transition_with_interlude(next_scene_path, interlude_lines, -1.0,
+			interlude_image, interlude_image_before_line)
 	elif next_scene_path != "":
 		FadeTransition.transition_to_scene(next_scene_path)
 	else:

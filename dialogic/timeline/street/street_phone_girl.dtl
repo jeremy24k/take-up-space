@@ -1,7 +1,7 @@
-(Una chica escucha un audio en altavoz.)
-alice: (alcanza a oír) "...sí, en el minimercado ese, junto a la torre de cristal..."
-alice: ¿Un minimercado? ¿Junto a la torre?
-alice: (pausa) Quizá ahí vendan comida para gatos.
-alice: (pausa) ...Debería ir a mirar.
-alice: (busca su teléfono por costumbre)
-alice: ... Ah. Es verdad. No tengo.
+(Una chica escucha un audio en altavoz.) #id:204
+alice: (alcanza a oír) "...sí, en el minimercado ese, junto a la torre de cristal..." #id:205
+alice: ¿Un minimercado? ¿Junto a la torre? #id:206
+alice: (pausa) Quizá ahí vendan comida para gatos. #id:207
+alice: (pausa) ...Debería ir a mirar. #id:208
+alice: (busca su teléfono por costumbre) #id:209
+alice: ... Ah. Es verdad. No tengo. #id:20a

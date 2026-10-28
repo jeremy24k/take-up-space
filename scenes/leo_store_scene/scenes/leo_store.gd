@@ -60,6 +60,8 @@ const SEARCH_SHELVES := {
 ## she searches the shelves for the tuna -> the conversation at the counter -> Leo says goodbye at the door -> demo end.
 ## Each step is saved in GameManager, so leaving and coming back resumes it.
 func _ready() -> void:
+	# The shop door's bell, as she comes in.
+	SoundManager.play_sfx("shop_bell")
 	Dialogic.signal_event.connect(_on_dialogic_signal)
 	# interacted fires right before the area starts its timeline, so each
 	# area can still pick the version that matches the current step.

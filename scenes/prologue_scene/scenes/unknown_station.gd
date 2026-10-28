@@ -7,6 +7,11 @@ extends Node2D
 ## If Alice stands still after getting off, the train leaves anyway after this
 ## many seconds, so the lost-phone scene never depends on stepping on the trigger.
 @export var departure_fallback_time: float = 3.0
+## The train pulling out, motor first: it starts as the train moves. It
+## rides on the train (pans and fades with the distance) and fades out over
+## the time the train takes to leave, so it is gone when the train is.
+const TRAIN_DEPARTURE_SOUND := preload("res://audio/sfx/train_departure.ogg")
+const DEPARTURE_HEARING_DISTANCE: float = 900.0
 
 ## "Rompecabezas de la Ansiedad" played from the timelines with
 ## [signal arg="anxiety_puzzle:<id>"]. The worker's is the first real one: the
@@ -53,6 +58,7 @@ func _depart_train() -> void:
 	# The train pulls away while Alice is still in control for a beat, so the
 	# player can walk around the platform and feel the disorientation before the
 	# phone revelation lands.
+	_play_departure_sound()
 	metro_train.leave_station()
 	await get_tree().create_timer(wait_time_for_phone_missing).timeout # Wait a beat before the phone revelation lands.
 
@@ -61,6 +67,18 @@ func _depart_train() -> void:
 		await Dialogic.timeline_ended
 	Dialogic.start("unknown_station_lost_phone")
 	await Dialogic.timeline_ended
+
+func _play_departure_sound() -> void:
+	var sound := AudioStreamPlayer2D.new()
+	sound.stream = TRAIN_DEPARTURE_SOUND
+	sound.bus = &"SFX"
+	sound.max_distance = DEPARTURE_HEARING_DISTANCE
+	metro_train.add_child(sound)
+	sound.play()
+	# Same duration as metro_train.leave_station(): arrival_time * 1.5.
+	var fade := create_tween()
+	fade.tween_property(sound, "volume_db", -60.0, metro_train.arrival_time * 1.5) 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	fade.tween_callback(sound.queue_free)
 
 # =========================
 # Anxiety puzzle

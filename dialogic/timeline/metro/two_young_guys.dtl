@@ -1,10 +1,10 @@
-alice: (escucha a dos personas que hablan cerca)
-chico: ¡No te digo! El último nivel es imposible.
-chica: No es imposible, es que eres malo.
-chico: Te apuesto a que no lo pasas ni en una semana.
-chica: ¿Una semana? Lo paso mañana.
-alice: (los mira un momento, sin que la vean) Yo también pasé ese nivel.
-alice: Bueno... casi.
-alice: Podría decir eso. Es una frase normal.
-alice: (se acerca un poco)[pause=0.8] ...
-alice: No pasa nada. No tengo que hablar con todo el mundo.
+alice: (escucha a dos personas que hablan cerca) #id:167
+couple_guy: ¡No te digo! El último nivel es imposible. #id:168
+couple_girl: No es imposible, es que eres malo. #id:169
+couple_guy: Te apuesto a que no lo pasas ni en una semana. #id:16a
+couple_girl: ¿Una semana? Lo paso mañana. #id:16b
+alice: (los mira un momento, sin que la vean) Yo también pasé ese nivel. #id:16c
+alice: Bueno... casi. #id:16d
+alice: Podría decir eso. Es una frase normal. #id:16e
+alice: (se acerca un poco)[pause=0.8] ... #id:16f
+alice: No pasa nada. No tengo que hablar con todo el mundo. #id:170

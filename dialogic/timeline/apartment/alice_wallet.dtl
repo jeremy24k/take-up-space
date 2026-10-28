@@ -1,23 +1,24 @@
 if {GameManager.quest_step} == 3.0 and {GameManager.prep_items_unlocked}:
-	alice: (la ve sobre la mesa) La cartera.
-	alice: (la abre, mira el dinero) El dinero justo.
-	alice: No puedo perderlo. No puedo gastarlo en otra cosa.
-	alice: (se la guarda en el bolsillo) Solo lo justo para la comida de Wilson.
+	alice: (la ve sobre la mesa) La cartera. #id:3f
+	alice: (la abre, mira el dinero) El dinero justo. #id:40
+	alice: No puedo perderlo. No puedo gastarlo en otra cosa. #id:41
+	alice: (se la guarda en el bolsillo) Solo lo justo para la comida de Wilson. #id:42
 	[signal arg="item_picked:alice_wallet"]
 	if GameManager.has_all_prep_items():
-		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme.
+		alice: (ajusta la mochila) Auriculares, cartera, zapatos... ya está todo. Ok... es hora de irme. #id:43
 		join alice (worried) leftmost
-		alice: Ojalá me emocionara.
-		alice: Quizás, si espero un poco...
-		(Wilson maúlla, impaciente.)
+		alice: Ojalá me emocionara. #id:44
+		alice: Quizás, si espero un poco... #id:45
+		[signal arg="sfx:meow"]
+		(Wilson maúlla, impaciente.) #id:46
 		update alice (neutral)
-		alice: No. Wilson me necesita. Lo voy a hacer.
+		alice: No. Wilson me necesita. Lo voy a hacer. #id:47
 		update alice (nervous)
-		alice: Pero antes... un par de frases frente al espejo del baño.
-		alice: Por si alguien me habla. Por si acaso.
+		alice: Pero antes... un par de frases frente al espejo del baño. #id:48
+		alice: Por si alguien me habla. Por si acaso. #id:49
 		leave alice
 		[signal arg="step_4"]
 else:
-	alice: (ve la cartera sobre la mesa) Ahí está mi cartera.
-	alice: El dinero justo... como siempre.
-	alice: Supongo que la necesitaré más tarde.
+	alice: (ve la cartera sobre la mesa) Ahí está mi cartera. #id:4a
+	alice: El dinero justo... como siempre. #id:4b
+	alice: Supongo que la necesitaré más tarde. #id:4c

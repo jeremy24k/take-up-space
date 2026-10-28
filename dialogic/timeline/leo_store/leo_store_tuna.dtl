@@ -1,4 +1,4 @@
-alice: (por fin, las latas para gatos; agarra una de atún sin mirar)
-alice: Atún. Sí. A Wilson le gusta el atún.
-alice: (mira de reojo hacia el mostrador)
+alice: (por fin, las latas para gatos; agarra una de atún sin mirar) #id:147
+alice: Atún. Sí. A Wilson le gusta el atún. #id:148
+alice: (mira de reojo hacia el mostrador) #id:149
 [signal arg="leo_tuna_taken"]

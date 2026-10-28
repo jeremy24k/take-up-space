@@ -100,6 +100,29 @@ func _ready() -> void:
 	Dialogic.signal_event.connect(_on_dialogic_signal)
 
 # =========================
+# New game
+# =========================
+## Not state: a live node and a computed text.
+const NOT_RESET: PackedStringArray = ["wilson", "missing_prep_text"]
+
+## Puts every piece of state back to how a new game starts (the demo end's
+## "Empezar de nuevo"). The defaults come from a fresh copy of this script
+## (Script.get_property_default_value only knows @export ones), so a variable
+## added later is reset too without touching this.
+func reset() -> void:
+	var fresh: Node = get_script().new()
+	for property in get_script().get_script_property_list():
+		if not property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE or property.name in NOT_RESET:
+			continue
+		var value: Variant = fresh.get(property.name)
+		if value is Array or value is Dictionary:
+			value = value.duplicate(true)
+		set(property.name, value)
+	fresh.free()
+	quest_step_changed.emit(quest_step)
+	outfit_changed.emit()
+
+# =========================
 # Dialogic event handling
 # =========================
 func _on_dialogic_signal(argument: String) -> void:
@@ -199,6 +222,35 @@ func has_all_prep_items() -> bool:
 		if not is_item_collected(item_id):
 			return false
 	return true
+
+## What Alice still lacks to leave, in words for the blocked front door
+## (alice_cant_leave_yet.dtl: {GameManager.missing_prep_text}). Before she
+## opens the backpack she only knows she needs the backpack; after, the items
+## still missing ("la cartera y los zapatos"). In the player's language.
+var missing_prep_text: String:
+	get:
+		var names: Array[String] = []
+		if not prep_items_unlocked:
+			names.append(_prep_item_name("alice_backpack"))
+		else:
+			for item_id in missing_prep_items:
+				if not is_item_collected(item_id):
+					names.append(_prep_item_name(item_id))
+		if names.size() <= 1:
+			return "".join(names)
+		return "%s %s %s" % [", ".join(names.slice(0, -1)), tr("y"), names[-1]]
+
+func _prep_item_name(item_id: String) -> String:
+	match item_id:
+		"alice_backpack":
+			return tr("la mochila")
+		"alice_wallet":
+			return tr("la cartera")
+		"alice_headphones":
+			return tr("los auriculares")
+		"alice_shoes":
+			return tr("los zapatos")
+	return item_id
 
 ## Counts only the prep items still missing. The backpack (and any other item)
 ## also lands in collected_items, so subtracting sizes went negative.

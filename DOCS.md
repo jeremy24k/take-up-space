@@ -32,6 +32,18 @@ addons/        Dialogic, AsepriteWizard, TileMapDual
 
 ## 2. Flujo del juego
 
+El juego arranca en la pantalla de idioma (`scenes/language_select/`, §12),
+que pasa al apartamento.
+
+**La portada** (`ui/cover.aseprite`, la ilustración del título) aparece a
+pantalla completa al salir del edificio: la escalera del apartamento tiene
+`interlude_image` y `interlude_image_before_line = 2`, así que
+`FadeTransition.transition_with_interlude()` la muestra entre "El aire de la
+mañana..." y "Camina rápido..." (1,4 s de fundido, 3,5 s quieta, se salta con
+Espacio). Cubre la pantalla recortando un poco arriba y abajo, y se filtra en
+lineal porque es ilustración, no pixel art. Vuelve, oscurecida, de fondo en
+`demo_end`.
+
 ```
 apartment.tscn ──global/stairs/stairs.gd──►  metro_stations.tscn  ──metro_train.gd──►  metro_train_interior.tscn
 (apartamento,                  (andén de                                  (vagón: se sienta → se duerme →
@@ -71,8 +83,16 @@ espejo del baño.") y la señal `step_4`. Como la señal se procesa antes que la
 condición, solo la dice el último objeto, sea cual sea el orden.
 
 **La puerta del departamento** (`outside_door.gd`) se abre con
-`quest_step >= 4` **y** `GameManager.mirror_practice_done`. Si va sin
-ensayar, `alice_cant_leave_yet` dice "Todavía no. Primero el espejo." El
+`quest_step >= 4` **y** `GameManager.mirror_practice_done`. Mientras no,
+`alice_cant_leave_yet` dice lo que toca según el paso:
+- paso 0 (aún no sabe que Wilson tiene hambre): "Wilson está maullando...
+  Debería ver qué le pasa." (con maullido);
+- pasos 1–2: "Tengo que conseguir comida para Wilson.";
+- paso 3: "Todavía no puedo. Aún necesito {GameManager.missing_prep_text}."
+  `missing_prep_text` (GameManager) da "la mochila" si aún no la abrió, y si
+  no, lo que falte de verdad ("la cartera y los zapatos"), ya traducido
+  (`tr()`, filas en `game_text.csv`);
+- paso 4 sin ensayar: "Todavía no. Primero el espejo." El
 espejo (`apartment/bathroom_glass`) tiene tres estados: antes de la
 preparación, las ojeras de siempre; con todo listo, el ensayo (ver
 `AnxietyPuzzle`); después, "Ya. Basta de practicar.", para que no se repita.
@@ -288,9 +308,13 @@ que genera un `.ase_layer` por capa en `player/alice_layers/`, cada uno un
   de Alice incrustada en la escena; se quitó para que use la del jugador.
 - **Los tiempos de cada frame viven en `alice.aseprite`**, no en Godot: la
   importación los copia. `sit_sleepy` y `sit_asleep` van a 1/3 s por frame
-  (3 fps, la respiración lenta al dormirse) y los pasos tienen duraciones
-  desiguales (`walk_front` 0,15/0,2/0,1/0,2/0,2/0,15; `walk_back`
-  0,2/0,2/0,1/0,1/0,2/0,2). Antes estaban ajustados a mano en el
+  (3 fps, la respiración lenta al dormirse). **Las tres animaciones de caminar
+  duran lo mismo por vuelta: 0,8 s** (`walk_front` 0,12/0,16/0,08/0,16/0,16/0,12;
+  `walk_back` 0,16/0,16/0,08/0,08/0,16/0,16; `walk_side` 6 × 0,133). Alice
+  avanza siempre a la misma velocidad, así que si una vuelta dura más que otra
+  las piernas (y los pasos, que suenan en `step_frames`) cambian de ritmo al
+  girar; antes `walk_side` duraba 0,6 s y las otras 1 s. Si retocas una,
+  mantén el total en 0,8 s. Antes estaban ajustados a mano en el
   `SpriteFrames` incrustado en `player.tscn`; al pasar a capas se perdieron y
   Alice "dormía" a 10 fps. `alice.aseprite.import` tiene
   `animation/round_fps=false`: con el redondeo, 3 fps se volvían 4.
@@ -533,6 +557,12 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   (clave del resultado → palabras en orden), `extra_words` (distractores que
   no llevan a ningún lado), `prompt`, `time_limit` (20 s) y
   `mistake_penalty` (1,5 s).
+- **Idiomas:** las palabras *son* el puzzle, así que no se traducen una a una
+  (en inglés la frase tiene otro orden y otro número de palabras). Cada
+  `.tres` en español tiene su versión `*_en.tres` al lado, enlazada en
+  `translations` (`{"en": ...}`); `run()` elige la del idioma actual con
+  `for_current_language()`. Las claves de `phrases` tienen que ser las mismas
+  en las dos versiones, porque el timeline ramifica por ellas. Ver §12.
 - **Cómo se juega:** las palabras de todas las respuestas, los distractores y
   "(...)" flotan mezclados (`ThoughtWord`: texto m3x6 sin caja, flota a su
   ritmo y tiembla más cuanto menos tiempo queda; la que tiene el foco se
@@ -1668,9 +1698,16 @@ LeoStore (Node2D, y_sort)               leo_store.gd
    Hay dos versiones según si le dio su número (`REFLECTION_GAVE_NUMBER` /
    `REFLECTION_KEPT_NUMBER`) y un cierre común (`REFLECTION_END`). Antes era
    una timeline de Dialogic (`leo_store_reflection`, borrada) con la caja de
-   diálogo sobre negro. `demo_end.tscn` solo muestra "Continuará..." y
-   "[Espacio] Salir", que cierra el juego (la salida se habilita cuando
-   termina de aparecer el título, para que un Espacio de más no lo cierre).
+   diálogo sobre negro. `demo_end.tscn` muestra, sobre la portada oscurecida
+   (`ui/cover.aseprite` al 30 %), uno tras otro, "Continuará...", "Gracias por jugar" con la invitación a dejar un
+   comentario, y dos opciones que se eligen con flechas y Espacio, como en la
+   pantalla de idioma: **Empezar de nuevo** (`GameManager.reset()` +
+   `Dialogic.VAR.reset()` y vuelta a la pantalla de idioma) y **Salir**
+   (`AppExit.quit_game()`). Las opciones solo responden cuando ya
+   aparecieron, para que un Espacio de más no cierre el juego.
+   `GameManager.reset()` toma los valores iniciales de una copia nueva del
+   script, así que una variable nueva de estado vuelve a cero sola (salvo las
+   de `NOT_RESET`: la referencia a Wilson y `missing_prep_text`).
 
 ### Estado en `GameManager`
 `leo_greeted`, `leo_has_tuna`, `leo_talk_done`, `leo_confidence` (la
@@ -1752,7 +1789,156 @@ delantal con el carrito, pantalón gris azulado y zapatillas grises. Tags:
 
 ---
 
-## 12. Cosas pendientes / a vigilar
+## 12. Idiomas (español e inglés)
+
+El juego se escribe en español y se puede jugar en español o en inglés. Todo
+usa el sistema de traducción de Godot (`TranslationServer` + CSV importados),
+y Dialogic usa el suyo encima del mismo sistema.
+
+**Pantalla de idioma** (`scenes/language_select/`): es la escena principal.
+Flechas para elegir, Espacio o Enter para confirmar, y pasa al apartamento con
+`FadeTransition`. Viene marcado el último idioma usado. La escena tiene
+`auto_translate_mode` desactivado: cada idioma se muestra con su propio nombre.
+
+**`Localization`** (autoload, `autoload/Localization.gd`): guarda el idioma en
+`user://settings.cfg` y lo aplica al arrancar, así que una escena lanzada sola
+desde el editor también sale en el último idioma elegido.
+`Localization.set_language("en")` cambia todo el juego.
+
+**Los textos, en tres CSV** (`translations/`, columnas `keys,es,en`):
+
+| Archivo | Qué tiene | Clave |
+|---|---|---|
+| `dialogic_timeline_translations.csv` | Todas las líneas y opciones de los `.dtl` | `Text/<id>/text`, `Choice/<id>/text` |
+| `dialogic_character_translations.csv` | Nombres de los personajes (`.dch`) | `Character/<id>/name` |
+| `game_text.csv` (solo `keys,en`) | Todo lo demás: pensamientos (`ThoughtTrigger`, `RemarkInteractable`, `AmbientThought`, `BoundaryArea`), `prompt_text`, textos de `Label`/`Button`, constantes de código (`LOST_LINES`, `STUMBLE_LINE`, el interludio de Leo...) | el propio texto en español |
+
+- **Dialogic:** cada línea de un `.dtl` lleva al final un `#id:xx`. Ese id es
+  la clave en el CSV: **no lo borres ni lo copies a otra línea** al editar.
+  Si cambias el texto en español, el inglés sigue siendo el viejo hasta que
+  lo actualices en el CSV.
+- **`game_text.csv`** usa el texto en español como clave: si una línea no
+  está en el CSV (o su columna `en` está vacía), se ve en español. Si cambias
+  una línea en español en el inspector, su traducción se pierde (queda la
+  vieja en el CSV como fila huérfana hasta la próxima actualización).
+- **Qué textos encuentra el recolector:** en escenas, las propiedades
+  `lines`, `first_line`, `thought_lines`, `thought_text`, `prompt_text`,
+  `interlude_lines` (y `text` de `Label`/`Button`); las mismas en los `.tres`
+  (p. ej. `global/remarks/ambient_npc_pool.tres`); en código, las constantes
+  que parecen frases y cualquier literal escrito como `tr("...")`. Un texto
+  nuevo con otro nombre de propiedad hay que añadirlo a
+  `TranslationCollector.TEXT_PROPERTIES`.
+- **Cómo se traduce en el juego:** `ThoughtBox.say()` pasa cada línea por
+  `tr()`; los `Label` y `Button` se traducen solos (`auto_translate`), y por
+  eso `prompt_text`, el interludio de `FadeTransition` y los textos fijos de
+  las escenas no necesitan código. Una constante nueva de código que se
+  muestre de otra forma necesita su `tr()`.
+- **Puzzles:** tienen su propia versión por idioma (ver `AnxietyPuzzle`, §5).
+- **Texto dibujado en el arte** (carteles, "MEOW!"): no se traduce.
+
+**Flujo al escribir texto nuevo:**
+1. Escríbelo en español, como siempre.
+2. Diálogos: Dialogic → Ajustes → Traducción → **Update CSV files** (añade los
+   `#id:` nuevos y las filas al CSV, sin tocar las traducciones que ya hay).
+   **Cuidado:** si sale un aviso de que cambiaron los ajustes, elige
+   "Keep old & Generate new": el botón OK de ese aviso, y el botón de borrar
+   traducciones de esa pestaña, borran los CSV con todo el inglés.
+3. Resto del texto: abre `global/localization/update_translations.gd` en el
+   editor de scripts y pulsa **Ctrl+Shift+X** (Archivo → Ejecutar).
+4. Rellena la columna `en` de las filas nuevas (Excel/Sheets/un editor de
+   texto; guárdalo en UTF-8). Godot reimporta el CSV solo.
+
+Desde la terminal, con el editor cerrado, todo de una vez:
+`godot --headless --path . --script res://global/localization/update_translations_cli.gd`
+(`TranslationCollector`, `global/localization/translation_collector.gd`).
+
+Añadir un tercer idioma: una columna nueva en los CSV, su código en
+`Localization.LANGUAGES` y en `TranslationCollector.LOCALES`, una opción en la
+pantalla de idioma, y versiones de los puzzles.
+
+---
+
+## 13. Sonido
+
+Todo el audio está en `audio/` (`ambience/`, `music/`, `sfx/`), ya recortado, en
+bucle y con el volumen igualado. De dónde sale cada archivo, y qué se le hizo,
+está en `audio/CREDITS.md` (todo de Pixabay, sin atribución obligatoria).
+
+**Tres buses** (`default_bus_layout.tres`, panel Audio del editor): `Music`
+(−2 dB), `Ambience` (−8 dB: el ambiente es aire de fondo, nunca tapa la música) y `SFX`. Para subir o bajar un tipo de sonido en todo
+el juego, se toca el bus, no cada archivo.
+
+**`SoundManager`** (autoload, `autoload/SoundManager.gd`): sobrevive a los
+cambios de escena, así que el sonido de una escena se funde con el de la
+siguiente (1,5 s) en vez de cortarse. API: `set_music(stream, db)`,
+`set_ambience(stream, db)` (null = silencio; si es el mismo stream sigue
+sonando donde iba) y `play_sfx(stream_o_nombre, db, pitch)`.
+
+**`SceneAudio`** (`global/scene_audio.gd`): un nodo por escena dice qué suena en
+ella, con `ambience`/`music` y su volumen en el inspector. Hueco vacío =
+silencio (lo anterior se apaga). Una escena sin `SceneAudio` deja sonar lo que
+hubiera.
+
+| Escena | Ambiente | Música |
+|---|---|---|
+| Apartamento | `apartment` (salón, tráfico lejano; −2 dB) | `apartment_morning` (−8 dB, debajo de los diálogos) |
+| Andén | `metro_platform` (andén + gente) | — |
+| Vagón | (su `TrainAmbience` propio, `train_ride`, que se apaga al dormirse) | — |
+| Estación desconocida | `unknown_station` (andén vacío, apagado) | — |
+| Calle | `street` | `lost_melancholic` (−12 dB, casi de fondo) |
+| Tienda de Leo | `leo_store` (nevera) | `leo_guitar` (−6 dB) |
+| Fin de la demo | — | `demo_end_breeze` |
+
+**Efectos y dónde se disparan:**
+- **Tren:** `metro_stations.gd` hace sonar la llegada al llamar al tren y la
+  campanita al abrir y cerrar las puertas (señales `doors_opened`/`doors_closed`
+  de `metro_train`). `unknown_station.gd` hace sonar la salida al irse el tren: el sonido va pegado al tren (`AudioStreamPlayer2D` hijo de `MetroTrain`, se desplaza y se atenúa con él) y además se apaga en lo que tarda el tren en irse (`arrival_time * 1.5`), así que se disipa mientras se aleja.
+- **Puertas** (`basic_door.gd`): `open_sound` (export) al abrirse. Vacío = puerta
+  muda.
+- **Campanita de la tienda:** al entrar (`leo_store.gd`, `_ready`).
+- **Wilson:** mientras maúlla (animación `meowing`), un maullido cada
+  `meow_interval` s (3). Suena desde donde está él (`AudioStreamPlayer2D`, se
+  apaga a `meow_hearing_distance` px), así que se pierde al alejarse y no
+  sigue en el interludio. Después de la despedida (`stay_home()`, la llama
+  `outside_door.gd`) solo maúlla `meows_after_goodbye` veces (2). En los diálogos, `[signal arg="sfx:meow"]` antes de cada
+  línea en que maúlla.
+- **Desde Dialogic:** `[signal arg="sfx:<nombre>"]` con cualquier nombre de
+  `SoundManager.SFX` (`meow`, `door_open`, `shop_bell`, `train_chime`).
+- **Rompecabezas de la Ansiedad:** solo en los de verdad (no en el espejo), un
+  latido que se acelera (×1 → ×1,4) y sube de volumen con la presión, y una
+  respiración agitada que entra en la segunda mitad. Se apagan con el puzzle.
+- **Pasos de Alice** (`player.gd`): en cada fotograma de `step_frames`
+  (`[0, 3]`) de `walk_front/back/side` suena uno de los 4 `footstep_*.ogg`,
+  nunca el mismo dos veces seguidas y con el tono un poco al azar (×0,92–1,08),
+  a `footstep_volume_db` (−12). Solo con animaciones `walk_`, así que las de
+  cinemática no suenan. Si un paso no cae justo cuando el pie toca el suelo,
+  cambia `step_frames` en el inspector de Alice.
+  Al girar caminando, la animación nueva sigue en el mismo fotograma y punto
+  del ciclo (`_switch_walk_animation`) en vez de volver al 0, que es un
+  fotograma de paso: si no, sonaba un paso de golpe y cortaba el anterior.
+  Además, nunca suenan dos pasos a menos de 0,25 s y un paso no corta la
+  cola del anterior (`max_polyphony = 2`).
+- **Pantalla de idioma:** un pitido suave al mover la selección.
+- **"Bajo el agua" en el Rompecabezas:** al empezar cualquier puzzle,
+  `SoundManager.set_muffled(true)` baja el filtro de paso bajo de los buses
+  `Music` y `Ambience` (20 kHz → 500 Hz) y los baja 6 dB en 0,6 s; al acabar
+  vuelve todo. El latido y la respiración van por `SFX`, sin filtro.
+
+Añadir un sonido: recórtalo/normalízalo, ponlo en `audio/`, apúntalo en
+`CREDITS.md`, y si es un bucle activa **Loop** en su panel de importación.
+
+**Bucles de música sin corte:** la música no se repite de punta a punta (se
+notaba un corte a mitad de frase). Cada pista se analizó para encontrar dos
+puntos donde suena lo mismo (mismo compás de la misma frase): el archivo
+acaba en el punto final E, sus últimos 80 ms se funden con lo que suena justo
+antes del punto S, y el importador vuelve a S al llegar al final (**Loop** +
+`loop_offset` = S en segundos, en el panel de importación). La intro solo
+suena la primera vez. Los puntos de cada pista están en `CREDITS.md`. Una
+música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
+
+---
+
+## 14. Cosas pendientes / a vigilar
 
 - **Crash al cerrar el juego en macOS (Godot 4.7).** Cerrar el juego después de
   haber cargado cualquier escena con `TileMapDual` termina con

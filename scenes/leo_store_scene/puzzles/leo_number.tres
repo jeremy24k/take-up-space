@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://dx1xcsuvdrxjw"]
 
 [ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://dd5gvbo08cmxv" path="res://scenes/leo_store_scene/puzzles/leo_number_en.tres" id="2_en"]
 
 [resource]
 script = ExtResource("1_data")
@@ -12,3 +13,6 @@ extra_words = PackedStringArray("teléfono", "atún", "adiós", "mañana")
 prompt = "¿Le pido su número... o me despido?"
 time_limit = 14.0
 mistake_penalty = 2.0
+translations = {
+"en": ExtResource("2_en")
+}

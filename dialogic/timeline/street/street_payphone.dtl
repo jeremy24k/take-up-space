@@ -1,7 +1,7 @@
-alice: (mira el teléfono público)
-alice: Al menos este parece funcionar.
-alice: Podría llamar a alguien...
-alice: (se queda pensando)
-alice: ...No me sé ningún número de memoria.
-alice: (baja la mirada)
-alice: Ni siquiera el mío.
+alice: (mira el teléfono público) #id:1f6
+alice: Al menos este parece funcionar. #id:1f7
+alice: Podría llamar a alguien... #id:1f8
+alice: (se queda pensando) #id:1f9
+alice: ...No me sé ningún número de memoria. #id:1fa
+alice: (baja la mirada) #id:1fb
+alice: Ni siquiera el mío. #id:1fc

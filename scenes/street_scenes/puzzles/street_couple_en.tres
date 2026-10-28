@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://jfiq7hiq2abs"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Sorry...", "can I", "get", "past?"),
+"wait": PackedStringArray("They\'ll", "be done soon...")
+}
+extra_words = PackedStringArray("Excuse me", "cross", "quick", "street")
+prompt = "Do I ask them to let me through... or wait?"
+time_limit = 15.0
+mistake_penalty = 2.0

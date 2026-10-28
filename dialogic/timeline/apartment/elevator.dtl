@@ -1,14 +1,14 @@
 set {elevator_interaction} += 1
 
 if {elevator_interaction} == 1:
-	alice: Fuera de servicio.
-	alice: Otra vez...
-	alice: Supongo que hoy toca hacer un poco de ejercicio.
+	alice: Fuera de servicio. #id:76
+	alice: Otra vez... #id:77
+	alice: Supongo que hoy toca hacer un poco de ejercicio. #id:78
 
 elif {elevator_interaction} == 2:
-	alice: Sigue sin funcionar.
+	alice: Sigue sin funcionar. #id:79
 
 elif {elevator_interaction} == 3:
-	alice: No va a arreglarse por mirarlo otra vez, Alice.
+	alice: No va a arreglarse por mirarlo otra vez, Alice. #id:7a
 else:
-	alice: Las escaleras están al final del pasillo.
+	alice: Las escaleras están al final del pasillo. #id:7b

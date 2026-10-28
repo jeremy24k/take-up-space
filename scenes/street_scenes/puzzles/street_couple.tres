@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3]
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://d2tyyily48yxl"]
 
 [ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+[ext_resource type="Resource" uid="uid://jfiq7hiq2abs" path="res://scenes/street_scenes/puzzles/street_couple_en.tres" id="2_en"]
 
 [resource]
 script = ExtResource("1_data")
@@ -12,3 +13,6 @@ extra_words = PackedStringArray("Disculpen", "cruzar", "rápido", "calle")
 prompt = "¿Les pido que me dejen pasar... o espero?"
 time_limit = 15.0
 mistake_penalty = 2.0
+translations = {
+"en": ExtResource("2_en")
+}

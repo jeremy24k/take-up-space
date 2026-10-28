@@ -24,3 +24,17 @@ extends Resource
 ## Rehearsal (the mirror in the apartment): no clock, no closing vignette and
 ## no time lost on mistakes. Alice can only stop by choosing "(...)".
 @export var relaxed: bool = false
+## The same puzzle in other languages, by language code (e.g. "en" -> the
+## English .tres next to this one). Words cannot be translated one by one:
+## another language has its own word order and word count. The answers keep
+## the same keys, since the timelines branch on them. A language not listed
+## here plays this version (Spanish).
+@export var translations: Dictionary = {}
+
+# =========================
+# Language
+# =========================
+func for_current_language() -> AnxietyPuzzleData:
+	var language := TranslationServer.get_locale().get_slice("_", 0)
+	var translated: AnxietyPuzzleData = translations.get(language)
+	return translated if translated else self

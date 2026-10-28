@@ -56,7 +56,7 @@ const CAR_OWNER_FADE_TIME: float = 0.3
 ## Where the owner shows up, from the car sprite's origin (its bottom centre):
 ## by the driver's door, on the pavement. Relative, so moving the car in the
 ## editor brings the owner along.
-const CAR_OWNER_OFFSET := Vector2(48, -39)
+const CAR_OWNER_OFFSET := Vector2(56, -39)
 ## The car pulls away to the right, along its lane, until it is off screen.
 const CAR_DRIVE_DISTANCE: float = 760.0
 const CAR_DRIVE_TIME: float = 3.0
