@@ -1,0 +1,19 @@
+(Un señor mayor está junto a su camión de helados. Tiene cara de no tener ninguna prisa.) #id:321
+alice: D-disculpe... ¿usted... ha visto a una... #id:322
+lia: (se pone de puntillas) ¡Señor! ¿Vio a mi mamá? ¡Tiene vestido rosa! #id:323
+alice: (se le corta la frase a la mitad. Se le suben los colores.) #id:324
+ice_cream_man: (sonríe, sin apuro) A ver, a ver. De una en una. (mira a Alice) ¿Qué me decías? #id:325
+alice: U-una señora... con vestido rosa. Es su mamá. #id:326
+ice_cream_man: Vestido rosa... Sí. Pasó por aquí caminando hacia la fuente. Hará unos veinte minutos. #id:327
+lia: ¡Hacia la fuente! (tira de la manga de Alice) #id:328
+ice_cream_man: Tranquila, pequeña. Si iba buscándote, no se va a ir muy lejos. #id:329
+alice: G-gracias. #id:32a
+ice_cream_man: (le guiña un ojo a Lía) Y cuando la encuentres, vuelves por un helado. #id:32b
+if not {GameManager.lia_approached_first}:
+	lia: ¿Tú qué estabas comprando? Antes, digo. #id:32c
+	alice: Comida para mi gato. #id:32d
+	lia: ¿Y se te perdió? #id:32e
+	alice: No. Yo me perdí. #id:32f
+	lia: Pero ahora estás conmigo. Entonces estás más perdida que antes. #id:330
+	alice: (no puede evitar una pequeña risa) Supongo que sí. #id:331
+[signal arg="lia_clue:ice_cream"]

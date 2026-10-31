@@ -57,6 +57,8 @@ var current_state: State = State.IDLE
 var last_direction: Vector2 = Vector2.DOWN # Face down by default while idle.
 var can_move: bool = true
 var is_control_locked: bool = false  # True while a scripted sequence owns the player.
+## Walking speed multiplier, e.g. slower while Lía holds her sleeve.
+var speed_scale: float = 1.0
 
 # =========================
 # Setup and dialogue hooks
@@ -104,7 +106,7 @@ func _physics_process(delta: float) -> void:
 
 	# Apply movement.
 	_apply_corner_correction(direction, delta)
-	velocity = direction * SPEED
+	velocity = direction * SPEED * speed_scale
 	move_and_slide()
 
 	# Update locomotion state.

@@ -1,0 +1,5 @@
+if {GameManager.plaza_stage} == 0:
+	ice_cream_man: ¡Helados! ¿Uno de fresa para el camino? #id:332
+	alice: (niega con la cabeza, rápido) #id:333
+else:
+	ice_cream_man: Hacia la fuente, ¿eh? Suerte. #id:334

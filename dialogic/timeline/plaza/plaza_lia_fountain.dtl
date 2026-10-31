@@ -1,0 +1,85 @@
+(Llegan a la fuente. No hay nadie con vestido rosa.) #id:2d2
+lia: (la respiración se le entrecorta) ¿Y si no aparece? #id:2d3
+if not {GameManager.lia_approached_first}:
+	alice: No pienses eso. Tu mamá te está buscando. Eso dijeron. No te va a dejar de buscar. #id:2d4
+	lia: (aprieta los labios. Asiente.) #id:2d5
+alice: (el agua de la fuente cae. Siente que el tiempo se escapa.) #id:2d6
+- Esperar en la fuente, donde la mamá podría volver #id:2d7
+	alice: Tu mamá vino hasta la fuente. Si seguimos moviéndonos, igual nos la seguimos perdiendo. #id:2d8
+	lia: ¿Entonces? #id:2d9
+	alice: Esperamos. Aquí. Donde ella ya vino. #id:2da
+	[signal arg="time_passes"]
+	(Pasan los minutos. Lía tararea algo bajito. Alice no reconoce la canción, pero la escucha.) #id:2db
+	lia: ¿Tienes papel? Para dibujar. Para que no pase tan lento. #id:2dc
+	alice: (en el fondo de la mochila hay una libreta vieja y un bolígrafo. Se los da.) #id:2dd
+	(Lía dibuja con concentración absoluta. Ya no llora. Se le asoma la lengua por la comisura.) #id:2de
+	lia: ¿Tú sabes dibujar? #id:2df
+	alice: No mucho. #id:2e0
+	lia: Yo tampoco. Pero a mi mamá le gustan igual. ...Ya casi. #id:2e1
+	[signal arg="lia_confidence:2"]
+- Buscar a alguien de seguridad #id:2e2
+	alice: Vamos a buscar a alguien que sepa qué hacer. Alguien de seguridad. #id:2e3
+	lia: ¿Y si mi mamá vuelve y no me encuentra? #id:2e4
+	alice: Le decimos dónde vamos a estar. Para que sepa. #id:2e5
+	(En el quiosco de información hay un señor mayor.) #id:2e6
+	alice: D-disculpe... esta niña se perdió. Su mamá tiene vestido rosa. La vieron por la fuente hace un rato. #id:2e7
+	plaza_old_man: (saca una radio) Voy a avisar. Quédense aquí. #id:2e8
+	[signal arg="time_passes"]
+	(Pasan los minutos. Lía no dice nada, pero no la suelta.) #id:2e9
+	lia: ¿Tienes algo para dibujar? Para no pensar. #id:2ea
+	(Alice le da una libreta vieja y un bolígrafo. Lía dibuja rápido. Trazos pequeños, apretados.) #id:2eb
+	lia: ¿Tú también te pones así cuando estás nerviosa? #id:2ec
+	alice: Sí. #id:2ed
+	[signal arg="lia_confidence:1"]
+- Dejarse llevar por el pánico #id:2ee
+	alice: No sé... no sé dónde más buscar... #id:2ef
+	lia: (los ojos se le llenan de lágrimas) ¿Te vas a ir? #id:2f0
+	alice: No. No me voy. #id:2f1
+	alice: (pero las manos le tiemblan. La fuente le da vueltas.) #id:2f2
+	lia: (le aprieta la mano) Respira. Mi mamá dice que hay que respirar. #id:2f3
+	[signal arg="time_passes"]
+	(Alice la imita. Una vez. Otra. El temblor no se va del todo, pero la plaza deja de girar.) #id:2f4
+	lia: ¿Tienes papel? Mi mamá dice que cuando estoy nerviosa dibuje. Si dibujamos juntas, las dos nos calmamos. #id:2f5
+	alice: (saca una libreta arrugada. Dibuja algo torcido. Un círculo que quería ser un gato.) #id:2f6
+	lia: ¿Eso es un gato? #id:2f7
+	alice: Wilson. #id:2f8
+	lia: Está feo. #id:2f9
+	alice: Sí. #id:2fa
+	(Pero las dos se ríen. Un poquito.) #id:2fb
+	[signal arg="lia_bittersweet"]
+	[signal arg="lia_confidence:-1"]
+lia_mom: ¡LÍA! #id:2fc
+[signal arg="lia_mom_arrives"]
+lia: ¡MAMÁ! #id:2fd
+(Una mujer con vestido rosa. Se abrazan en medio de la plaza. La mamá llora. Lía llora.) #id:2fe
+if {GameManager.lia_outcome} == "agridulce":
+	lia_mom: ¿Estás bien? Muchas gracias por quedarte con ella. #id:2ff
+	alice: (asiente. No puede hablar.) #id:300
+	lia_mom: (le da una palmada en el hombro) Tranquila. Ya pasó. #id:301
+	alice: (pero siente que no pasó del todo. Algo en ella todavía tiembla.) #id:302
+	lia: El dibujo. (lo saca del bolsillo y se lo da) #id:303
+	(Dos figuras de palo agarradas de la mano. Una con gafas redondas. Un sol, algo que podría ser una fuente. Abajo: "ALICE Y LIA".) #id:304
+	lia: No me quedó muy bien. Pero es para ti. #id:305
+	alice: (los dedos le tiemblan) Está bien. Me gusta. #id:306
+	[signal arg="lia_drawing_given"]
+	lia_mom: Cuídate, Alice. #id:307
+	[signal arg="lia_leaves"]
+	(Lía agita la mano desde el hombro de su mamá. Alice agita la suya.) #id:308
+	alice: (No ayudé bien. Pero ayudé.) #id:309
+else:
+	lia_mom: ¿Eras tú? ¿Tú estabas con ella? #id:30a
+	alice: Sí. Estábamos... esperando. #id:30b
+	lia_mom: Gracias. Gracias, de verdad. No sabes cómo te lo agradezco. #id:30c
+	lia: Espera, espera. (saca el dibujo doblado y se lo da a Alice) #id:30d
+	(Una niña con gafas redondas y una mochila, y otra más pequeña de su mano. Una fuente y un sol enorme. En la esquina: "ALICE Y LIA".) #id:30e
+	lia: Es para que te acuerdes de mí. #id:30f
+	alice: (lo toma con cuidado) Gracias, Lía. #id:310
+	[signal arg="lia_drawing_given"]
+	lia_mom: Vamos, pequeña. Ya es tarde. #id:311
+	[signal arg="lia_leaves"]
+	(Lía se gira un par de veces para mirarla. En la última, agita la mano con fuerza.) #id:312
+	alice: (agita la suya. No tan fuerte. Pero la agita.) #id:313
+alice: (mira el reloj en la pared de la fuente. Se le hace un nudo en el estómago.) #id:314
+alice: El metro... #id:315
+alice: (suelta un juramento bajito que no se atrevería a decir si hubiera alguien cerca) #id:316
+alice: (ya no corre. Sabe que no va a llegar.) #id:317

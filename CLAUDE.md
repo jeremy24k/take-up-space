@@ -65,6 +65,7 @@ Both go through Dialogic, with two Styles in `dialogic/styles/` (`thought` inher
 
 ## Dialogic gotchas
 - Write each line as `character_id: text`, using the `.dch` id (`alice`, `metro_worker`, `wilson`). Actions look like `alice: (suspira)`. If the colon is missing, the whole line shows as narration. If the name is unknown, Dialogic creates a temporary character.
+- **Never give a character an id that starts with `do`.** Dialogic parses any line starting with `do` as a Call event, so `dog_lady: ...` was silently skipped ("Call event failed"). That character is `lady_with_dog`.
 - **Dialogic picks the timeline identifier, not you.** It uses the bare filename and adds the folder prefix only when names collide (e.g. `metro/ticket_store` vs `unknown_station_worker`). Always check `dtl_directory` in `project.godot` before calling `Dialogic.start("...")`.
 - `Dialogic.signal_event` and `Dialogic.timeline_ended` are **global**. Connect with `CONNECT_ONE_SHOT` or filter on the argument or timeline, or other dialogues will fire your callback. See `_wait_for_signal()` in `metro_train_interior.gd`.
 

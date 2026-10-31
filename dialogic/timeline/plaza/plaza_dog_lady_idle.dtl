@@ -1,0 +1,6 @@
+if {GameManager.plaza_stage} == 0:
+	lady_with_dog: Qué tarde tan bonita, ¿verdad? #id:347
+	alice: (asiente sin mirarla. El perro sí la mira a ella.) #id:348
+else:
+	lady_with_dog: ¡Suerte con la búsqueda! #id:349
+	(Toby mueve la cola.) #id:34a

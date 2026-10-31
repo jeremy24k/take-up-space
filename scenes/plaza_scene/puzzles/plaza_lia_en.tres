@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AnxietyPuzzleData" format=3 uid="uid://jgixo6ua1diju"]
+
+[ext_resource type="Script" uid="uid://bx3wq21hnovh" path="res://global/anxiety_puzzle/anxiety_puzzle_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+phrases = {
+"ask": PackedStringArray("Are you...", "okay?", "Where's", "your", "mom?"),
+"leave": PackedStringArray("I have", "to go.")
+}
+extra_words = PackedStringArray("girl", "metro", "cry", "sorry")
+prompt = "Do I ask what's wrong... or keep going to the metro?"
+time_limit = 16.0
+mistake_penalty = 2.0

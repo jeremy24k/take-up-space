@@ -44,6 +44,29 @@ var street_couple_waits: int = 0
 ## The dusty car's owner drove off with Alice's cat drawing: the car is gone.
 var street_car_gone: bool = false
 
+# =========================
+# Plaza (midgame)
+# =========================
+## Where Alice is in the plaza's story (plaza.gd drives it):
+## ARRIVED: she just got there; Lía cries on a bench across the plaza.
+## WITH_LIA: Lía holds her sleeve; they ask around the plaza (the ice-cream
+## man, the woman with the dog, the guy with headphones, in any order).
+## KNOWS_FOUNTAIN: enough clues point to the fountain.
+## LIA_HOME: Lía is back with her mother; the last train has already left.
+## MISSED_TRAIN: the gate is down. Night.
+enum PlazaStage { ARRIVED, WITH_LIA, KNOWS_FOUNTAIN, LIA_HOME, MISSED_TRAIN }
+var plaza_stage: PlazaStage = PlazaStage.ARRIVED
+## Trust Alice builds with Lía through her choices. Saved for later scenes.
+var lia_confidence: int = 0
+## True if Alice went to Lía on her own (instead of Lía coming after her).
+var lia_approached_first: bool = false
+## True if Alice walked off towards the metro and Lía ran after her.
+var lia_tried_to_leave: bool = false
+## Who already gave a clue about Lía's mother ("ice_cream", "dog_lady", "teen").
+var lia_clues: Array[String] = []
+## "feliz" or "agridulce": how well Alice held up until the mother came.
+var lia_outcome: String = "feliz"
+
 # Emitted the first time each clue is found (the street's "lost" reminder
 # restarts its clock on it).
 signal clue_added(clue_id: String)
@@ -163,6 +186,12 @@ func _on_dialogic_signal(argument: String) -> void:
 			leo_talk_done = true
 		"couple_waited":
 			street_couple_waits += 1
+		"lia_approached_first":
+			lia_approached_first = true
+		"lia_tried_to_leave":
+			lia_tried_to_leave = true
+		"lia_bittersweet":
+			lia_outcome = "agridulce"
 		"headphones_on":
 			set_headphones_on_head(true)
 		"headphones_off":
@@ -171,6 +200,8 @@ func _on_dialogic_signal(argument: String) -> void:
 			# "leo_confidence:<amount>", e.g. "leo_confidence:-1".
 			if argument.begins_with("leo_confidence:"):
 				leo_confidence += int(argument.get_slice(":", 1))
+			elif argument.begins_with("lia_confidence:"):
+				lia_confidence += int(argument.get_slice(":", 1))
 
 # =========================
 # Quest progression

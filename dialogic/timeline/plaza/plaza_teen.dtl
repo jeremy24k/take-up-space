@@ -1,0 +1,22 @@
+(Un chico sentado en la banca, con auriculares grandes y la cara metida en el teléfono.) #id:34b
+alice: Eh... perdona. #id:34c
+(Nada. Ni la mira.) #id:34d
+alice: (más bajito todavía) Perdona... #id:34e
+lia: (le tira de la manga) No te oye. ¡Más fuerte! #id:34f
+alice: (Está ocupado. No quiere que nadie le hable. Yo tampoco querría.) #id:350
+- Subir la voz #id:351
+	alice: ¡P-PERDONA! #id:352
+	(Le sale mucho más fuerte de lo que quería. Una señora se da vuelta. Alice quiere desaparecer.) #id:353
+	[signal arg="lia_confidence:1"]
+- Hacerle gestos #id:354
+	alice: (agita la mano delante del teléfono, roja de vergüenza) #id:355
+	(El chico levanta la vista como si hubiera visto un fantasma.) #id:356
+headphones_teen: (se quita un auricular) ¿Qué? #id:357
+alice: ¿V-viste a una señora con vestido rosa? #id:358
+headphones_teen: No. No he visto a nadie. #id:359
+lia: (se desinfla) #id:35a
+headphones_teen: (señala con la barbilla) Pero si se perdió, la fuente está allá, al otro lado. Todo el mundo queda ahí. #id:35b
+alice: Gracias. Perdón por... molestarte. #id:35c
+(Antes de que termine la frase, ya se volvió a poner el auricular.) #id:35d
+alice: (Ahí está. La sensación de haber molestado. Se le queda pegada.) #id:35e
+[signal arg="lia_clue:teen"]

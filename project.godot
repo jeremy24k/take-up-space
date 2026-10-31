@@ -37,8 +37,14 @@ directories/dch_directory={
 "couple_girl": "res://dialogic/characters/couple_girl.dch",
 "couple_guy": "res://dialogic/characters/couple_guy.dch",
 "grandma": "res://dialogic/characters/grandma.dch",
+"headphones_teen": "res://dialogic/characters/headphones_teen.dch",
+"ice_cream_man": "res://dialogic/characters/ice_cream_man.dch",
+"lady_with_dog": "res://dialogic/characters/lady_with_dog.dch",
 "leo": "res://dialogic/characters/leo.dch",
+"lia": "res://dialogic/characters/lia.dch",
+"lia_mom": "res://dialogic/characters/lia_mom.dch",
 "metro_worker": "res://dialogic/characters/metro_worker.dch",
+"plaza_old_man": "res://dialogic/characters/plaza_old_man.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
 }
 directories/dtl_directory={
@@ -82,6 +88,15 @@ directories/dtl_directory={
 "metro/two_young_guys": "res://dialogic/timeline/metro/two_young_guys.dtl",
 "metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
 "metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
+"plaza_dog_lady": "res://dialogic/timeline/plaza/plaza_dog_lady.dtl",
+"plaza_dog_lady_idle": "res://dialogic/timeline/plaza/plaza_dog_lady_idle.dtl",
+"plaza_ice_cream": "res://dialogic/timeline/plaza/plaza_ice_cream.dtl",
+"plaza_ice_cream_idle": "res://dialogic/timeline/plaza/plaza_ice_cream_idle.dtl",
+"plaza_lia_fountain": "res://dialogic/timeline/plaza/plaza_lia_fountain.dtl",
+"plaza_lia_meet": "res://dialogic/timeline/plaza/plaza_lia_meet.dtl",
+"plaza_missed_train": "res://dialogic/timeline/plaza/plaza_missed_train.dtl",
+"plaza_teen": "res://dialogic/timeline/plaza/plaza_teen.dtl",
+"plaza_teen_idle": "res://dialogic/timeline/plaza/plaza_teen_idle.dtl",
 "rotten_food": "res://dialogic/timeline/apartment/rotten_food.dtl",
 "street_ad_column": "res://dialogic/timeline/street/street_ad_column.dtl",
 "street_arrival": "res://dialogic/timeline/street/street_arrival.dtl",
@@ -173,7 +188,7 @@ translation/add_separator=true
 translation/intern/save_mode=0
 translation/intern/file_mode=0
 translation/intern/translation_folder="res://translations"
-translation/id_counter=555
+translation/id_counter=865
 
 [display]
 

@@ -35,6 +35,28 @@ addons/        Dialogic, AsepriteWizard, TileMapDual
 El juego arranca en la pantalla de idioma (`scenes/language_select/`, §12),
 que pasa al apartamento.
 
+**Midgame (en construcción):** `scenes/plaza_scene/scenes/plaza.tscn` + `plaza.gd`.
+La plaza al atardecer, después de la tienda de Leo (salto de tiempo en el
+interludio): Lía busca a su madre, Alice pierde el último tren por ayudarla y,
+de noche, Clara. La secuencia de Lía está en la sección 15.
+Mismas capas y tilesets que `street_zone_1`. El mapa: plaza cuadrada con
+cuatro jardines vallados, una plazoleta central con la fuente, calles arriba y
+abajo, y la boca del metro en la esquina inferior derecha. Alice entra por el
+hueco del muro de abajo (626, 1291); cámara de 0–1280 × 0–1308.
+- **Calzadas** (`SuperiorLayer/StreetRoadColisions`, oculta): la de abajo
+  bloqueada salvo los tres pasos de cebra (columnas 1–2, 19–20 y 37–38); la de
+  arriba, entera.
+- **Boca del metro** (esquina inferior derecha): una sola pieza de escalera
+  (`Buildings2`, atlas `buildings` 1–3 × 6–9; la copia apilada en `Buildings`
+  se quitó porque se leía como dos entradas), con sombra proyectada abajo a la
+  derecha en `Shadow` (como en la zona 1) y el recinto abierto hacia la acera
+  y hacia la izquierda: solo quedan la valla del borde derecho y la de abajo.
+- **Bordes** (`MapBoundaries`): izquierda y derecha ("No hace falta alejarme.
+  El metro está aquí...") y el hueco de entrada ("Por ahí vine...").
+`SunFilter` en tono de atardecer y el ambiente de la calle. La tienda de Leo
+lleva aquí (interludio con el salto de tiempo); la noche lleva a `demo_end`
+hasta que exista Clara.
+
 **Las líneas al salir del edificio** están en `apartment.gd` (`LEAVING_LINES`),
 que las pone en la escalera al cargar, y no en la escena: un editor con una
 copia vieja de `apartment.tscn` las borró varias veces al guardar (Godot guarda
@@ -1702,7 +1724,9 @@ LeoStore (Node2D, y_sort)               leo_store.gd
    `FadeTransition.transition_with_interlude` (la misma pieza que la escalera
    al metro) para contar, con la pantalla en negro, cómo Alice sale a la calle.
    Hay dos versiones según si le dio su número (`REFLECTION_GAVE_NUMBER` /
-   `REFLECTION_KEPT_NUMBER`) y un cierre común (`REFLECTION_END`). Antes era
+   `REFLECTION_KEPT_NUMBER`) y un cierre común (`REFLECTION_END`, que termina
+   con el salto de tiempo hasta la plaza, adonde lleva ahora; `demo_end` llega
+   al final de la plaza, sección 15). Antes era
    una timeline de Dialogic (`leo_store_reflection`, borrada) con la caja de
    diálogo sobre negro. `demo_end.tscn` muestra, sobre la portada oscurecida
    (`ui/cover.aseprite` al 30 %), uno tras otro, "Continuará...", "Gracias por jugar" con la invitación a dejar un
@@ -2008,7 +2032,7 @@ música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
   todo el alto del mapa.
 - **Después del prólogo existen** la calle (sección 10) y la tienda de Leo con
   su conversación completa (sección 11), que termina en "Continuará...". No
-  existen todavía los encuentros con Lía/Clara/Rosa, inventario, guardado,
+  existen todavía los encuentros con Clara/Rosa (Lía está en la sección 15), inventario, guardado,
   menús ni arte de retratos/cinemáticas. La "confianza" con Leo ya se guarda
   en `GameManager.leo_confidence`, pero nada la usa aún.
 - **`fonts/m3x6.ttf` está modificada**: la original no traía tildes, ñ ni ü,
@@ -2020,3 +2044,135 @@ música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
   Daniel Linssen, vuelven a romperse las tildes. `tiny.ttf` y Silkscreen
   siguen sin tildes, pero ya no se usan para textos en español. El prólogo en sí (apartamento → vagón →
   estación desconocida) es jugable de principio a fin.
+
+---
+
+## 15. La plaza: Lía (`plaza.tscn` + `plaza.gd`)
+
+Adaptación del Twine "Escena Lia" (`Documents/Twine/Stories/Escena Lia.html`).
+Por ayudar a Lía, Alice pierde el último tren: eso justifica que esté en la
+plaza de noche (Clara). Los NPCs usan **sprites provisionales** de
+`npcs_sprite_sheet` (`BaseNPC`, `column_npc`) y se deslizan con tweens
+(`_slide`), porque no tienen ciclo de caminar.
+
+### Recorrido
+1. **Llegada** (`ARRIVED`). Nube: "Llegué. Solo falta bajar al metro y...",
+   "...¿Alguien está llorando?". Lía (`MiddleLayer/NPCS/Lia`, columna 19) llora
+   en la banca de arriba a la derecha de la plazoleta (731, 398); su `Bark`
+   (`SpeechBark`) dice "¡Mamá!" cada 4 s si Alice está a menos de 360 px.
+2. **Primera decisión.** Dos formas de llegar a ella:
+   - Hablarle: `plaza_lia_meet` con el rompecabezas `plaza_lia`. "ask" =
+     *Rama_Acercarse* (+1, `lia_approached_first`) y luego la **segunda
+     decisión** (menú: calmada +2 / nerviosa +1 / bloqueada −1). "leave" =
+     da media vuelta y salta a la etiqueta `chase`. Callarse = *Rama_Espera*
+     y salta a la etiqueta `forced`.
+   - Ir al metro sin hablarle: al entrar en `SubwayArea`, Lía cruza la plaza
+     corriendo (`_lia_runs_after_alice`) y arranca
+     `Dialogic.start("plaza_lia_meet", "chase")` (*Rama_No_Acercarse_Pasa*,
+     −1, `lia_tried_to_leave`). `chase` sigue en `forced`
+     (*Interaccion_Inicial_Forzada* + *Segunda_Decision_Forzada*).
+   Todas terminan en `[signal arg="lia_grabs_sleeve"]` (`WITH_LIA`): Lía la
+   sigue agarrada de la manga (Alice camina a ×0.75) y le va soltando
+   preguntas (`LIA_QUESTIONS`) en el `Bark`.
+3. **La búsqueda** (`WITH_LIA`). Tres personas pueden ayudar, en el orden
+   que el jugador quiera (o ninguno); con **2 pistas** (`LIA_CLUES_NEEDED`)
+   Alice sabe que tiene que ir a la fuente (`KNOWS_FOUNTAIN`). En cada una,
+   Lía sube la tensión:
+   - **Heladero** (`IceCreamMan`, columna 22 de `npcs_sprite_sheet`, en la
+     acera junto a su camión, `plaza_ice_cream`): un señor mayor y paciente.
+     El camión es `ParkedVehicles/IceCreamVan`
+     (`scenes/street_scenes/assets/ice_cream_van.aseprite`, textura fija,
+     región 71×58 del lienzo de 100×100; la posición del nodo es la base de
+     las ruedas), aparcado en el tramo despejado de la calle de abajo, junto
+     al paso de cebra de la derecha. Alice tartamudea y Lía la
+     interrumpe a gritos. Pista: la vio ir hacia la fuente hace unos veinte
+     minutos. Si Alice no se acercó a Lía por su cuenta, después viene la
+     charla de "¿Tú qué estabas comprando?" del Twine.
+   - **Señora del perro** (`DogLady`, paseo de la izquierda,
+     `plaza_dog_lady`): mujer joven con Toby, un perro enorme que se le pega
+     a Alice. Lía le suelta la manga y se va a jugar con él
+     (`lia_lets_go`; vuelve con `lia_holds_on`). Menú: preguntar igual (+1)
+     o apartarse primero. Pista: iba preocupada, preguntando por una niña,
+     hacia la fuente. **Toby no tiene sprite todavía.**
+   - **Chico con auriculares** (`Teen`, banca del paseo de la derecha,
+     `plaza_teen`, personaje `headphones_teen`): no la oye. Lía le tira de la
+     manga ("¡Más fuerte!"). Menú: subir la voz (+1) o hacerle gestos. Pista:
+     no vio a nadie, pero la fuente está al otro lado.
+   Cada pista se manda con `[signal arg="lia_clue:<id>"]` y se guarda en
+   `GameManager.lia_clues`. `plaza.gd` (`_refresh_helpers`) les cambia el
+   `timeline_name`: la de la pista solo mientras se busca y no se les ha
+   preguntado; si no, `<timeline>_idle` (una línea antes de Lía y otra
+   después). Tras la primera pista sale "Mejor preguntarle a alguien más..."
+   y tras la segunda "La fuente. Vamos a la fuente.".
+4. **La fuente** (`StoryAreas/FountainArea`, solo en `KNOWS_FOUNTAIN`):
+   `plaza_lia_fountain`. Lía se pone al lado de Alice y viene la **tercera
+   decisión** (esperar +2 / buscar a seguridad +1 / pánico −1 y final
+   "agridulce"). `time_passes` funde a negro y deja el cielo más rojo;
+   `lia_mom_arrives` trae a la madre (columna 3) desde `MotherStart` hasta el
+   lado de Lía; `lia_drawing_given` añade `dibujo_lia`; `lia_leaves` se las
+   lleva a `FamilyExit` mientras siguen las líneas. Termina con el reloj de
+   la fuente: Alice ya sabe que perdió el tren (`LIA_HOME`, camina a ×0.8,
+   "ya no corre").
+5. **La reja** (`SubwayArea` en `LIA_HOME`): `plaza_missed_train`, cae la
+   noche, se pone los auriculares y el interludio de *Transicion_Clara*
+   (`NIGHT_LINES`) lleva a `demo_end`.
+Con cada pista nueva, al acabar el diálogo sale un pensamiento con el
+siguiente sitio (`CLUE_*_LINES`).
+
+### Estado en `GameManager`
+`plaza_stage` (`PlazaStage`: `ARRIVED`, `WITH_LIA`, `KNOWS_FOUNTAIN`,
+`LIA_HOME`, `MISSED_TRAIN`), `lia_clues`, `lia_confidence`,
+`lia_approached_first`, `lia_tried_to_leave` y `lia_outcome`
+(`"feliz"`/`"agridulce"`). Señales: `lia_approached_first`,
+`lia_tried_to_leave`, `lia_bittersweet`, `lia_confidence:<n>`. Las de la
+escena (`lia_grabs_sleeve`, `lia_clue:<id>`, `lia_lets_go`,
+`lia_holds_on`, `time_passes`, `lia_mom_arrives`, `lia_drawing_given`, `lia_leaves`) las
+atiende `plaza.gd`. `_restore_stage()` monta la escena según el paso, así que
+se puede recargar en cualquier momento.
+
+### Decisiones al adaptar el Twine
+- La primera decisión es el rompecabezas (primer contacto); la segunda y la
+  tercera, menús de Dialogic.
+- *Rama_No_Acercarse_Pasa* es jugable de verdad: pasa si Alice camina al
+  metro. Elegir "Tengo que irme" en el rompecabezas lleva al mismo texto.
+- La madre lleva **vestido rosa** (el primer borrador decía abrigo rojo).
+- El quiosco de *Rama_Buscar_Adulto* se cuenta en la narración; el señor de
+  la radio es el personaje `plaza_old_man` ("Señor").
+- El reloj está en la fuente y Alice **ya no corre** al metro (como en el
+  Twine): sabe que lo perdió antes de llegar a la reja.
+
+### Gotcha: ids de personaje que empiezan por "do"
+Dialogic lee cualquier línea que empieza por `do` como un evento *Call*
+(`do Autoload.metodo()`), así que `dog_lady: ...` se saltaba con
+"Call event failed". Por eso la señora es `lady_with_dog`. No pongas ids de
+personaje que empiecen por "do".
+
+### Palomas (`PigeonFlock`, `global/npcs/scripts/pigeon_flock.gd`)
+Pieza reutilizable: un `Node2D` con el script, puesto en una capa con y-sort,
+crea 3–4 palomas (`count = 0`) repartidas alrededor (`spread`), con plumaje
+al azar (`pigeons.aseprite`, importado como `SpriteFrames`: 9 colores con
+`peck`, `stand`, `sit` y `rest`). Cada 1,5–4 s cada una cambia de pose o,
+con probabilidad `walk_chance` (45 %), da un paseo corto a un punto al azar
+a menos de `wander_radius` (12 px) de donde apareció, a `walk_speed`
+(14 px/s), mirando hacia donde va, y al llegar se pone a picotear.
+Nunca se superponen: al aparecer y al elegir adónde caminar guardan
+`min_gap` (11 px) con las demás, contando dónde están y adónde van, y no
+cruzan por encima de otra. Si no encuentra un sitio libre, en vez de caminar
+cambia de pose. Si Alice
+se acerca a menos de `scare_distance` (44 px) de cualquiera, sale volando
+todo el grupo (emite `flew_away`): lejos de ella y hacia arriba, por encima
+de todo, mirando hacia donde vuelan (el dibujo mira a la izquierda, así que
+se voltea al volar a la derecha) y acelerando (`takeoff_speed` →
+`max_speed`), y crecen un poco al despegar (`takeoff_scale` 1.3 en
+`takeoff_grow_time` 0,35 s), como si se acercaran a la cámara. Cada paloma lleva un `VisibleOnScreenNotifier2D` y se borra
+con `queue_free()` al salir de la pantalla; el grupo se borra con la última
+(y como red de seguridad, a los 8 s). Vuelven al recargar la escena. **El sprite no tiene animación de vuelo:** se alternan el fotograma
+de alas arriba de `peck` y el de `stand`. Si se dibuja una tag
+`<color>_fly`, se usa sola. Tampoco hay sonido de aleteo: `takeoff_sound`
+está vacío. En la plaza hay seis grupos en `MiddleLayer/Pigeons`.
+**Es `@tool`:** en el editor cada grupo dibuja una vista previa quieta (4
+palomas, o `count` si no es 0), el rectángulo donde se reparten (`spread`,
+amarillo) y, en rojo, más o menos hasta dónde puede llegar Alice antes de que
+salgan volando (`scare_distance` contado desde el borde del grupo). Las
+palomas de la vista previa no tienen *owner*, así que no se guardan en el
+`.tscn`; en el juego se generan al azar como siempre.

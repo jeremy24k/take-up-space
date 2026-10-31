@@ -1,0 +1,5 @@
+if {GameManager.plaza_stage} == 0:
+	(Lleva auriculares y no levanta la vista del teléfono.) #id:35f
+	alice: (Yo también llevo los míos. Mejor no molestarlo.) #id:360
+else:
+	alice: (Ya volvió a su mundo. No pienso molestarlo otra vez.) #id:361

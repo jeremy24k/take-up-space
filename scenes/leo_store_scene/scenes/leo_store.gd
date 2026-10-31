@@ -4,7 +4,7 @@ extends Node2D
 # Scene configuration
 # =========================
 ## Shown after Alice leaves the store at the end of the conversation.
-const DEMO_END_SCENE := "res://scenes/demo_end/demo_end.tscn"
+const PLAZA_SCENE := "res://scenes/plaza_scene/scenes/plaza.tscn"
 ## Her walk out of the store, told on the black screen of the transition
 ## (FadeTransition interlude; lines between «» are her thoughts).
 const REFLECTION_GAVE_NUMBER: PackedStringArray = [
@@ -24,6 +24,8 @@ const REFLECTION_KEPT_NUMBER: PackedStringArray = [
 const REFLECTION_END: PackedStringArray = [
 	"Guarda el papel con cuidado en la mochila y camina hacia la plaza, como Leo le indicó.",
 	"Está un poco menos perdida que antes. Pero todavía no está en casa.",
+	"Camina derecho un buen rato, como Leo le indicó. La calle se ensancha, los edificios se abren.",
+	"Cuando llega a la plaza, el sol ya empieza a bajar.",
 ]
 ## Time to let the fade-in finish before Leo greets her.
 const GREETING_DELAY: float = 1.0
@@ -169,5 +171,5 @@ func _on_exit_blocked() -> void:
 func _leave_store() -> void:
 	player.lock_control()
 	var reflection := REFLECTION_GAVE_NUMBER if GameManager.leo_gave_number else REFLECTION_KEPT_NUMBER
-	FadeTransition.transition_with_interlude(DEMO_END_SCENE, reflection + REFLECTION_END,
+	FadeTransition.transition_with_interlude(PLAZA_SCENE, reflection + REFLECTION_END,
 		exit_to_street.fade_duration)
