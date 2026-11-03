@@ -1,18 +1,22 @@
 alice: (se acerca al mostrador y deja la lata) #id:dd
+join leo (friendly) rightmost
 leo: Hola. Soy Leo. Te saludé hace un rato, pero creo que no me escuchaste. #id:de
 join alice (nervous) leftmost
 alice: (con un hilo de voz) E-eh... hola. Yo soy Alice. #id:df
 leo: ¿Estás bien? Te veo un poco nerviosa. #id:e0
 alice: (la pregunta del espejo... pero el espejo no la miraba así) #id:e1
 leave alice
+leave leo
 [signal arg="anxiety_puzzle:leo_are_you_ok"]
 if {anxiety_result} == "truth":
 	alice: La verdad... no. Me perdí. Bajé del metro y ya no sé dónde estoy. #id:e2
 	(Leo no se ríe. Solo asiente.) #id:e3
+	join leo (friendly) rightmost
 	leo: Ah, eso explica la cara de "¿qué hago aquí?". ¿Y viniste a comprar comida para gatos? #id:e4
 	join alice (neutral) leftmost
 	alice: (mira la lata de atún) Para mi gato. Wilson. #id:e5
 	[signal arg="leo_knows_wilson"]
+	update leo (laughing)
 	leo: Buen plan. Comida antes que orientación. Yo también tendría las prioridades así. #id:e6
 	alice: (suelta una risa corta, nerviosa) #id:e7
 	leave alice
@@ -20,50 +24,64 @@ if {anxiety_result} == "truth":
 elif {anxiety_result} == "lie":
 	alice: N-no, estoy bien. Solo... no conocía esta tienda. #id:e8
 	(Miente mal. Se le nota en la voz.) #id:e9
+	join leo (friendly) rightmost
 	leo: Ah, claro. Es que te vi entrar como si el edificio estuviera en llamas. #id:ea
 	join alice (shocked) leftmost
 	alice: (se queda en blanco) #id:eb
+	update leo (laughing)
 	leo: (se ríe suave) Es broma. Pero en serio, ¿necesitas algo más que atún? #id:ec
 	update alice (nervous)
 	alice: En realidad... me perdí. Y no sé bien cómo volver. #id:ed
+	update leo (friendly)
 	leo: Ahí está. Bueno, por algo se empieza. #id:ee
 	leave alice
 else:
 	alice: (abre la boca, pero no sale nada) #id:ef
+	join leo (thinking) rightmost
 	leo: ¿Se te escapó la voz? #id:f0
 	alice: (asiente) #id:f1
+	update leo (laughing)
 	leo: Me pasa a veces. Sobre todo antes del primer café. #id:f2
 	(Leo no está molesto. Solo espera.) #id:f3
+	update leo (friendly)
 	leo: (más suave) ¿Perdida? #id:f4
 	alice: (vuelve a asentir) #id:f5
 	leo: Bueno, lo primero es lo primero. Déjame cobrarte el atún. #id:f6
 	[signal arg="leo_confidence:-1"]
 (Leo registra la compra con calma.) #id:f7
 alice: (saca las monedas de la cartera y las cuenta dos veces) #id:f8
+update leo (friendly)
 leo: Justo. Ni una moneda más. #id:f9
 alice: (guarda la lata en la mochila) #id:fa
 leo: Para volver... el metro de esta calle es de la línea que termina aquí, en la terminal. #id:fb
 leo: Mejor camina derecho hasta la plaza. Ahí pasa la otra línea, la que va al centro. Desde ahí seguro te ubicas. #id:fc
 join alice (relaxed) leftmost
 alice: (siente un alivio enorme) #id:fd
+update leo (thinking)
 leo: Aunque... ¿sabes bien la dirección? Por si necesitas algo más exacto. #id:fe
 alice: Eh... es un edificio gris. Con un balcón chiquito. Hay un árbol enfrente... #id:ff
+update leo (laughing)
 leo: (sonríe) ¿No sabes el nombre de tu calle? #id:100
 update alice (nervous)
 alice: (niega con la cabeza; quiere que se la trague la tierra) #id:101
+update leo (friendly)
 leo: Bueno, con el metro llegas igual. #id:102
 leave alice
 (La conversación se acaba. Pero algo en Alice no quiere irse todavía.) #id:103
+leave leo
 [signal arg="anxiety_puzzle:leo_number"]
 if {anxiety_result} == "ask":
 	alice: (con la voz temblorosa) Oye, Leo... ¿puedo...? ¿Me das tu número? #id:104
 	(Leo la mira sorprendido. Luego sonríe.) #id:105
+	join leo (thinking) rightmost
 	leo: ¿Mi número? #id:106
 	alice: Por si... no sé. Por si me pierdo otra vez. O si Wilson se come toda la comida y necesito preguntarte si tienes más atún. #id:107
 	[signal arg="leo_knows_wilson"]
+	update leo (laughing)
 	leo: (se ríe) Buena excusa. Dame tu teléfono. #id:108
 	alice: Lo perdí. En el metro. #id:109
 	(Leo ni se inmuta. Saca un bolígrafo y escribe en el dorso del ticket.) #id:10a
+	update leo (friendly)
 	leo: ¿Papel y bolígrafo te sirven? #id:10b
 	[signal arg="leo_took_initiative"]
 	[signal arg="leo_confidence:1"]
@@ -73,8 +91,10 @@ else:
 	else:
 		alice: (no dice nada) #id:10d
 	(Leo la mira un momento, como si esperara algo.) #id:10e
+	join leo (thinking) rightmost
 	leo: Bueno... #id:10f
 	(Leo saca un bolígrafo y escribe en el dorso del ticket.) #id:110
+	update leo (friendly)
 	leo: Toma. Por si te pierdes otra vez y necesitas preguntarle a alguien que al menos sabe dónde queda esta tienda. #id:111
 	join alice (shocked) leftmost
 	alice: (parpadea) ¿En serio? #id:112
@@ -89,6 +109,7 @@ else:
 		alice: (escribe su número en el papelito y se lo da) #id:118
 		(Leo mira el papel. Luego la mira a ella.) #id:119
 		join alice (relaxed) leftmost
+		update leo (laughing)
 		leo: Alice-sin-nombre-de-calle, con número incluido. Me gusta. #id:11a
 		(Leo guarda el papel con cuidado.) #id:11b
 		leave alice
@@ -108,3 +129,4 @@ else:
 		leo: De nada. Que encuentres el camino. #id:123
 		alice: (asiente y se gira hacia la puerta) #id:124
 [signal arg="leo_talk_done"]
+leave leo

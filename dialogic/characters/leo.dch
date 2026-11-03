@@ -10,12 +10,40 @@
 "style": "",
 "suffix": ""
 },
-&"default_portrait": "",
+&"default_portrait": "friendly",
 &"description": "",
 &"display_name": "Leo",
 &"mirror": false,
 &"nicknames": [""],
 &"offset": Vector2(0, 0),
-&"portraits": {},
+&"portraits": {
+"friendly": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/leo/leo_friendly.png\""
+},
+"mirror": false,
+"offset": Vector2(-40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"laughing": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/leo/leo_laughing.png\""
+},
+"mirror": false,
+"offset": Vector2(-40, 0),
+"scale": 0.832,
+"scene": ""
+},
+"thinking": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/leo/leo_thinking.png\""
+},
+"mirror": false,
+"offset": Vector2(-40, 0),
+"scale": 0.832,
+"scene": ""
+}
+},
 &"scale": 1.0
 }

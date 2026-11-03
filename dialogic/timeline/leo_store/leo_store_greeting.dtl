@@ -1,4 +1,5 @@
 [signal arg="leo_wave"]
+join leo (friendly) rightmost
 leo: ¡Bienvenida! #id:136
 join alice (nervous) leftmost
 alice: (se queda paralizada en la entrada) #id:137
@@ -7,4 +8,5 @@ alice: ... #id:138
 [signal arg="leo_wave_end"]
 alice: (siente que le arden las mejillas y se desvía hacia las góndolas) #id:13a
 leave alice
+leave leo
 [signal arg="leo_greeted"]

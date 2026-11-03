@@ -869,6 +869,28 @@ pensamientos (la nube de arriba, `ThoughtBox`) y de los interludios en negro de
   rompecabezas es un `CanvasLayer` (capa 2) encima de Dialogic (capa 1), y la
   ilustración quedaría debajo de la nube de palabras.
 
+### Ilustraciones de Leo
+
+Igual que las de Alice, pero **siempre en `rightmost`**, enfrente de ella, con
+`offset: (-40, 0)` y `scale: 0.832` en `leo.dch`. Archivos:
+`dialogic/portraits/leo/leo_<expresión>.png` (340×640, recortadas de las
+originales de 1333×2000 con el mismo marco para las tres: de la cabeza hasta
+y=1300 del original, un poco más arriba de las rodillas como Alice, así los
+dos se ven a la misma escala y no saltan al cambiar de expresión).
+
+- **Expresiones:** `friendly` (la mano abierta, por defecto), `thinking` (la
+  mano en la barbilla) y `laughing` (se ríe con la mano en la nuca).
+- **A diferencia de Alice**, Leo se queda en pantalla durante toda su
+  conversación: entra en su primera línea, cambia de expresión con
+  `update leo (...)` y sale con `leave leo` antes de cada rompecabezas y al
+  final de cada timeline.
+- **Dónde:** `leo_store_greeting` ("¡Bienvenida!", `friendly`),
+  `leo_store_checkout` (`friendly` al presentarse; `laughing` en "Buen plan",
+  "Es broma", "Me pasa a veces", "¿No sabes el nombre de tu calle?", "Buena
+  excusa" y "Alice-sin-nombre-de-calle"; `thinking` en "¿Se te escapó la
+  voz?", "¿sabes bien la dirección?", "¿Mi número?" y "Bueno..."), y
+  `leo_store_farewell` (`friendly`).
+
 ---
 
 ## 7. Convenciones

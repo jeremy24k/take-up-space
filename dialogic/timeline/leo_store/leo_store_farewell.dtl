@@ -2,6 +2,7 @@ if {GameManager.leo_gave_number}:
 	alice: (camina hacia la puerta; el corazón le late más rápido) #id:127
 else:
 	alice: (camina hacia la puerta; quiere darse la vuelta, pero no se atreve) #id:128
+join leo (friendly) rightmost
 leo: Oye, Alice. #id:129
 alice: (se gira) #id:12a
 if {GameManager.leo_gave_number}:
@@ -15,3 +16,4 @@ else:
 	leo: Que encuentres el camino. #id:12f
 	(Leo sonríe. No dice nada más.) #id:130
 	alice: (asiente) #id:131
+leave leo
