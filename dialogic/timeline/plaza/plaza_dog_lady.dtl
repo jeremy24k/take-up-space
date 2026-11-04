@@ -1,4 +1,5 @@
-(Una mujer joven pasea un perro enorme. El perro las ve y viene directo hacia ellas, moviendo la cola.) #id:335
+(Una mujer joven que sale a correr con un perro enorme se para a tomar aire. El perro las ve y viene directo hacia ellas, moviendo la cola.) #id:335
+[signal arg="toby_comes"]
 alice: (se queda tiesa. El perro le olfatea las rodillas.) #id:336
 [signal arg="lia_lets_go"]
 lia: (le suelta la manga) ¡Un perrito! ¡Es enorme! ¿Cómo se llama? #id:337

@@ -4611,7 +4611,8 @@ column_npc = 17
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/OfficeManNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 17
 
 [node name="Shadow" parent="MiddleLayer/NPCS/OfficeManNPC/Sprite2D" index="0"]
@@ -4634,7 +4635,8 @@ column_npc = 2
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/StudentNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 2
 
 [node name="Shadow" parent="MiddleLayer/NPCS/StudentNPC/Sprite2D" index="0"]
@@ -4689,7 +4691,8 @@ column_npc = 3
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/PhoneGirlNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 3
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PhoneGirlNPC/Sprite2D" index="0"]
@@ -4711,7 +4714,8 @@ position = Vector2(928, 1065)
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BenchNewspaperNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchNewspaperNPC/Sprite2D" index="0"]
 position = Vector2(0, -2)
@@ -4734,7 +4738,8 @@ column_npc = 9
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BenchSittingNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -23)
+position = Vector2(0, -14)
+offset = Vector2(0, -9)
 frame = 9
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchSittingNPC/Sprite2D" index="0"]
@@ -4758,7 +4763,8 @@ column_npc = 13
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/VinylWindowNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 13
 
 [node name="Shadow" parent="MiddleLayer/NPCS/VinylWindowNPC/Sprite2D" index="0"]
@@ -4781,7 +4787,8 @@ column_npc = 14
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/DeliveryNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 14
 
 [node name="Shadow" parent="MiddleLayer/NPCS/DeliveryNPC/Sprite2D" index="0"]
@@ -4804,7 +4811,8 @@ column_npc = 15
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BusStopGrandmaNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 frame = 15
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BusStopGrandmaNPC/Sprite2D" index="0"]
@@ -4831,7 +4839,8 @@ sprite_frames = ExtResource("36_redcap")
 animation = &"idle_front"
 autoplay = "idle_front"
 frame_progress = 0.458629
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianA/AnimatedSprite2D" index="0"]
 position = Vector2(0, -2)
@@ -4862,7 +4871,8 @@ metadata/_edit_group_ = true
 sprite_frames = ExtResource("37_blonde")
 animation = &"walk_side"
 autoplay = "idle_front"
-offset = Vector2(0, -16)
+position = Vector2(0, -7)
+offset = Vector2(0, -9)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianB/AnimatedSprite2D" index="0"]
 position = Vector2(0, -2)
@@ -4895,7 +4905,8 @@ metadata/_edit_group_ = true
 sprite_frames = ExtResource("street_cat")
 animation = &"walk_side"
 autoplay = "idle_front"
-offset = Vector2(0, -8)
+position = Vector2(0, 1)
+offset = Vector2(0, -9)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/StreetCat/AnimatedSprite2D" index="0"]
 position = Vector2(0, 6)

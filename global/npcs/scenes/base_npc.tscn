@@ -8,12 +8,15 @@
 size = Vector2(14, 28)
 
 [node name="BaseNPC" type="CharacterBody2D" unique_id=1283702522]
+y_sort_enabled = true
 script = ExtResource("1_xvse1")
 animation_speed = 1.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2102186028]
 texture_filter = 1
+position = Vector2(0, 9)
 texture = ExtResource("2_55e2e")
+offset = Vector2(0, -9)
 hframes = 30
 vframes = 10
 metadata/_aseprite_wizard_interface_config_ = {

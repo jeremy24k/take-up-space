@@ -104,6 +104,14 @@ const MOTHER_WALK_TIME: float = 1.8
 const LIA_BESIDE_ALICE := Vector2(22, -2)
 const MOTHER_BESIDE_LIA := Vector2(16, 0)
 const LEAVING_WALK_TIME: float = 3.0
+## Toby keeps to this side of his owner, a little lower (closer to the
+## camera): behind her one way, ahead of her on the way back.
+const TOBY_LEASH_OFFSET := Vector2(16, 5)
+## Set from code, not as an override in plaza.tscn: the editor kept dropping
+## that override when saving the scene (2026-11-03), leaving the template's
+## placeholder sprite.
+const JOGGER_FRAMES: SpriteFrames = preload("res://global/npcs/assets/sporty_girl.aseprite")
+const TOBY_FRAMES: SpriteFrames = preload("res://global/npcs/assets/dog.aseprite")
 
 @onready var player: Player = $MiddleLayer/Player
 @onready var lia: CharacterBody2D = $MiddleLayer/NPCS/Lia
@@ -126,7 +134,11 @@ const HELPER_TIMELINES := {
 	"dog_lady": "plaza_dog_lady",
 	"teen": "plaza_teen",
 }
-@onready var dog_lady: Node2D = $MiddleLayer/NPCS/DogLady
+## The woman with the dog jogs along the top sidewalk (JoggingRoute) with
+## Toby beside her, resting 12-15 s at each end; she stops when Alice comes
+## close.
+@onready var dog_lady: WalkingNPC = $MiddleLayer/NPCS/DogLady
+@onready var toby: WalkingNPC = $MiddleLayer/NPCS/Toby
 @onready var mother_start: Marker2D = $StoryPoints/MotherStart
 @onready var family_exit: Marker2D = $StoryPoints/FamilyExit
 
@@ -151,6 +163,13 @@ func _ready() -> void:
 	_question_timer = randf_range(LIA_QUESTION_EVERY.x, LIA_QUESTION_EVERY.y)
 	_restore_stage()
 	_refresh_helpers()
+	dog_lady.sprite.sprite_frames = JOGGER_FRAMES
+	dog_lady.sprite.play("idle_front")
+	toby.sprite.sprite_frames = TOBY_FRAMES
+	toby.sprite.play("idle_side")
+	dog_lady.start_patrol()
+	toby.global_position = dog_lady.global_position + TOBY_LEASH_OFFSET
+	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
 
 ## Puts every character where the current story step needs them.
 func _restore_stage() -> void:
@@ -226,10 +245,13 @@ func _on_dialogic_signal(argument: Variant) -> void:
 		"lia_grabs_sleeve":
 			_advance_to(GameManager.PlazaStage.WITH_LIA, SEARCH_START_LINES)
 			_start_lia_following()
+		"toby_comes":
+			_toby_comes()
 		"lia_lets_go":
 			_lia_plays_with_dog()
 		"lia_holds_on":
 			_lia_following = true
+			_toby_goes_back()
 		"time_passes":
 			_let_time_pass()
 		"lia_mom_arrives":
@@ -274,14 +296,38 @@ func _refresh_helpers() -> void:
 		var asked := GameManager.lia_clues.has(clue)
 		area.timeline_name = HELPER_TIMELINES[clue] + ("" if searching and not asked else "_idle")
 
-## The dog wins: Lía lets go of the sleeve to play with it, and holds on
-## again when Alice calls her ([signal arg="lia_holds_on"]).
+## Toby sees them and trots straight up to Alice to lean on her legs
+## ([signal arg="toby_comes"]). Lía lets go of the sleeve to play with him
+## ("lia_lets_go") and holds on again when Alice calls her ("lia_holds_on");
+## then Toby goes back to his owner.
+func _toby_comes() -> void:
+	toby.stop_following()
+	# Glued to Alice's legs: as a solid body he would push her around.
+	toby.collision_layer = 0
+	toby.collision_mask = 0
+	var side := signf(toby.global_position.x - player.global_position.x)
+	if side == 0.0:
+		side = 1.0
+	var at_alice := player.global_position + Vector2(16 * side, -2)
+	_face(toby, at_alice)
+	toby.sprite.play("run_side")
+	await _slide(toby, at_alice, 0.5)
+	toby.face_direction(player.global_position - toby.global_position)
+
 func _lia_plays_with_dog() -> void:
 	_lia_following = false
 	lia_bark.hide_now()
-	var spot := dog_lady.global_position + Vector2(-14, 8)
-	lia.sprite.flip_h = spot.x < lia.global_position.x
-	_slide(lia, spot, 0.5)
+	var side := signf(toby.global_position.x - player.global_position.x)
+	if side == 0.0:
+		side = 1.0
+	var by_toby := toby.global_position + Vector2(8 * side, -12)
+	_face(lia, by_toby)
+	_slide(lia, by_toby, 0.4)
+
+## Back on the leash: he catches up with his owner by himself.
+func _toby_goes_back() -> void:
+	toby.collision_mask = 1
+	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
 
 # =========================
 # Lía holds her sleeve
@@ -407,6 +453,11 @@ func _slide(npc: Node2D, target: Vector2, duration: float) -> void:
 	var tween := create_tween()
 	tween.tween_property(npc, "global_position", target, duration)
 	await tween.finished
+
+## The sheet's characters face right by default.
+func _face(npc: Node2D, target: Vector2) -> void:
+	if absf(target.x - npc.global_position.x) > 1.0:
+		npc.sprite.flip_h = target.x < npc.global_position.x
 
 ## Hiding is not enough: a hidden NPC still blocks Alice and still answers.
 func _set_npc_active(npc: Node2D, is_active: bool) -> void:

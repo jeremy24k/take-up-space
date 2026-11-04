@@ -14,6 +14,15 @@ const SOLID_COLLISION_LAYER: int = 1
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 var facing: Vector2 = Vector2.DOWN
+## Where it is going, or where it will go next while it rests between legs
+## of a patrol (its sprite may be facing the camera meanwhile). Followers
+## look this way when they stand still.
+var heading: Vector2 = Vector2.RIGHT
+
+## Prefix of the movement cycle: "walk" plays walk_side/front/back, "run"
+## plays run_side/... (e.g. a jogger). A missing front/back cycle falls back
+## to the side one, so a sprite drawn only from the side still moves.
+@export var move_animation: String = "walk"
 
 # =========================
 # Approach point configuration
@@ -69,7 +78,7 @@ func _physics_process(_delta: float) -> void:
 		face_direction(global_position.direction_to(player.global_position))
 	elif _paused_for_player:
 		_paused_for_player = false
-		_play_animation("walk_" + _direction_suffix(_walk_direction))
+		_play_move(_walk_direction)
 		_walk_tween.play()
 
 # =========================
@@ -85,6 +94,12 @@ func _physics_process(_delta: float) -> void:
 @export var patrol_speed: float = 28.0
 ## Seconds it rests at each end of the route, facing the camera.
 @export var patrol_pause: float = 2.5
+## If larger than patrol_pause, each rest lasts a random time between the
+## two (e.g. 12-15 s, so a jogger does not run all the time).
+@export var patrol_pause_max: float = 0.0
+## On: goes round the points as a circuit (last point back to the first)
+## without stopping, like a jogger doing laps. Off: there and back.
+@export var patrol_loop: bool = false
 
 # =========================
 # Facing and animation
@@ -95,6 +110,17 @@ func _physics_process(_delta: float) -> void:
 func _play_animation(animation_name: String) -> void:
 	if sprite.sprite_frames.has_animation(animation_name):
 		sprite.play(animation_name)
+
+## Plays the movement cycle for direction (move_animation prefix). With no
+## front/back cycle it uses the side one, flipped by the horizontal part of
+## the direction.
+func _play_move(direction: Vector2) -> void:
+	var animation_name := move_animation + "_" + _direction_suffix(direction)
+	if not sprite.sprite_frames.has_animation(animation_name):
+		animation_name = move_animation + "_side"
+		if absf(direction.x) > 0.01:
+			sprite.flip_h = direction.x < 0
+	_play_animation(animation_name)
 
 func face_direction(direction: Vector2) -> void:
 	if direction == Vector2.ZERO:
@@ -108,6 +134,11 @@ func face_direction(direction: Vector2) -> void:
 		# standing still facing the camera beats sliding in a walk cycle.
 		sprite.flip_h = false
 		sprite.play("idle_front")
+	elif sprite.sprite_frames.has_animation("idle_side"):
+		# Side-only sprites (e.g. a dog) turn towards where they look.
+		if absf(direction.x) > 0.01:
+			sprite.flip_h = direction.x < 0
+		sprite.play("idle_side")
 	else:
 		sprite.stop()
 
@@ -170,6 +201,9 @@ func start_patrol() -> void:
 	if points.size() < 2:
 		return
 	global_position = points[0]
+	if patrol_loop:
+		_patrol_circuit(points)
+		return
 	var forward := true
 	while is_inside_tree():
 		var leg: Array[Vector2] = points.duplicate()
@@ -179,8 +213,77 @@ func start_patrol() -> void:
 		await walk_path(leg, patrol_speed)
 		# Walkers only walk sideways; they rest facing the camera.
 		face_direction(Vector2.DOWN)
-		await get_tree().create_timer(patrol_pause).timeout
 		forward = not forward
+		var next_point := points[1] if forward else points[points.size() - 2]
+		heading = global_position.direction_to(next_point)
+		await get_tree().create_timer(_rest_time()).timeout
+
+## Laps around points, back to the first one each time, with patrol_pause
+## (if any) at the start of every lap.
+func _patrol_circuit(points: Array[Vector2]) -> void:
+	var lap: Array[Vector2] = points.duplicate()
+	lap.remove_at(0)
+	lap.append(points[0])
+	while is_inside_tree():
+		await walk_path(lap, patrol_speed)
+		if patrol_pause > 0.0:
+			face_direction(Vector2.DOWN)
+			heading = global_position.direction_to(lap[0])
+			await get_tree().create_timer(_rest_time()).timeout
+
+# =========================
+# Following someone
+# =========================
+func _rest_time() -> float:
+	if patrol_pause_max > patrol_pause:
+		return randf_range(patrol_pause, patrol_pause_max)
+	return patrol_pause
+
+## Keeps this NPC at a fixed offset from leader (e.g. a dog on its owner's
+## leash): it does not swing round when the leader turns, so on the way
+## back it simply goes on the other side. It catches up smoothly, runs with
+## move_animation while catching up and, when it stands still, looks where
+## the leader is heading (a WalkingNPC's `heading`: at the end of a patrol
+## leg, towards the next point). Call stop_following() before moving it by
+## script.
+func follow(leader: Node2D, offset: Vector2 = Vector2(14, 4)) -> void:
+	_leader = leader
+	_follow_offset = offset
+	_leader_last_position = leader.global_position
+	collision_layer = 0
+	set_process(true)
+
+func stop_following() -> void:
+	_leader = null
+	set_process(false)
+
+func is_following() -> bool:
+	return _leader != null
+
+var _leader: Node2D
+var _follow_offset := Vector2.ZERO
+var _leader_last_position := Vector2.ZERO
+## How fast it closes the gap (higher = tighter leash).
+const FOLLOW_STIFFNESS: float = 8.0
+## Closer than this to its spot it stands still instead of running.
+const FOLLOW_SETTLE: float = 2.0
+
+func _ready() -> void:
+	set_process(false)
+
+func _process(delta: float) -> void:
+	if _leader == null or not is_instance_valid(_leader):
+		stop_following()
+		return
+	var leader_motion := _leader.global_position - _leader_last_position
+	_leader_last_position = _leader.global_position
+	var gap := _leader.global_position + _follow_offset - global_position
+	if gap.length() <= FOLLOW_SETTLE and leader_motion.length() <= 0.05:
+		var look: Vector2 = _leader.heading if _leader is WalkingNPC else Vector2.ZERO
+		face_direction(look)
+		return
+	global_position += gap * minf(1.0, FOLLOW_STIFFNESS * delta)
+	_play_move(leader_motion if leader_motion.length() > 0.05 else gap)
 
 ## One leg of movement: tweens straight to target_position while playing the
 ## matching walk animation. Returns the direction walked (Vector2.ZERO if
@@ -191,11 +294,12 @@ func _walk_leg(target_position: Vector2, speed: float) -> Vector2:
 		return Vector2.ZERO
 
 	_walk_direction = direction
+	heading = direction
 	if _paused_for_player:
 		# A new leg started while she was standing next to it: start it paused.
 		face_direction(global_position.direction_to(_player_position()))
 	else:
-		_play_animation("walk_" + _direction_suffix(direction))
+		_play_move(direction)
 
 	var distance := global_position.distance_to(target_position)
 	_walk_tween = create_tween()
