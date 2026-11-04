@@ -227,11 +227,14 @@ animations = [{
 size = Vector2(14, 28)
 
 [node name="WalkingNPC" type="CharacterBody2D" unique_id=15668528]
+y_sort_enabled = true
 collision_layer = 1
 script = ExtResource("1_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1544429594]
 texture_filter = 1
+position = Vector2(0, 9)
+offset = Vector2(0, -9)
 sprite_frames = SubResource("SpriteFrames_ds32o")
 animation = &"sit_asleep"
 metadata/_aseprite_wizard_interface_config_ = {

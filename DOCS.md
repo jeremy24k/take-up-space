@@ -490,8 +490,25 @@ colocarlo a mano.
 - La usan: los 8 NPCs de la calle, Leo, el oficinista y los dos chicos del
   metro, el trabajador, la chica sentada y el chico de auriculares de la
   terminal, y Wilson. La ventanilla de tickets no, porque es un objeto.
-- Ojo con los `BaseNPC`: su sprite está centrado en el nodo (no en los pies),
+- Ojo con los `BaseNPC`: el dibujo está centrado en el nodo (no en los pies),
   así que la cabeza queda unos 15 px más arriba del origen, no 30.
+
+### Orden de profundidad de los NPCs (y-sort)
+Todos los NPCs se ordenan con faroles, bancos y árboles **por el mismo punto
+que Alice: 7 px por encima de la base del dibujo** (sus pies). Alice lo
+consigue con `offset (0, -9)` en su sprite de 32 px. En `base_npc.tscn` y
+`walking_npc.tscn` el nodo raíz tiene `y_sort_enabled` y el sprite está en
+`position (0, 9)` con `offset (0, -9)`: el dibujo queda donde siempre, pero
+Godot ordena por la posición del sprite (porque el padre tiene y-sort), que
+ahora cae en los pies. Antes ordenaban por el centro del dibujo, 9 px más
+arriba que Alice, y un farol los tapaba antes de tiempo.
+
+**Regla para subir o bajar un NPC dentro de su nodo** (sentados, la calle):
+deja siempre `offset (0, -9)` y mueve el `position` del sprite:
+`position.y = centro del dibujo + 9`. Por ejemplo, los de la calle tienen el
+centro en -16 → `position (0, -7)`; los sentados en -20 → `(0, -11)`.
+**No cambies solo el `offset`**: movería el dibujo sin mover el punto de
+orden. Las sombras se recolocan solas.
 
 ### `RemarkInteractable` (`global/remark_interactable.tscn`)
 Para lo que **parece interactivo pero tiene poco que contar**: NPCs
@@ -1230,9 +1247,9 @@ Si se mueve un área, mantener las dos reglas.
 ### NPCs
 - **Fijos:** instancias de `base_npc.tscn` en `MiddleLayer/NPCS`, como en el
   metro, con su diálogo en `InteractableDetectors`. **En la calle el origen está
-  en los pies:** cada instancia sube el `Sprite2D` 16 px y usa una colisión de
-  pies de 14×8. Así se ordenan bien con bancos y faroles. `base_npc.tscn` no se
-  tocó, para no mover a los NPCs del metro.
+  en los pies:** cada instancia sube el dibujo 16 px (`Sprite2D` en
+  `position (0, -7)` con `offset (0, -9)`, ver "Orden de profundidad de los
+  NPCs") y usa una colisión de pies de 14×8.
 - **Ambientales (solo visuales):** también son `base_npc.tscn`, pero no tienen
   área en `InteractableDetectors`, así que no tienen diálogo.
   - `BenchNewspaperNPC` (columna 0, lee el diario) está en la banca de frente
@@ -1272,6 +1289,26 @@ Si se mueve un área, mantener las dos reglas.
   - Ojo con el editor: si tiene cargada la versión vieja del script, al guardar
     la escena descarta `patrol_points` (pasó una vez). Recargar el proyecto
     después de cambiar exports de un script.
+  - **`patrol_loop`** (2026-11-03): en vez de ida y vuelta, da vueltas al
+    circuito (del último punto vuelve al primero), con `patrol_pause` al
+    empezar cada vuelta (0 = sin parar).
+  - **`patrol_pause_max`**: si es mayor que `patrol_pause`, cada descanso dura
+    un tiempo al azar entre los dos (la corredora: 12–15 s).
+  - **`heading`** (variable): hacia dónde va o, mientras descansa, hacia
+    dónde irá en el siguiente tramo (aunque el sprite mire a cámara).
+  - **`move_animation`** (`"walk"` por defecto): prefijo del ciclo de
+    movimiento. `"run"` reproduce `run_side`/`run_front`/`run_back` (la
+    corredora y Toby). Si falta el de frente o espaldas usa el de lado,
+    volteado según hacia dónde va, así un sprite dibujado solo de lado sirve
+    para cualquier ruta. Para estar quieto usa `idle_<dir>`, si no
+    `idle_front`, si no `idle_side`.
+  - **`follow(lider, offset)` / `stop_following()`**: el NPC se queda a un
+    `offset` fijo del líder, como un perro con correa. No se cambia de lado
+    al girar (a la ida va detrás y a la vuelta delante, o al revés). Lo
+    alcanza suavemente (en marcha se queda unos 9 px corto), corre mientras
+    se acerca y, quieto, mira hacia el `heading` del líder: al final de un
+    tramo, hacia el siguiente punto. No choca mientras sigue. Hay que llamar
+    `stop_following()` antes de moverlo por código.
 - **`WalkingNPC.stops_when_talked_to`** (grupo "Interaction" del inspector,
   `true` por defecto) decide si el NPC se frena cuando Alice le habla. Si está
   activado, `street_zone_1.gd` lo congela durante el diálogo
@@ -2110,12 +2147,27 @@ plaza de noche (Clara). Los NPCs usan **sprites provisionales** de
      interrumpe a gritos. Pista: la vio ir hacia la fuente hace unos veinte
      minutos. Si Alice no se acercó a Lía por su cuenta, después viene la
      charla de "¿Tú qué estabas comprando?" del Twine.
-   - **Señora del perro** (`DogLady`, paseo de la izquierda,
-     `plaza_dog_lady`): mujer joven con Toby, un perro enorme que se le pega
-     a Alice. Lía le suelta la manga y se va a jugar con él
-     (`lia_lets_go`; vuelve con `lia_holds_on`). Menú: preguntar igual (+1)
-     o apartarse primero. Pista: iba preocupada, preguntando por una niña,
-     hacia la fuente. **Toby no tiene sprite todavía.**
+   - **Señora del perro** (`DogLady`, `plaza_dog_lady`): mujer joven que sale
+     a correr con Toby (`MiddleLayer/NPCS/Toby`, sin "..." porque no habla).
+     Desde 2026-11-03 los dos son `WalkingNPC` con sus propios sprites
+     (`global/npcs/assets/sporty_girl.aseprite`: `idle_front`, `run_side`;
+     `dog.aseprite`: `idle_side`, `run_side`; las columnas 23 y 24 de la hoja
+     ya no se usan). Los `SpriteFrames` se asignan desde `plaza.gd`
+     (`JOGGER_FRAMES`, `TOBY_FRAMES`), no en la escena: el editor borraba ese
+     override al guardar y volvía el sprite de prueba de la plantilla y `move_animation = "run"`. Ella va y vuelve por la acera
+     de arriba, entre la valla y los edificios (`JoggingRoute/Point1`–`2`,
+     y = 210, 70 px/s), y descansa 12–15 s en cada punta; se para y mira a
+     Alice si se acerca a 44 px (`pause_near_player`), así se le puede
+     hablar. Toby la sigue con `follow()` a 16 px a su derecha y 5 px más
+     abajo; en las puntas mira hacia el siguiente tramo. Las palomas que
+     estaban en esa acera (`Pigeons/TopSidewalk`) pasaron al paseo central de
+     arriba (640, 300). Al empezar, Toby deja de
+     seguirla y va hasta las piernas de Alice (`toby_comes`, sin colisión);
+     Lía le suelta la manga y se pone a su lado a jugar con él
+     (`lia_lets_go`); al llamarla, vuelve a la manga y Toby vuelve a seguir
+     a su dueña (`lia_holds_on`). Menú: preguntar igual (+1) o
+     apartarse primero. Pista: iba preocupada, preguntando por una niña,
+     hacia la fuente.
    - **Chico con auriculares** (`Teen`, banca del paseo de la derecha,
      `plaza_teen`, personaje `headphones_teen`): no la oye. Lía le tira de la
      manga ("¡Más fuerte!"). Menú: subir la voz (+1) o hacerle gestos. Pista:

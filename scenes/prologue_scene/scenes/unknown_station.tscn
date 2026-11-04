@@ -1681,7 +1681,8 @@ column_npc = 9
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/SittingBoyNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -20)
+position = Vector2(0, -11)
+offset = Vector2(0, -9)
 frame = 9
 
 [node name="Shadow" parent="MiddleLayer/NPCS/SittingBoyNPC/Sprite2D" index="0"]
@@ -1703,7 +1704,8 @@ column_npc = 11
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/SittingGirlNPC" index="0" unique_id=2102186028]
-offset = Vector2(0, -20)
+position = Vector2(0, -11)
+offset = Vector2(0, -9)
 frame = 11
 
 [node name="Shadow" parent="MiddleLayer/NPCS/SittingGirlNPC/Sprite2D" index="0"]
@@ -1770,6 +1772,7 @@ column_npc = 20
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/OficinistManNPC" index="0" unique_id=2102186028]
+position = Vector2(0, 0)
 offset = Vector2(0, -9)
 frame = 20
 
