@@ -14,6 +14,15 @@ Everything lives in `press_kit/video_tools/` (gitignored, local only). Read `pre
 - Music: Pixabay only (license compatible). Credit tracks in the description. Downloading a new track needs the user's OK.
 - Never touch game code for a video. Temporary Godot scripts are copied to the repo root as `_xxx_tmp.gd` and deleted afterwards along with their `.uid`.
 
+## What the Shorts metrics taught (Nov 2026)
+- The cat Short lost half its viewers between seconds 4 and 7: slow walking and metro shots before the conflict.
+- "This is what social anxiety looks like in my indie game" kept 42% and grew after the title change.
+- Rules that follow:
+  - Open on dialogue or the puzzle already on screen.
+  - Reach the twist by second 3-5.
+  - Titles follow "This is what [X] looks like in my indie game".
+  - End with an on-screen question, plus a pinned comment with the same question (comments are low).
+
 ## Pipeline
 1. **Plan the beats.** Pick dialogue or scenes. Read the `.dtl` (Spanish) and `translations/dialogic_timeline_translations.csv` (English). Propose hook, captions and end question to the user before recording.
 2. **Record** with `record.gd` (Movie Maker, `--fixed-fps 30`, 1280x768). Add a `clip_<name>()`.

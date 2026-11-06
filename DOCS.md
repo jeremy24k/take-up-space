@@ -1992,6 +1992,14 @@ música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
 
 ## 14. Cosas pendientes / a vigilar
 
+- **Feedback de jugadores para el Rompecabezas de la Ansiedad (pendiente, 4 nov 2026).**
+  Viene de un comentario de @ryux0000 en un vídeo de YouTube:
+  *"You should probably have those thoughts literally switch up/change in random intervals. Probably even add thoughts like 'can I go home', 'I gotta go', etc. In my opinion the panting is kinda exxagerated."*
+  Plan acordado:
+  - **Pensamientos que cambian solos.** Solo las palabras distractoras (`extra_words`); las de las respuestas se quedan quietas para que el puzzle siga siendo justo. Cada pocos segundos, una distractora se desvanece y reaparece como otro pensamiento de una lista común (*"go home"*, *"just leave"*, *"they're staring"*, *"say something"*, *"too late"*…). Con más presión, cambian más a menudo. La lista va en `game_text.csv` con su versión en español.
+  - **Respiración más contenida.** Hoy `BREATHING_DB` sube hasta -12 dB y entra en la segunda mitad del tiempo (`pressure * 2.0 - 1.0`). Bajar el máximo a unos -20 dB y que entre solo en el último tercio. Si sigue sonando forzada, cambiar `audio/sfx/breathing_loop.ogg` por una respiración más corta.
+  - **Para la comunidad:** cuando esté hecho, enseñarlo en un vídeo ("a viewer suggested this, so I added it") y contestar a @ryux0000.
+
 - **Crash al cerrar el juego en macOS (Godot 4.7).** Cerrar el juego después de
   haber cargado cualquier escena con `TileMapDual` termina con
   `Program crashed with signal 11` dentro de `NSApplication terminate`
