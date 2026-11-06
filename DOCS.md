@@ -650,6 +650,13 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   pasan por `tr()` y están traducidos en `game_text.csv`. Uno de ellos ya
   está en la nube al abrir (`INTRUSIVE_AT_START`). Elegir uno es un error
   como cualquier distractor.
+- **Dónde cae cada palabra** (`_place_word`): prueba 80 sitios al azar y se
+  queda con el primero que no toca a ninguna otra palabra (con `WORD_GAP` de
+  margen). Si no encuentra ninguno, barre toda la nube en una rejilla y elige
+  el sitio que menos se solapa (`_overlap_score`: que se pisen las letras
+  pesa mucho más que estar demasiado cerca). Antes se quedaba con el último
+  sitio que había probado, y con la nube llena un pensamiento que cambiaba
+  podía caer encima de otra palabra (pasaba en ~1 de cada 10 cambios).
 - **Aviso sin distractores:** si un puzzle real llega sin `extra_words`,
   `run()` lo avisa con `push_warning`. El editor se los borró más de una vez
   (la última, en el commit del espejo).

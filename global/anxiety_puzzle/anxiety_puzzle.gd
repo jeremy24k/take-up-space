@@ -182,18 +182,49 @@ func _scatter_words() -> void:
 		_words[0].grab_focus()
 
 ## Moves one word to a random spot of the cloud that none of the taken rects
-## covers (or the last one tried, if the cloud is too crowded).
+## covers. If the cloud is too crowded for that, it takes the spot that
+## overlaps the least: before, it kept the last spot tried, and a swapped
+## thought could land right on top of another word.
 func _place_word(word: ThoughtWord, taken: Array[Rect2]) -> void:
 	word.reset_size()
 	var area := Rect2(CLOUD_RECT.position, CLOUD_RECT.size - word.size)
-	var spot := area.position
+	var best_spot := area.position
+	var best_score := INF
 	for attempt in PLACEMENT_TRIES:
-		spot = (area.position + Vector2(randf() * area.size.x, randf() * area.size.y)).round()
-		var rect := Rect2(spot, word.size).grow(WORD_GAP)
-		if not taken.any(func(other: Rect2) -> bool: return other.intersects(rect)):
-			break
-	word.base_position = spot
-	word.position = spot
+		var spot := (area.position + Vector2(randf() * area.size.x, randf() * area.size.y)).round()
+		var score := _overlap_score(Rect2(spot, word.size), taken)
+		if score < best_score:
+			best_score = score
+			best_spot = spot
+			if score == 0.0:
+				break
+	# Random tries can miss the one free gap of a crowded cloud: sweep it all.
+	if best_score > 0.0:
+		var step := WORD_GAP / 2.0
+		var y := area.position.y
+		while y <= area.end.y and best_score > 0.0:
+			var x := area.position.x
+			while x <= area.end.x:
+				var score := _overlap_score(Rect2(Vector2(x, y), word.size), taken)
+				if score < best_score:
+					best_score = score
+					best_spot = Vector2(x, y)
+					if score == 0.0:
+						break
+				x += step
+			y += step
+	word.base_position = best_spot
+	word.position = best_spot
+
+## How badly a word placed at rect would collide with the taken rects. Text
+## on top of text is far worse than words only closer than WORD_GAP.
+func _overlap_score(rect: Rect2, taken: Array[Rect2]) -> float:
+	var padded := rect.grow(WORD_GAP)
+	var score := 0.0
+	for other in taken:
+		score += other.intersection(rect).get_area() * 1000.0
+		score += other.intersection(padded).get_area()
+	return score
 
 func _intrusive_thoughts() -> Array[String]:
 	var thoughts: Array[String] = []
