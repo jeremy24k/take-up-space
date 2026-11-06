@@ -51,6 +51,7 @@ Everything lives in `press_kit/video_tools/` (gitignored, local only). Read `pre
 7. **Check frames** with contact sheets (`fps=1/10,tile`) before delivering. Write `<name>_script.md` with posting texts (TikTok + YouTube) in the video's folder.
 
 ## Pitfalls already paid for
+- Record with `--always-on-top`. If the Godot window gets covered while the user works, macOS stops drawing it and Movie Maker keeps writing the same frame. The log then says fewer "frames at 30 FPS" than there are PNGs; check by md5-ing a few frames.
 - Movie Maker runs in game time. Count frames; never use `Time.get_ticks_msec`. Godot exit code 134 at quit is normal and the frames are saved.
 - Setting `Camera2D.offset` or disabling smoothing in the apartment and metro jumps the view to the wrong room. Use the default camera; only small `lift` values are safe.
 - Alice does not walk with `Input.action_press` in these recordings. For movement, cut from the user's playthrough (`press_kit/youtube_long/clips_jeremy/gameplay_full.mov`, `crop=2560:1440:190:236`) or ask for a new one.
