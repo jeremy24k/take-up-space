@@ -26,6 +26,23 @@ const HINT_BLINKS: int = 3
 ## in place of the prompt. Without it the reshuffle looked like a glitch.
 const STUMBLE_LINE := "No... así no."
 const STUMBLE_LINE_TIME: float = 1.2
+## Thoughts that crowd in while she tries to talk. Real puzzles only: they
+## float as distractors and swap in and out with the extra_words.
+const INTRUSIVE_THOUGHTS: PackedStringArray = [
+	"¿Me puedo ir a casa?",
+	"Me tengo que ir.",
+	"Todos me miran.",
+	"Quiero irme.",
+	"¿Y si me equivoco?",
+	"Wilson me espera.",
+]
+## How many of them are already in the cloud when the puzzle opens.
+const INTRUSIVE_AT_START: int = 1
+## Seconds between two thoughts swapping (calm -> about to freeze), with a
+## random spread so the swaps never fall into a rhythm.
+const SWAP_INTERVAL := Vector2(3.2, 1.4)
+const SWAP_SPREAD: float = 0.35
+const SWAP_FADE: float = 0.25
 const ARROW_ACTIONS: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
 ## Words of the sentence line, same look as thought_word.tscn: 4x the m3x6
 ## pixel font, with a thick near-black outline, readable over any scene.
@@ -33,13 +50,16 @@ const WORD_FONT_SIZE: int = 64
 const WORD_OUTLINE_SIZE: int = 10
 const WORD_OUTLINE_COLOR := Color(0.04, 0.01, 0.07)
 ## Alice's body under the clock: her heartbeat speeds up and gets louder as
-## the time runs out, and her breathing comes in during the second half.
+## the time runs out, and her breathing comes in softly near the end.
 ## Only in real puzzles; the mirror rehearsal stays quiet.
 const HEARTBEAT := preload("res://audio/sfx/heartbeat_loop.ogg")
 const BREATHING := preload("res://audio/sfx/breathing_loop.ogg")
 const HEARTBEAT_DB := Vector2(-20.0, -6.0)  # calm -> about to freeze
 const HEARTBEAT_PITCH := Vector2(1.0, 1.4)
-const BREATHING_DB := Vector2(-40.0, -12.0)
+## Playtest feedback: the panting was too much. It now starts at 60% of the
+## time and never gets louder than a background breath.
+const BREATHING_DB := Vector2(-40.0, -24.0)
+const BREATHING_FROM: float = 0.6
 const SILENT_DB: float = -60.0
 
 @onready var root: Control = $Root
@@ -60,6 +80,10 @@ var _accepting: bool = false
 var _done: bool = false
 var _heartbeat: AudioStreamPlayer
 var _breathing: AudioStreamPlayer
+## Distractor words that can change into another thought. Answer words and
+## "(...)" never change, so the puzzle always stays solvable.
+var _swappable: Array[ThoughtWord] = []
+var _swap_timer: float = 0.0
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -122,16 +146,27 @@ func _spawn_words() -> void:
 		for word in _data.phrases[key]:
 			if not texts.has(word):
 				texts.append(word)
+	var answer_count := texts.size()
 	for word in _data.extra_words:
 		if not texts.has(word):
 			texts.append(word)
+	if not _data.relaxed:
+		var intrusive := _intrusive_thoughts()
+		intrusive.shuffle()
+		for thought in intrusive.slice(0, INTRUSIVE_AT_START):
+			if not texts.has(thought):
+				texts.append(thought)
+	var swappable_count := texts.size() - answer_count
 	texts.append(SILENCE_WORD)
-	for text in texts:
+	for i in texts.size():
 		var word := WORD_SCENE.instantiate() as ThoughtWord
 		word_cloud.add_child(word)
-		word.setup(text)
+		word.setup(texts[i])
 		word.pressed.connect(_on_word_pressed.bind(word))
 		_words.append(word)
+		if i >= answer_count and i < answer_count + swappable_count:
+			_swappable.append(word)
+	_swap_timer = _next_swap_delay()
 	_scatter_words()
 
 ## Places every word at a random free spot of the cloud and focuses one.
@@ -140,19 +175,80 @@ func _scatter_words() -> void:
 	var taken: Array[Rect2] = []
 	for word in _words:
 		word.show()
-		word.reset_size()
-		var area := Rect2(CLOUD_RECT.position, CLOUD_RECT.size - word.size)
-		var spot := area.position
-		for attempt in PLACEMENT_TRIES:
-			spot = (area.position + Vector2(randf() * area.size.x, randf() * area.size.y)).round()
-			var rect := Rect2(spot, word.size).grow(WORD_GAP)
-			if not taken.any(func(other: Rect2) -> bool: return other.intersects(rect)):
-				break
-		taken.append(Rect2(spot, word.size))
-		word.base_position = spot
-		word.position = spot
+		word.modulate.a = 1.0
+		_place_word(word, taken)
+		taken.append(Rect2(word.base_position, word.size))
 	if not _awaiting_first_focus:
 		_words[0].grab_focus()
+
+## Moves one word to a random spot of the cloud that none of the taken rects
+## covers (or the last one tried, if the cloud is too crowded).
+func _place_word(word: ThoughtWord, taken: Array[Rect2]) -> void:
+	word.reset_size()
+	var area := Rect2(CLOUD_RECT.position, CLOUD_RECT.size - word.size)
+	var spot := area.position
+	for attempt in PLACEMENT_TRIES:
+		spot = (area.position + Vector2(randf() * area.size.x, randf() * area.size.y)).round()
+		var rect := Rect2(spot, word.size).grow(WORD_GAP)
+		if not taken.any(func(other: Rect2) -> bool: return other.intersects(rect)):
+			break
+	word.base_position = spot
+	word.position = spot
+
+func _intrusive_thoughts() -> Array[String]:
+	var thoughts: Array[String] = []
+	for thought in INTRUSIVE_THOUGHTS:
+		thoughts.append(tr(thought))
+	return thoughts
+
+# =========================
+# Swapping thoughts
+# =========================
+## Her head does not hold still: every few seconds one distractor fades out
+## and comes back somewhere else as another thought. Faster under pressure.
+func _update_swaps(delta: float, pressure: float) -> void:
+	_swap_timer -= delta
+	if _swap_timer > 0.0:
+		return
+	_swap_timer = _next_swap_delay(pressure)
+	_swap_one_thought()
+
+func _next_swap_delay(pressure: float = 0.0) -> float:
+	var delay := lerpf(SWAP_INTERVAL.x, SWAP_INTERVAL.y, pressure)
+	return delay * randf_range(1.0 - SWAP_SPREAD, 1.0 + SWAP_SPREAD)
+
+func _swap_one_thought() -> void:
+	# The focused word is the one she is holding on to: it never slips away.
+	var candidates := _swappable.filter(func(word: ThoughtWord) -> bool:
+		return word.visible and not word.has_focus() and word.modulate.a >= 1.0)
+	if candidates.is_empty():
+		return
+	var shown: PackedStringArray = []
+	for word in _words:
+		shown.append(word.text)
+	var pool: PackedStringArray = []
+	for text in Array(_data.extra_words) + _intrusive_thoughts():
+		if not shown.has(text) and not pool.has(text):
+			pool.append(text)
+	if pool.is_empty():
+		return
+	var word: ThoughtWord = candidates.pick_random()
+	var new_text: String = pool[randi() % pool.size()]
+	var tween := word.create_tween()
+	tween.tween_property(word, "modulate:a", 0.0, SWAP_FADE)
+	tween.tween_callback(_replace_thought.bind(word, new_text))
+	tween.tween_property(word, "modulate:a", 1.0, SWAP_FADE)
+
+func _replace_thought(word: ThoughtWord, new_text: String) -> void:
+	# Picked (hidden) while fading out: the next scatter brings it back as is.
+	if _done or not word.visible:
+		return
+	word.text = new_text
+	var taken: Array[Rect2] = []
+	for other in _words:
+		if other != word and other.visible:
+			taken.append(Rect2(other.base_position, other.size))
+	_place_word(word, taken)
 
 func _focus_any_visible() -> void:
 	for word in _words:
@@ -276,8 +372,9 @@ func _process(delta: float) -> void:
 		word.pressure = pressure
 	_heartbeat.volume_db = lerpf(HEARTBEAT_DB.x, HEARTBEAT_DB.y, pressure)
 	_heartbeat.pitch_scale = lerpf(HEARTBEAT_PITCH.x, HEARTBEAT_PITCH.y, pressure)
-	var breath := clampf(pressure * 2.0 - 1.0, 0.0, 1.0)
+	var breath := clampf((pressure - BREATHING_FROM) / (1.0 - BREATHING_FROM), 0.0, 1.0)
 	_breathing.volume_db = lerpf(BREATHING_DB.x, BREATHING_DB.y, breath)
+	_update_swaps(delta, pressure)
 	if _time_left <= 0.0:
 		_finish(SILENCE)
 

@@ -42,7 +42,10 @@ const DEFEATED_SPEED_SCALE: float = 0.8
 ## to one side so Alice's sprite does not cover her.
 const LIA_FOLLOW_GAP: float = 24.0
 const LIA_SIDE_OFFSET: float = 8.0
-const LIA_SPEED: float = 120.0
+## How tightly she closes the gap (like WalkingNPC.follow). A fixed speed
+## faster than Alice made her catch up and stop every other frame, and that
+## stop-and-go stutter made her look blurry.
+const LIA_FOLLOW_STIFFNESS: float = 8.0
 ## If Alice walks off to the metro, Lía runs after her this fast.
 const LIA_CHASE_SPEED: float = 260.0
 ## Before Alice talks to her she cries for her mother now and then, if Alice
@@ -104,9 +107,15 @@ const MOTHER_WALK_TIME: float = 1.8
 const LIA_BESIDE_ALICE := Vector2(22, -2)
 const MOTHER_BESIDE_LIA := Vector2(16, 0)
 const LEAVING_WALK_TIME: float = 3.0
+## Toby keeps to this side of his owner, a little lower (closer to the
+## camera): behind her one way, ahead of her on the way back.
+const TOBY_LEASH_OFFSET := Vector2(16, 5)
+## Played while Lía waits alone, crying for her mother, once it is drawn in
+## lia.aseprite. Until then she stands facing the camera.
+const LIA_CRY_ANIMATION := "cry"
 
 @onready var player: Player = $MiddleLayer/Player
-@onready var lia: CharacterBody2D = $MiddleLayer/NPCS/Lia
+@onready var lia: WalkingNPC = $MiddleLayer/NPCS/Lia
 @onready var lia_talk: InteractableArea = $MiddleLayer/NPCS/Lia/TalkArea
 @onready var lia_bark: SpeechBark = $MiddleLayer/NPCS/Lia/Bark
 @onready var lia_mom: CharacterBody2D = $MiddleLayer/NPCS/LiaMom
@@ -126,11 +135,28 @@ const HELPER_TIMELINES := {
 	"dog_lady": "plaza_dog_lady",
 	"teen": "plaza_teen",
 }
-@onready var dog_lady: Node2D = $MiddleLayer/NPCS/DogLady
+## The woman with the dog jogs along the top sidewalk (JoggingRoute) with
+## Toby beside her, resting 12-15 s at each end; she stops when Alice comes
+## close.
+@onready var dog_lady: WalkingNPC = $MiddleLayer/NPCS/DogLady
+@onready var toby: WalkingNPC = $MiddleLayer/NPCS/Toby
+## Background people (AmbientThought only). The daytime crowd (reader,
+## grandma, guitarist, couple, girl at the picnic) goes home when the
+## afternoon is over; the two strollers keep walking their routes.
+@onready var daytime_crowd: Node2D = $MiddleLayer/NPCS/DaytimeCrowd
+@onready var strollers: Array[WalkingNPC] = [
+	$MiddleLayer/NPCS/StrollerSidewalk,
+	$MiddleLayer/NPCS/StrollerWalkway,
+]
 @onready var mother_start: Marker2D = $StoryPoints/MotherStart
 @onready var family_exit: Marker2D = $StoryPoints/FamilyExit
 
 var _lia_following: bool = false
+var _lia_still_time: float = 0.0
+## Alice's position last frame, to tell whether she is walking.
+var _alice_last_position := Vector2.ZERO
+## Seconds Lía stands still behind Alice before she stops walking.
+const LIA_STOP_DELAY: float = 0.15
 var _cry_timer: float = 0.0
 var _question_timer: float = 0.0
 var _questions_left: Array[String] = []
@@ -151,6 +177,12 @@ func _ready() -> void:
 	_question_timer = randf_range(LIA_QUESTION_EVERY.x, LIA_QUESTION_EVERY.y)
 	_restore_stage()
 	_refresh_helpers()
+	_lia_waits_crying()
+	dog_lady.start_patrol()
+	for stroller in strollers:
+		stroller.start_patrol()
+	toby.global_position = dog_lady.global_position + TOBY_LEASH_OFFSET
+	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
 
 ## Puts every character where the current story step needs them.
 func _restore_stage() -> void:
@@ -165,10 +197,12 @@ func _restore_stage() -> void:
 			_start_lia_following()
 		GameManager.PlazaStage.LIA_HOME:
 			sun_filter.color = SKY_LATE
+			_send_crowd_home()
 			_set_npc_active(lia, false)
 			player.speed_scale = DEFEATED_SPEED_SCALE
 		GameManager.PlazaStage.MISSED_TRAIN:
 			sun_filter.color = SKY_NIGHT
+			_send_crowd_home()
 			_set_npc_active(lia, false)
 
 func _greet_the_plaza() -> void:
@@ -198,11 +232,18 @@ func _follow_alice(delta: float) -> void:
 	var facing := player.last_direction.normalized()
 	var behind := -facing * LIA_FOLLOW_GAP + facing.orthogonal() * LIA_SIDE_OFFSET
 	var to_target := player.global_position + behind - lia.global_position
-	if to_target.length() < 2.0:
+	var alice_motion := player.global_position - _alice_last_position
+	_alice_last_position = player.global_position
+	if to_target.length() < 2.0 and alice_motion.length() <= 0.05:
+		# Caught up and Alice stands still: stop walking after a short moment.
+		_lia_still_time += delta
+		if _lia_still_time >= LIA_STOP_DELAY:
+			lia.face_direction(facing)
 		return
-	lia.global_position += to_target.limit_length(LIA_SPEED * delta)
-	if absf(to_target.x) > 1.0:
-		lia.sprite.flip_h = to_target.x < 0.0
+	_lia_still_time = 0.0
+	# Eased, so while Alice walks Lía keeps her exact pace a step behind.
+	lia.global_position += to_target * minf(1.0, LIA_FOLLOW_STIFFNESS * delta)
+	lia.play_move(to_target if to_target.length() > 1.0 else alice_motion)
 
 func _ask_something(delta: float) -> void:
 	if Dialogic.current_timeline != null and not ThoughtBox.is_showing():
@@ -226,10 +267,14 @@ func _on_dialogic_signal(argument: Variant) -> void:
 		"lia_grabs_sleeve":
 			_advance_to(GameManager.PlazaStage.WITH_LIA, SEARCH_START_LINES)
 			_start_lia_following()
+		"toby_comes":
+			_toby_comes()
 		"lia_lets_go":
 			_lia_plays_with_dog()
 		"lia_holds_on":
+			_alice_last_position = player.global_position
 			_lia_following = true
+			_toby_goes_back()
 		"time_passes":
 			_let_time_pass()
 		"lia_mom_arrives":
@@ -274,19 +319,43 @@ func _refresh_helpers() -> void:
 		var asked := GameManager.lia_clues.has(clue)
 		area.timeline_name = HELPER_TIMELINES[clue] + ("" if searching and not asked else "_idle")
 
-## The dog wins: Lía lets go of the sleeve to play with it, and holds on
-## again when Alice calls her ([signal arg="lia_holds_on"]).
+## Toby sees them and trots straight up to Alice to lean on her legs
+## ([signal arg="toby_comes"]). Lía lets go of the sleeve to play with him
+## ("lia_lets_go") and holds on again when Alice calls her ("lia_holds_on");
+## then Toby goes back to his owner.
+func _toby_comes() -> void:
+	toby.stop_following()
+	# Glued to Alice's legs: as a solid body he would push her around.
+	toby.collision_layer = 0
+	toby.collision_mask = 0
+	var side := signf(toby.global_position.x - player.global_position.x)
+	if side == 0.0:
+		side = 1.0
+	var at_alice := player.global_position + Vector2(16 * side, -2)
+	_face(toby, at_alice)
+	await _slide(toby, at_alice, 0.5)
+	toby.face_direction(player.global_position - toby.global_position)
+
 func _lia_plays_with_dog() -> void:
 	_lia_following = false
 	lia_bark.hide_now()
-	var spot := dog_lady.global_position + Vector2(-14, 8)
-	lia.sprite.flip_h = spot.x < lia.global_position.x
-	_slide(lia, spot, 0.5)
+	var side := signf(toby.global_position.x - player.global_position.x)
+	if side == 0.0:
+		side = 1.0
+	var by_toby := toby.global_position + Vector2(8 * side, -12)
+	_face(lia, by_toby)
+	_slide(lia, by_toby, 0.4)
+
+## Back on the leash: he catches up with his owner by himself.
+func _toby_goes_back() -> void:
+	toby.collision_mask = 1
+	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
 
 # =========================
 # Lía holds her sleeve
 # =========================
 func _start_lia_following() -> void:
+	_alice_last_position = player.global_position
 	_lia_following = true
 	player.speed_scale = SLEEVE_SPEED_SCALE
 	# She walks glued to Alice: as a solid body she would shove her around.
@@ -304,7 +373,6 @@ func _lia_runs_after_alice() -> void:
 	lia.collision_layer = 0
 	lia.collision_mask = 0
 	var target := player.global_position + Vector2(-LIA_FOLLOW_GAP, 4)
-	lia.sprite.flip_h = target.x < lia.global_position.x
 	await _slide(lia, target, lia.global_position.distance_to(target) / LIA_CHASE_SPEED)
 	player.face_direction(player.global_position.direction_to(lia.global_position))
 	Dialogic.start("plaza_lia_meet", "chase")
@@ -340,6 +408,7 @@ func _let_time_pass() -> void:
 	Dialogic.paused = true
 	await FadeTransition.fade_out(TIME_SKIP_FADE)
 	sun_filter.color = SKY_LATE
+	_send_crowd_home()
 	await FadeTransition.fade_in(TIME_SKIP_FADE)
 	Dialogic.paused = false
 
@@ -359,8 +428,8 @@ func _family_leaves() -> void:
 	var leaving := create_tween().set_parallel(true)
 	leaving.tween_property(lia, "global_position", family_exit.global_position, LEAVING_WALK_TIME)
 	leaving.tween_property(lia_mom, "global_position", family_exit.global_position + Vector2(10, 2), LEAVING_WALK_TIME)
-	lia.sprite.flip_h = family_exit.global_position.x < lia.global_position.x
-	lia_mom.sprite.flip_h = lia.sprite.flip_h
+	lia.play_move(family_exit.global_position - lia.global_position)
+	lia_mom.sprite.flip_h = family_exit.global_position.x < lia_mom.global_position.x
 	await leaving.finished
 	_set_npc_active(lia, false)
 	_set_npc_active(lia_mom, false)
@@ -400,13 +469,42 @@ func _miss_the_train() -> void:
 # =========================
 # Helpers
 # =========================
-## Placeholder movement: the provisional sprites have no walk cycle, so the
-## characters glide. Replace with walk animations once Lía and her mother
-## have their own sprites.
+## Moves an NPC in a straight line in `duration`. A WalkingNPC (Lía, Toby)
+## plays its walk/run cycle and then stands facing the way it went; the
+## sheet's characters (Lía's mother) still glide, they have no walk cycle.
 func _slide(npc: Node2D, target: Vector2, duration: float) -> void:
+	var direction := target - npc.global_position
+	if npc is WalkingNPC and direction.length() > 1.0:
+		npc.play_move(direction)
 	var tween := create_tween()
 	tween.tween_property(npc, "global_position", target, duration)
 	await tween.finished
+	if npc is WalkingNPC and direction.length() > 1.0:
+		npc.face_direction(direction)
+
+## Turns an NPC towards target. The sheet's characters face right by default.
+func _face(npc: Node2D, target: Vector2) -> void:
+	if npc is WalkingNPC:
+		npc.face_direction(target - npc.global_position)
+	elif absf(target.x - npc.global_position.x) > 1.0:
+		npc.sprite.flip_h = target.x < npc.global_position.x
+
+## Lía alone, waiting for her mother: crying if that animation exists.
+func _lia_waits_crying() -> void:
+	if lia.sprite.sprite_frames.has_animation(LIA_CRY_ANIMATION):
+		lia.sprite.play(LIA_CRY_ANIMATION)
+	else:
+		lia.face_direction(Vector2.DOWN)
+
+## The afternoon is over: the daytime crowd is gone (while the screen is
+## dark, or before the scene shows). Their thought notice over Alice goes
+## too, in case she was standing by one of them.
+func _send_crowd_home() -> void:
+	for npc in daytime_crowd.get_children():
+		for child in npc.get_children():
+			if child is AmbientThought:
+				ThoughtBox.set_notice(child, false)
+		_set_npc_active(npc, false)
 
 ## Hiding is not enough: a hidden NPC still blocks Alice and still answers.
 func _set_npc_active(npc: Node2D, is_active: bool) -> void:
