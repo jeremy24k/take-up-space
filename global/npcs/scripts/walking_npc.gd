@@ -1,3 +1,4 @@
+@tool
 class_name WalkingNPC
 extends CharacterBody2D
 
@@ -12,6 +13,17 @@ const DEFAULT_WALK_SPEED: float = 40.0
 const SOLID_COLLISION_LAYER: int = 1
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+## This NPC's animations (an .aseprite imported as SpriteFrames). Set it here,
+## on the NPC, instead of on its AnimatedSprite2D: the script is @tool, so the
+## editor shows the real sprite, and the template's placeholder stays as the
+## fallback when this is empty. (Overriding sprite_frames on the child got
+## lost in the plaza more than once, 2026-11-03.)
+@export var frames: SpriteFrames:
+	set(value):
+		frames = value
+		if is_node_ready():
+			_apply_frames()
 
 var facing: Vector2 = Vector2.DOWN
 ## Where it is going, or where it will go next while it rests between legs
@@ -78,7 +90,7 @@ func _physics_process(_delta: float) -> void:
 		face_direction(global_position.direction_to(player.global_position))
 	elif _paused_for_player:
 		_paused_for_player = false
-		_play_move(_walk_direction)
+		play_move(_walk_direction)
 		_walk_tween.play()
 
 # =========================
@@ -111,10 +123,11 @@ func _play_animation(animation_name: String) -> void:
 	if sprite.sprite_frames.has_animation(animation_name):
 		sprite.play(animation_name)
 
-## Plays the movement cycle for direction (move_animation prefix). With no
+## Plays the movement cycle for direction (move_animation prefix). Public so a
+## scene can animate an NPC it moves by itself (e.g. Lía glued to Alice). With no
 ## front/back cycle it uses the side one, flipped by the horizontal part of
 ## the direction.
-func _play_move(direction: Vector2) -> void:
+func play_move(direction: Vector2) -> void:
 	var animation_name := move_animation + "_" + _direction_suffix(direction)
 	if not sprite.sprite_frames.has_animation(animation_name):
 		animation_name = move_animation + "_side"
@@ -270,6 +283,21 @@ const FOLLOW_SETTLE: float = 2.0
 
 func _ready() -> void:
 	set_process(false)
+	_apply_frames()
+	if Engine.is_editor_hint():
+		# Only the sprite preview runs in the editor.
+		set_physics_process(false)
+
+## Puts `frames` on the sprite and shows it standing still (front if it has
+## that pose, else its side).
+func _apply_frames() -> void:
+	if frames == null or sprite == null:
+		return
+	sprite.sprite_frames = frames
+	for idle in ["idle_front", "idle_side"]:
+		if frames.has_animation(idle):
+			sprite.play(idle)
+			return
 
 func _process(delta: float) -> void:
 	if _leader == null or not is_instance_valid(_leader):
@@ -283,7 +311,7 @@ func _process(delta: float) -> void:
 		face_direction(look)
 		return
 	global_position += gap * minf(1.0, FOLLOW_STIFFNESS * delta)
-	_play_move(leader_motion if leader_motion.length() > 0.05 else gap)
+	play_move(leader_motion if leader_motion.length() > 0.05 else gap)
 
 ## One leg of movement: tweens straight to target_position while playing the
 ## matching walk animation. Returns the direction walked (Vector2.ZERO if
@@ -299,7 +327,7 @@ func _walk_leg(target_position: Vector2, speed: float) -> Vector2:
 		# A new leg started while she was standing next to it: start it paused.
 		face_direction(global_position.direction_to(_player_position()))
 	else:
-		_play_move(direction)
+		play_move(direction)
 
 	var distance := global_position.distance_to(target_position)
 	_walk_tween = create_tween()

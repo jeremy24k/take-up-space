@@ -4829,13 +4829,13 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="PedestrianA" parent="MiddleLayer/NPCS" unique_id=192636796 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
+frames = ExtResource("36_redcap")
 y_sort_enabled = true
 position = Vector2(992, 531)
 patrol_points = [NodePath("../../../PedestrianRoutes/PedestrianA/Point1"), NodePath("../../../PedestrianRoutes/PedestrianA/Point2")]
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/PedestrianA" index="0" unique_id=1544429594]
-sprite_frames = ExtResource("36_redcap")
 animation = &"idle_front"
 autoplay = "idle_front"
 frame_progress = 0.458629
@@ -4862,13 +4862,13 @@ first_timeline = ""
 first_line = ""
 
 [node name="PedestrianB" parent="MiddleLayer/NPCS" unique_id=1854181935 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
+frames = ExtResource("37_blonde")
 y_sort_enabled = true
 position = Vector2(305, 439)
 patrol_points = [NodePath("../../../PedestrianRoutes/PedestrianB/Point1"), NodePath("../../../PedestrianRoutes/PedestrianB/Point2")]
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/PedestrianB" index="0" unique_id=1544429594]
-sprite_frames = ExtResource("37_blonde")
 animation = &"walk_side"
 autoplay = "idle_front"
 position = Vector2(0, -7)
@@ -4894,6 +4894,7 @@ first_timeline = ""
 first_line = ""
 
 [node name="StreetCat" parent="MiddleLayer/NPCS" unique_id=753911802 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
+frames = ExtResource("street_cat")
 y_sort_enabled = true
 position = Vector2(144, 247)
 talk_animation = "meow"
@@ -4902,7 +4903,6 @@ patrol_points = [NodePath("../../../PedestrianRoutes/StreetCat/Point1"), NodePat
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/StreetCat" index="0" unique_id=1544429594]
-sprite_frames = ExtResource("street_cat")
 animation = &"walk_side"
 autoplay = "idle_front"
 position = Vector2(0, 1)

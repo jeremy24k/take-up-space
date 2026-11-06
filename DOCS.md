@@ -510,6 +510,13 @@ centro en -16 → `position (0, -7)`; los sentados en -20 → `(0, -11)`.
 **No cambies solo el `offset`**: movería el dibujo sin mover el punto de
 orden. Las sombras se recolocan solas.
 
+**Excepción: sentado en una banca frontal.** La banca (tiles de
+`AddonsSuperior`) se ordena por debajo de las patas, así que con el punto de
+orden normal la banca tapa a quien está sentado. Ahí se baja el punto de orden
+sin mover el dibujo: se suma lo mismo al `position` del sprite y se resta al
+`offset` (el chico de auriculares de la plaza: `position (0, 20)`,
+`offset (0, -20)`, raíz 3 px más arriba para que los pies cuelguen sobre la base de las patas; punto de orden a 522, por delante de la banca a 520).
+
 ### `RemarkInteractable` (`global/remark_interactable.tscn`)
 Para lo que **parece interactivo pero tiene poco que contar**: NPCs
 ambientales, puertas cerradas, la segunda máquina expendedora. Usa el mismo
@@ -627,6 +634,18 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   tecla, porque en el tercer playtest el tiempo se acababa antes de entender
   cómo se jugaba; ahora eso lo enseña el ensayo del espejo (`relaxed`, sin
   reloj), así que la presión empieza en el acto.
+- **Pensamientos que cambian** (feedback de un comentario en YouTube): en los
+  puzzles reales (no en el espejo), cada 1,4–3,2 s (más rápido cuanto menos
+  tiempo queda, con un margen al azar para que no tenga ritmo) un distractor
+  se desvanece y vuelve en otro sitio como otro pensamiento. Solo cambian los
+  distractores: las palabras de las respuestas y "(...)" nunca cambian, así
+  que el puzzle siempre se puede resolver. La palabra con el foco tampoco
+  cambia (es la que Alice está agarrando). Los pensamientos salen de los
+  `extra_words` del puzzle más `INTRUSIVE_THOUGHTS` en `anxiety_puzzle.gd`
+  ("¿Me puedo ir a casa?", "Me tengo que ir.", "Todos me miran."...), que
+  pasan por `tr()` y están traducidos en `game_text.csv`. Uno de ellos ya
+  está en la nube al abrir (`INTRUSIVE_AT_START`). Elegir uno es un error
+  como cualquier distractor.
 - **Aviso sin distractores:** si un puzzle real llega sin `extra_words`,
   `run()` lo avisa con `push_warning`. El editor se los borró más de una vez
   (la última, en el commit del espejo).
@@ -1289,6 +1308,15 @@ Si se mueve un área, mantener las dos reglas.
   - Ojo con el editor: si tiene cargada la versión vieja del script, al guardar
     la escena descarta `patrol_points` (pasó una vez). Recargar el proyecto
     después de cambiar exports de un script.
+  - **`frames`** (2026-11-05): las animaciones de cada `WalkingNPC` se ponen
+    en este export del propio NPC, **no** en `sprite_frames` de su
+    `AnimatedSprite2D`. El script es `@tool`: en el editor se ve el sprite de
+    verdad (quieto en `idle_front` o `idle_side`). En la plaza, el editor
+    borraba al guardar el `sprite_frames` puesto en el hijo y volvía el
+    placeholder de la plantilla (pasó tres veces); en la raíz no pasa. Ya lo
+    usan Lía, la corredora, Toby, los paseantes de la plaza y los peatones y
+    el gato de la calle. En el editor solo corre la vista previa (sin
+    `_physics_process` ni `_process`).
   - **`patrol_loop`** (2026-11-03): en vez de ida y vuelta, da vueltas al
     circuito (del último punto vuelve al primero), con `patrol_pause` al
     empezar cada vuelta (0 = sin parar).
@@ -1995,7 +2023,9 @@ hubiera.
   `SoundManager.SFX` (`meow`, `door_open`, `shop_bell`, `train_chime`).
 - **Rompecabezas de la Ansiedad:** solo en los de verdad (no en el espejo), un
   latido que se acelera (×1 → ×1,4) y sube de volumen con la presión, y una
-  respiración agitada que entra en la segunda mitad. Se apagan con el puzzle.
+  respiración que entra al 60 % del tiempo (`BREATHING_FROM`) y no pasa de
+  −24 dB. Antes entraba a la mitad y llegaba a −12 dB, y en YouTube
+  comentaron que el jadeo era exagerado. Se apagan con el puzzle.
 - **Pasos de Alice** (`player.gd`): en cada fotograma de `step_frames`
   (`[0, 3]`) de `walk_front/back/side` suena uno de los 4 `footstep_*.ogg`,
   nunca el mismo dos veces seguidas y con el tono un poco al azar (×0,92–1,08),
@@ -2110,13 +2140,20 @@ música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
 
 Adaptación del Twine "Escena Lia" (`Documents/Twine/Stories/Escena Lia.html`).
 Por ayudar a Lía, Alice pierde el último tren: eso justifica que esté en la
-plaza de noche (Clara). Los NPCs usan **sprites provisionales** de
-`npcs_sprite_sheet` (`BaseNPC`, `column_npc`) y se deslizan con tweens
-(`_slide`), porque no tienen ciclo de caminar.
+plaza de noche (Clara). **Lía tiene su propio sprite** desde 2026-11-05
+(`global/npcs/assets/lia.aseprite`: `idle_front/side/back` y
+`walk_front/side/back`); es un `WalkingNPC` con `frames = lia.aseprite`. `_slide()`
+reproduce el ciclo de caminar (`play_move()`) en los `WalkingNPC` y al final
+los deja quietos mirando hacia donde iban; su madre (columna 3 de
+`npcs_sprite_sheet`) todavía se desliza. Siguiendo a Alice, Lía camina
+mientras avanza y solo vuelve a `idle` tras 0,15 s quieta (`LIA_STOP_DELAY`),
+para que no parpadee. **Falta la animación de llorar:** cuando exista una
+`cry` en `lia.aseprite`, `_lia_waits_crying()` la usa al esperar en la banca;
+hasta entonces está quieta de frente.
 
 ### Recorrido
 1. **Llegada** (`ARRIVED`). Nube: "Llegué. Solo falta bajar al metro y...",
-   "...¿Alguien está llorando?". Lía (`MiddleLayer/NPCS/Lia`, columna 19) llora
+   "...¿Alguien está llorando?". Lía (`MiddleLayer/NPCS/Lia`) llora
    en la banca de arriba a la derecha de la plazoleta (731, 398); su `Bark`
    (`SpeechBark`) dice "¡Mamá!" cada 4 s si Alice está a menos de 360 px.
 2. **Primera decisión.** Dos formas de llegar a ella:
@@ -2152,9 +2189,8 @@ plaza de noche (Clara). Los NPCs usan **sprites provisionales** de
      Desde 2026-11-03 los dos son `WalkingNPC` con sus propios sprites
      (`global/npcs/assets/sporty_girl.aseprite`: `idle_front`, `run_side`;
      `dog.aseprite`: `idle_side`, `run_side`; las columnas 23 y 24 de la hoja
-     ya no se usan). Los `SpriteFrames` se asignan desde `plaza.gd`
-     (`JOGGER_FRAMES`, `TOBY_FRAMES`), no en la escena: el editor borraba ese
-     override al guardar y volvía el sprite de prueba de la plantilla y `move_animation = "run"`. Ella va y vuelve por la acera
+     ya no se usan). Sus animaciones van en el export `frames` de cada
+     `WalkingNPC` (ver más abajo) y `move_animation = "run"`. Ella va y vuelve por la acera
      de arriba, entre la valla y los edificios (`JoggingRoute/Point1`–`2`,
      y = 210, 70 px/s), y descansa 12–15 s en cada punta; se para y mira a
      Alice si se acerca a 44 px (`pause_near_player`), así se le puede
@@ -2168,7 +2204,8 @@ plaza de noche (Clara). Los NPCs usan **sprites provisionales** de
      a su dueña (`lia_holds_on`). Menú: preguntar igual (+1) o
      apartarse primero. Pista: iba preocupada, preguntando por una niña,
      hacia la fuente.
-   - **Chico con auriculares** (`Teen`, banca del paseo de la derecha,
+   - **Chico con auriculares** (`Teen`, columna 25 de `npcs_sprite_sheet`,
+     sentado en la banca frontal del paseo de la derecha, raíz en (957, 502),
      `plaza_teen`, personaje `headphones_teen`): no la oye. Lía le tira de la
      manga ("¡Más fuerte!"). Menú: subir la voz (+1) o hacerle gestos. Pista:
      no vio a nadie, pero la fuente está al otro lado.
@@ -2220,6 +2257,31 @@ Dialogic lee cualquier línea que empieza por `do` como un evento *Call*
 (`do Autoload.metodo()`), así que `dog_lady: ...` se saltaba con
 "Call event failed". Por eso la señora es `lady_with_dog`. No pongas ids de
 personaje que empiecen por "do".
+
+### Gente de fondo en la plaza (2026-11-05)
+Solo `AmbientThought` (icono de pensamiento sobre Alice + una línea en la
+nube, traducida en `game_text.csv`), sin "...":
+- **`MiddleLayer/NPCS/DaytimeCrowd`** (`Node2D` con y-sort), los que se van
+  al terminar la tarde:
+  - `NewspaperReader` (columna 0), sentado en la banca frontal del paseo de la
+    izquierda (332, 502), con el mismo truco que el chico de auriculares
+    (`position (0, 20)`, `offset (0, -20)`);
+  - `PigeonGrandma` (15), junto a las palomas de arriba de la fuente;
+  - `Guitarist` (16), abajo de la fuente;
+  - `CafeWoman` (21) y `CafeMan` (20), de pie junto a la mesa redonda del
+    jardín de abajo a la izquierda;
+  - `PicnicGirl` (18, con su perrito), al borde del mantel del picnic.
+  `plaza.gd` (`_send_crowd_home()`) los desactiva cuando pasa el tiempo
+  (`time_passes`, con la pantalla a negro) y al cargar la plaza en
+  `LIA_HOME` o `MISSED_TRAIN`; también apaga su aviso sobre Alice.
+- **Paseantes** (`StrollerSidewalk` con `pedestrian_red_cap`, por la acera de
+  abajo; `StrollerWalkway` con `pedestrian_blonde`, por el paseo de la
+  izquierda hasta la plaza central): `WalkingNPC` con rutas en
+  `StrollerRoutes`, `pause_near_player = 24`. `plaza.gd` les llama
+  `start_patrol()` y siguen también de noche. Solo tienen ciclo de lado, así
+  que sus rutas son horizontales.
+- Las palomas del paseo de la izquierda (nodo `Pigeons/Node2D`) bajaron a
+  y = 546 para que la paseante no las atraviese.
 
 ### Palomas (`PigeonFlock`, `global/npcs/scripts/pigeon_flock.gd`)
 Pieza reutilizable: un `Node2D` con el script, puesto en una capa con y-sort,
