@@ -42,7 +42,10 @@ const DEFEATED_SPEED_SCALE: float = 0.8
 ## to one side so Alice's sprite does not cover her.
 const LIA_FOLLOW_GAP: float = 24.0
 const LIA_SIDE_OFFSET: float = 8.0
-const LIA_SPEED: float = 120.0
+## How tightly she closes the gap (like WalkingNPC.follow). A fixed speed
+## faster than Alice made her catch up and stop every other frame, and that
+## stop-and-go stutter made her look blurry.
+const LIA_FOLLOW_STIFFNESS: float = 8.0
 ## If Alice walks off to the metro, Lía runs after her this fast.
 const LIA_CHASE_SPEED: float = 260.0
 ## Before Alice talks to her she cries for her mother now and then, if Alice
@@ -150,6 +153,8 @@ const HELPER_TIMELINES := {
 
 var _lia_following: bool = false
 var _lia_still_time: float = 0.0
+## Alice's position last frame, to tell whether she is walking.
+var _alice_last_position := Vector2.ZERO
 ## Seconds Lía stands still behind Alice before she stops walking.
 const LIA_STOP_DELAY: float = 0.15
 var _cry_timer: float = 0.0
@@ -227,16 +232,18 @@ func _follow_alice(delta: float) -> void:
 	var facing := player.last_direction.normalized()
 	var behind := -facing * LIA_FOLLOW_GAP + facing.orthogonal() * LIA_SIDE_OFFSET
 	var to_target := player.global_position + behind - lia.global_position
-	if to_target.length() < 2.0:
-		# Caught up. While Alice keeps walking this happens every other
-		# frame, so she only stops walking after a short moment still.
+	var alice_motion := player.global_position - _alice_last_position
+	_alice_last_position = player.global_position
+	if to_target.length() < 2.0 and alice_motion.length() <= 0.05:
+		# Caught up and Alice stands still: stop walking after a short moment.
 		_lia_still_time += delta
 		if _lia_still_time >= LIA_STOP_DELAY:
 			lia.face_direction(facing)
 		return
 	_lia_still_time = 0.0
-	lia.global_position += to_target.limit_length(LIA_SPEED * delta)
-	lia.play_move(to_target)
+	# Eased, so while Alice walks Lía keeps her exact pace a step behind.
+	lia.global_position += to_target * minf(1.0, LIA_FOLLOW_STIFFNESS * delta)
+	lia.play_move(to_target if to_target.length() > 1.0 else alice_motion)
 
 func _ask_something(delta: float) -> void:
 	if Dialogic.current_timeline != null and not ThoughtBox.is_showing():
@@ -265,6 +272,7 @@ func _on_dialogic_signal(argument: Variant) -> void:
 		"lia_lets_go":
 			_lia_plays_with_dog()
 		"lia_holds_on":
+			_alice_last_position = player.global_position
 			_lia_following = true
 			_toby_goes_back()
 		"time_passes":
@@ -347,6 +355,7 @@ func _toby_goes_back() -> void:
 # Lía holds her sleeve
 # =========================
 func _start_lia_following() -> void:
+	_alice_last_position = player.global_position
 	_lia_following = true
 	player.speed_scale = SLEEVE_SPEED_SCALE
 	# She walks glued to Alice: as a solid body she would shove her around.

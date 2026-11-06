@@ -513,9 +513,13 @@ orden. Las sombras se recolocan solas.
 **Excepción: sentado en una banca frontal.** La banca (tiles de
 `AddonsSuperior`) se ordena por debajo de las patas, así que con el punto de
 orden normal la banca tapa a quien está sentado. Ahí se baja el punto de orden
-sin mover el dibujo: se suma lo mismo al `position` del sprite y se resta al
-`offset` (el chico de auriculares de la plaza: `position (0, 20)`,
-`offset (0, -20)`, raíz 3 px más arriba para que los pies cuelguen sobre la base de las patas; punto de orden a 522, por delante de la banca a 520).
+sin mover el dibujo, con el export **`sort_lower`** del `BaseNPC` (en la
+raíz): suma esos píxeles al `position` del sprite y los resta al `offset`, y
+recoloca la sombra. En la plaza, el chico de auriculares (`Teen`) y el del
+periódico (`NewspaperReader`) tienen `sort_lower = 11`: raíz a y=502, punto
+de orden a 522, por delante de la banca (512) y del seto (520). Antes se hacía
+con un override de `position`/`offset` en el `Sprite2D` hijo, pero el editor
+lo borró al guardar la plaza y los dos quedaron detrás de la banca.
 
 ### `RemarkInteractable` (`global/remark_interactable.tscn`)
 Para lo que **parece interactivo pero tiene poco que contar**: NPCs
@@ -2145,11 +2149,15 @@ plaza de noche (Clara). **Lía tiene su propio sprite** desde 2026-11-05
 `walk_front/side/back`); es un `WalkingNPC` con `frames = lia.aseprite`. `_slide()`
 reproduce el ciclo de caminar (`play_move()`) en los `WalkingNPC` y al final
 los deja quietos mirando hacia donde iban; su madre (columna 3 de
-`npcs_sprite_sheet`) todavía se desliza. Siguiendo a Alice, Lía camina
-mientras avanza y solo vuelve a `idle` tras 0,15 s quieta (`LIA_STOP_DELAY`),
-para que no parpadee. **Falta la animación de llorar:** cuando exista una
-`cry` en `lia.aseprite`, `_lia_waits_crying()` la usa al esperar en la banca;
-hasta entonces está quieta de frente.
+`npcs_sprite_sheet`) todavía se desliza. Siguiendo a Alice, Lía se acerca a su
+sitio con un acercamiento suave (`LIA_FOLLOW_STIFFNESS`, como
+`WalkingNPC.follow()`), así que mientras Alice camina va a su mismo ritmo un
+paso por detrás. Antes iba a velocidad fija (120 px/s, más que Alice con la
+manga agarrada): la alcanzaba, se paraba un fotograma, arrancaba el
+siguiente... y ese tirón continuo la hacía ver borrosa. Solo vuelve a `idle`
+cuando Alice está quieta y Lía ya llegó, tras 0,15 s (`LIA_STOP_DELAY`).
+La animación `cry` de `lia.aseprite` la usa `_lia_waits_crying()` al esperar
+en la banca.
 
 ### Recorrido
 1. **Llegada** (`ARRIVED`). Nube: "Llegué. Solo falta bajar al metro y...",

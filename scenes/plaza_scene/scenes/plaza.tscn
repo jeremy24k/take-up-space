@@ -5136,6 +5136,7 @@ position = Vector2(0, -30)
 
 [node name="Teen" parent="MiddleLayer/NPCS" unique_id=859423113 instance=ExtResource("base_npc")]
 position = Vector2(957, 502)
+sort_lower = 11
 column_npc = 25
 metadata/_edit_group_ = true
 
@@ -5154,6 +5155,7 @@ y_sort_enabled = true
 
 [node name="NewspaperReader" parent="MiddleLayer/NPCS/DaytimeCrowd" unique_id=642730241 instance=ExtResource("base_npc")]
 position = Vector2(332, 502)
+sort_lower = 11
 metadata/_edit_group_ = true
 
 [node name="AmbientThought" parent="MiddleLayer/NPCS/DaytimeCrowd/NewspaperReader" unique_id=799878127 instance=ExtResource("ambient_thought")]
