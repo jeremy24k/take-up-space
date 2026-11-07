@@ -4948,6 +4948,9 @@ size = Vector2(20, 1333)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u5wad"]
 size = Vector2(119, 20)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crosswalk"]
+size = Vector2(84, 22)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tables"]
 size = Vector2(230, 170)
 
@@ -5025,7 +5028,7 @@ tile_map_data = PackedByteArray("AAADAAAAAAAFAAkAAAADAAEAAAAFAAoAAAADAAIAAAAFAAs
 tile_set = SubResource("TileSet_w7mgy")
 
 [node name="Player" parent="MiddleLayer" unique_id=172954088 instance=ExtResource("6_0br3n")]
-position = Vector2(492, 146)
+position = Vector2(635, 1274)
 metadata/_edit_group_ = true
 
 [node name="Camera2D" parent="MiddleLayer/Player" index="0" unique_id=1567288049]
@@ -5069,7 +5072,7 @@ region_rect = Rect2(17, 14, 71, 58)
 y_sort_enabled = true
 
 [node name="Lia" parent="MiddleLayer/NPCS" unique_id=647082159 instance=ExtResource("walking_npc")]
-position = Vector2(731, 398)
+position = Vector2(1112, 1046)
 frames = ExtResource("lia_frames")
 metadata/_edit_group_ = true
 
@@ -5136,8 +5139,8 @@ position = Vector2(0, -30)
 
 [node name="Teen" parent="MiddleLayer/NPCS" unique_id=859423113 instance=ExtResource("base_npc")]
 position = Vector2(957, 502)
-sort_lower = 11
 column_npc = 25
+sort_lower = 11
 metadata/_edit_group_ = true
 
 [node name="TalkArea" parent="MiddleLayer/NPCS/Teen" unique_id=498100308 instance=ExtResource("npc_talk_area")]
@@ -5237,6 +5240,35 @@ group_id = ""
 first_timeline = ""
 first_line = ""
 
+[node name="BenchReaderSouth" parent="MiddleLayer/NPCS/DaytimeCrowd" unique_id=1081429878 instance=ExtResource("base_npc")]
+position = Vector2(792, 1190)
+column_npc = 1
+sort_lower = 11
+metadata/_edit_group_ = true
+
+[node name="AmbientThought" parent="MiddleLayer/NPCS/DaytimeCrowd/BenchReaderSouth" unique_id=976794652 instance=ExtResource("ambient_thought")]
+position = Vector2(0, -8)
+lines = Array[String](["Lee como si el metro no existiera.", "Ojalá tuviera esa paciencia."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
+[node name="CoffeeWaiter" parent="MiddleLayer/NPCS/DaytimeCrowd" unique_id=814627536 instance=ExtResource("base_npc")]
+position = Vector2(505, 1118)
+column_npc = 7
+metadata/_edit_group_ = true
+
+[node name="AmbientThought" parent="MiddleLayer/NPCS/DaytimeCrowd/CoffeeWaiter" unique_id=229563196 instance=ExtResource("ambient_thought")]
+position = Vector2(0, -8)
+lines = Array[String](["Mira la hora cada dos segundos.", "Él sí sabe a dónde va."])
+loop_lines = true
+pool = null
+group_id = ""
+first_timeline = ""
+first_line = ""
+
 [node name="StrollerSidewalk" parent="MiddleLayer/NPCS" unique_id=412397592 node_paths=PackedStringArray("patrol_points") instance=ExtResource("walking_npc")]
 position = Vector2(60, 872)
 frames = ExtResource("red_cap_frames")
@@ -5297,6 +5329,21 @@ y_sort_enabled = true
 position = Vector2(433, 900)
 script = ExtResource("pigeon_flock")
 
+[node name="SouthBenches" type="Node2D" parent="MiddleLayer/Pigeons" unique_id=1750299611]
+y_sort_enabled = true
+position = Vector2(210, 1245)
+script = ExtResource("pigeon_flock")
+
+[node name="ShopFront" type="Node2D" parent="MiddleLayer/Pigeons" unique_id=1109731163]
+y_sort_enabled = true
+position = Vector2(420, 1140)
+script = ExtResource("pigeon_flock")
+
+[node name="SubwaySidewalk" type="Node2D" parent="MiddleLayer/Pigeons" unique_id=563505050]
+y_sort_enabled = true
+position = Vector2(900, 1250)
+script = ExtResource("pigeon_flock")
+
 [node name="TopSidewalk" type="Node2D" parent="MiddleLayer/Pigeons" unique_id=541551299]
 y_sort_enabled = true
 position = Vector2(1249, 288)
@@ -5353,6 +5400,38 @@ thought_lines = Array[String](["Por ahí vine. Ahora, a buscar el metro."])
 
 [node name="CollisionShape2D" parent="MapBoundaries/BoundaryEntry" index="0" unique_id=1198806918]
 shape = SubResource("RectangleShape2D_u5wad")
+
+[node name="Crosswalks" type="Node2D" parent="MapBoundaries" unique_id=1588203117]
+
+[node name="CrosswalkLeft" parent="MapBoundaries/Crosswalks" unique_id=1588203118 instance=ExtResource("boundary")]
+position = Vector2(63, 1016)
+push_direction = 1
+push_distance = 26.0
+push_duration = 0.4
+thought_lines = Array[String](["No me conviene alejarme. La entrada del metro debería estar por aquí cerca."])
+
+[node name="CollisionShape2D" parent="MapBoundaries/Crosswalks/CrosswalkLeft" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_crosswalk")
+
+[node name="CrosswalkMiddle" parent="MapBoundaries/Crosswalks" unique_id=1588203119 instance=ExtResource("boundary")]
+position = Vector2(638, 1016)
+push_direction = 1
+push_distance = 26.0
+push_duration = 0.4
+thought_lines = Array[String](["No me conviene alejarme. La entrada del metro debería estar por aquí cerca."])
+
+[node name="CollisionShape2D" parent="MapBoundaries/Crosswalks/CrosswalkMiddle" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_crosswalk")
+
+[node name="CrosswalkRight" parent="MapBoundaries/Crosswalks" unique_id=1588203120 instance=ExtResource("boundary")]
+position = Vector2(1216, 1016)
+push_direction = 1
+push_distance = 26.0
+push_duration = 0.4
+thought_lines = Array[String](["No me conviene alejarme. La entrada del metro debería estar por aquí cerca."])
+
+[node name="CollisionShape2D" parent="MapBoundaries/Crosswalks/CrosswalkRight" index="0" unique_id=1198806918]
+shape = SubResource("RectangleShape2D_crosswalk")
 
 [node name="InteractableDetectors" type="Node2D" parent="." unique_id=1240530171]
 z_index = 3
@@ -5433,3 +5512,6 @@ gizmo_extents = 6.0
 [editable path="MapBoundaries/BoundaryLeft"]
 [editable path="MapBoundaries/BoundaryRight"]
 [editable path="MapBoundaries/BoundaryEntry"]
+[editable path="MapBoundaries/Crosswalks/CrosswalkLeft"]
+[editable path="MapBoundaries/Crosswalks/CrosswalkMiddle"]
+[editable path="MapBoundaries/Crosswalks/CrosswalkRight"]

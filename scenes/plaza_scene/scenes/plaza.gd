@@ -48,6 +48,11 @@ const LIA_SIDE_OFFSET: float = 8.0
 const LIA_FOLLOW_STIFFNESS: float = 8.0
 ## If Alice walks off to the metro, Lía runs after her this fast.
 const LIA_CHASE_SPEED: float = 260.0
+## At the metro: how long the camera takes to reach Lía (and come back), how
+## far from her Alice stops when she goes over, and Alice's walking speed.
+const LIA_FOCUS_TIME: float = 0.9
+const LIA_TALK_DISTANCE: float = 22.0
+const ALICE_CUTSCENE_SPEED: float = 70.0
 ## Before Alice talks to her she cries for her mother now and then, if Alice
 ## is near enough to hear it.
 const LIA_CRY_LINES: Array[String] = ["¡Mamá...!", "(snif) ¿Mamá?", "¡MAMÁ!"]
@@ -148,6 +153,10 @@ const HELPER_TIMELINES := {
 	$MiddleLayer/NPCS/StrollerSidewalk,
 	$MiddleLayer/NPCS/StrollerWalkway,
 ]
+## Map edges on the three crosswalks (BoundaryArea). Before meeting Lía,
+## Alice's only goal is the metro entrance on this side of the street, so
+## she turns back there; they open once Lía takes her sleeve.
+@onready var crosswalks: Node2D = $MapBoundaries/Crosswalks
 @onready var mother_start: Marker2D = $StoryPoints/MotherStart
 @onready var family_exit: Marker2D = $StoryPoints/FamilyExit
 
@@ -187,6 +196,8 @@ func _ready() -> void:
 ## Puts every character where the current story step needs them.
 func _restore_stage() -> void:
 	_set_npc_active(lia_mom, false)
+	if GameManager.plaza_stage != GameManager.PlazaStage.ARRIVED:
+		_open_crosswalks()
 	match GameManager.plaza_stage:
 		GameManager.PlazaStage.ARRIVED:
 			sun_filter.color = SKY_ARRIVAL
@@ -265,8 +276,17 @@ func _on_dialogic_signal(argument: Variant) -> void:
 		return
 	match argument:
 		"lia_grabs_sleeve":
+			_open_crosswalks()
 			_advance_to(GameManager.PlazaStage.WITH_LIA, SEARCH_START_LINES)
 			_start_lia_following()
+		"focus_on_lia":
+			_focus_on_lia()
+		"alice_goes_to_lia":
+			_alice_goes_to_lia()
+		"alice_turns_away":
+			_alice_turns_away()
+		"lia_comes_to_alice":
+			_lia_comes_to_alice()
 		"toby_comes":
 			_toby_comes()
 		"lia_lets_go":
@@ -363,22 +383,76 @@ func _start_lia_following() -> void:
 	lia.collision_mask = 0
 	_set_area_active(lia_talk, false)
 
-## Twine: Rama_No_Acercarse_Pasa. Alice walks off to the metro without
-## talking to her; Lía runs across the plaza and grabs her sleeve.
-func _lia_runs_after_alice() -> void:
+## Alice reaches the metro without having talked to Lía (Twine: the girl
+## keeps crying, Alice cannot stop looking at her). The camera goes to Lía
+## and plaza_lia_meet starts at "metro": the anxiety puzzle decides between
+## going to her ("ask"), walking off ("leave": she runs after Alice) and
+## freezing (silence: she comes over). The movement happens on the
+## timeline's signals (_on_dialogic_signal) while Dialogic is paused.
+func _lia_at_the_metro() -> void:
 	_in_cutscene = true
 	player.lock_control()
 	lia_bark.hide_now()
 	_set_area_active(lia_talk, false)
 	lia.collision_layer = 0
 	lia.collision_mask = 0
-	var target := player.global_position + Vector2(-LIA_FOLLOW_GAP, 4)
-	await _slide(lia, target, lia.global_position.distance_to(target) / LIA_CHASE_SPEED)
 	player.face_direction(player.global_position.direction_to(lia.global_position))
-	Dialogic.start("plaza_lia_meet", "chase")
+	Dialogic.start("plaza_lia_meet", "metro")
 	await Dialogic.timeline_ended
+	await player.reset_camera(LIA_FOCUS_TIME)
 	player.unlock_control()
 	_in_cutscene = false
+
+## "focus_on_lia": the camera glides over to her while she cries.
+func _focus_on_lia() -> void:
+	Dialogic.paused = true
+	await player.pan_camera_to(lia.global_position + Vector2(0, -8), LIA_FOCUS_TIME)
+	Dialogic.paused = false
+
+## "alice_goes_to_lia": Alice walks up to her (Rama_Acercarse).
+func _alice_goes_to_lia() -> void:
+	Dialogic.paused = true
+	# Not awaited: the camera comes back while she walks.
+	player.reset_camera(LIA_FOCUS_TIME)
+	var from_lia := lia.global_position.direction_to(player.global_position)
+	var target := lia.global_position + from_lia * LIA_TALK_DISTANCE
+	await _walk_player(target)
+	player.face_direction(player.global_position.direction_to(lia.global_position))
+	lia.face_direction(lia.global_position.direction_to(player.global_position))
+	Dialogic.paused = false
+
+## "alice_turns_away": she turns her back on Lía, towards the stairs down.
+func _alice_turns_away() -> void:
+	Dialogic.paused = true
+	await player.reset_camera(LIA_FOCUS_TIME)
+	player.face_direction(player.global_position.direction_to(subway_area.global_position))
+	Dialogic.paused = false
+
+## "lia_comes_to_alice": Lía runs over and stops beside Alice (she chases
+## her when Alice walks off, she jumps up when Alice just stands there).
+func _lia_comes_to_alice() -> void:
+	Dialogic.paused = true
+	player.reset_camera(LIA_FOCUS_TIME)
+	var side := signf(lia.global_position.x - player.global_position.x)
+	if side == 0.0:
+		side = -1.0
+	var target := player.global_position + Vector2(LIA_FOLLOW_GAP * side, 4)
+	await _slide(lia, target, lia.global_position.distance_to(target) / LIA_CHASE_SPEED)
+	lia.face_direction(lia.global_position.direction_to(player.global_position))
+	player.face_direction(player.global_position.direction_to(lia.global_position))
+	Dialogic.paused = false
+
+## Walks Alice in a straight line during a cutscene (she is locked).
+func _walk_player(target: Vector2) -> void:
+	var direction := target - player.global_position
+	if direction.length() < 1.0:
+		return
+	var suffix := player.get_direction_suffix(direction)
+	player.play_animation("walk_" + suffix, "idle_" + suffix)
+	var tween := create_tween()
+	tween.tween_property(player, "global_position", target, direction.length() / ALICE_CUTSCENE_SPEED)
+	await tween.finished
+	player.face_direction(direction)
 
 # =========================
 # Waiting at the fountain
@@ -442,7 +516,7 @@ func _on_subway_entered(body: Node2D) -> void:
 		return
 	match GameManager.plaza_stage:
 		GameManager.PlazaStage.ARRIVED:
-			_lia_runs_after_alice()
+			_lia_at_the_metro()
 		GameManager.PlazaStage.WITH_LIA, GameManager.PlazaStage.KNOWS_FOUNTAIN:
 			_think_once(SUBWAY_WITH_LIA_LINES)
 		GameManager.PlazaStage.LIA_HOME:
@@ -495,6 +569,11 @@ func _lia_waits_crying() -> void:
 		lia.sprite.play(LIA_CRY_ANIMATION)
 	else:
 		lia.face_direction(Vector2.DOWN)
+
+## Alice can cross the street to the plaza (to ask around with Lía).
+func _open_crosswalks() -> void:
+	for boundary in crosswalks.get_children():
+		_set_area_active(boundary, false)
 
 ## The afternoon is over: the daytime crowd is gone (while the screen is
 ## dark, or before the scene shows). Their thought notice over Alice goes

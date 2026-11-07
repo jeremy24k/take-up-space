@@ -26,7 +26,6 @@ GameManager="*uid://6hkqeuft1dyk"
 FadeTransition="*uid://cikuexy8o2qwo"
 ThoughtBox="*res://autoload/ThoughtBox.gd"
 AppExit="*res://autoload/AppExit.gd"
-McpBridge="*res://.mcp/godot-runtime/bridge/mcp_bridge.gd"
 Localization="*res://autoload/Localization.gd"
 SoundManager="*res://autoload/SoundManager.gd"
 
@@ -189,7 +188,7 @@ translation/add_separator=true
 translation/intern/save_mode=0
 translation/intern/file_mode=0
 translation/intern/translation_folder="res://translations"
-translation/id_counter=865
+translation/id_counter=868
 
 [display]
 

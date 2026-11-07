@@ -2177,19 +2177,47 @@ en la banca.
 ### Recorrido
 1. **Llegada** (`ARRIVED`). Nube: "Llegué. Solo falta bajar al metro y...",
    "...¿Alguien está llorando?". Lía (`MiddleLayer/NPCS/Lia`) llora
-   en la banca de arriba a la derecha de la plazoleta (731, 398); su `Bark`
+   junto a la banca con baranda que está encima de la entrada del metro, en la
+   acera de abajo (1110, 1060), al mismo lado de la calle que Alice; su `Bark`
    (`SpeechBark`) dice "¡Mamá!" cada 4 s si Alice está a menos de 360 px.
-2. **Primera decisión.** Dos formas de llegar a ella:
-   - Hablarle: `plaza_lia_meet` con el rompecabezas `plaza_lia`. "ask" =
-     *Rama_Acercarse* (+1, `lia_approached_first`) y luego la **segunda
-     decisión** (menú: calmada +2 / nerviosa +1 / bloqueada −1). "leave" =
-     da media vuelta y salta a la etiqueta `chase`. Callarse = *Rama_Espera*
-     y salta a la etiqueta `forced`.
-   - Ir al metro sin hablarle: al entrar en `SubwayArea`, Lía cruza la plaza
-     corriendo (`_lia_runs_after_alice`) y arranca
-     `Dialogic.start("plaza_lia_meet", "chase")` (*Rama_No_Acercarse_Pasa*,
-     −1, `lia_tried_to_leave`). `chase` sigue en `forced`
-     (*Interaccion_Inicial_Forzada* + *Segunda_Decision_Forzada*).
+   **Pasos peatonales cerrados hasta conocer a Lía** (2026-11-06): el primer
+   objetivo de Alice es el metro, que está de este lado de la calle. Los tres
+   pasos (`MapBoundaries/Crosswalks/CrosswalkLeft`, `Middle`, `Right`, en
+   x = 63, 638, 1216, y = 1016) son `BoundaryArea` como los bordes del mapa:
+   Alice piensa "No me conviene alejarme. La entrada del metro debería estar
+   por aquí cerca." y retrocede. El resto de la calle ya tiene colisión.
+   Cada uno tiene su `CollisionShape2D` con `RectangleShape2D_crosswalk`
+   (84 × 22) y "Hijos editables" activado (`[editable path=...]`): sin eso el
+   editor descartó el tamaño al guardar y volvieron al área pequeña por
+   defecto.
+   `plaza.gd` los desactiva (`_open_crosswalks()`) con `lia_grabs_sleeve` y al
+   cargar la plaza en cualquier etapa que no sea `ARRIVED`.
+2. **Primera decisión** (2026-11-06: Lía ya no persigue a Alice nada más
+   llegar al metro). Dos formas de llegar a ella:
+   - **Hablarle antes del metro** (su `TalkArea`): `plaza_lia_meet` desde el
+     principio. Descripción de la niña, Alice piensa "(tiene que ser rápido.
+     El metro no la va a esperar.)" y salta a `approach` (*Rama_Acercarse*,
+     +1, `lia_approached_first`) sin rompecabezas, porque ya eligió
+     acercarse. Luego la **segunda decisión** (menú: calmada +2 / nerviosa +1
+     / bloqueada −1).
+   - **Ignorarla e ir al metro**: al entrar en `SubwayArea`,
+     `_lia_at_the_metro()` bloquea a Alice y arranca
+     `Dialogic.start("plaza_lia_meet", "metro")`. `[signal arg="focus_on_lia"]`
+     lleva la cámara hasta Lía (`pan_camera_to`, 0,9 s): "(La niña sigue
+     llorando.)", "(Nadie se detiene...)", "(podría seguir caminando. Nadie la
+     obliga a meterse. Pero no puede dejar de mirarla.)". Después el
+     rompecabezas `plaza_lia` hace de las tres decisiones del Twine:
+     - "ask" = *Rama_Acercarse*: `alice_goes_to_lia` (la cámara vuelve y
+       Alice camina hasta 22 px de Lía) y salta a `approach`.
+     - "leave" = *Rama_No_Acercarse_Pasa*: `alice_turns_away` (mira hacia la
+       escalera), "da media vuelta" y `chase`: Lía corre hasta ella
+       (`lia_comes_to_alice`) y le agarra la manga (−1,
+       `lia_tried_to_leave`), luego `forced`.
+     - callarse = *Rama_No_Acercarse_Espera*: Lía la ve, se levanta y corre
+       hasta ella (`lia_comes_to_alice`), "¡Tú llevas rato mirándome!",
+       luego `forced`.
+     Cada señal de movimiento pausa Dialogic mientras dura. Al terminar, la
+     cámara vuelve a Alice y se desbloquea.
    Todas terminan en `[signal arg="lia_grabs_sleeve"]` (`WITH_LIA`): Lía la
    sigue agarrada de la manga (Alice camina a ×0.75) y le va soltando
    preguntas (`LIA_QUESTIONS`) en el `Bark`.
@@ -2297,6 +2325,12 @@ nube, traducida en `game_text.csv`), sin "...":
   `plaza.gd` (`_send_crowd_home()`) los desactiva cuando pasa el tiempo
   (`time_passes`, con la pantalla a negro) y al cargar la plaza en
   `LIA_HOME` o `MISSED_TRAIN`; también apaga su aviso sobre Alice.
+- **Acera del metro** (2026-11-06, al sur de la calle, donde empieza Alice),
+  también en `DaytimeCrowd`: `BenchReaderSouth` (columna 1, sentado leyendo
+  en la banca de la derecha, raíz (792, 1190), `sort_lower = 11`) y
+  `CoffeeWaiter` (columna 7, con maletín, en la puerta del café). Tres grupos
+  de palomas más en `MiddleLayer/Pigeons`: `SouthBenches` (210, 1245),
+  `ShopFront` (420, 1140) y `SubwaySidewalk` (900, 1250).
 - **Paseantes** (`StrollerSidewalk` con `pedestrian_red_cap`, por la acera de
   abajo; `StrollerWalkway` con `pedestrian_blonde`, por el paseo de la
   izquierda hasta la plaza central): `WalkingNPC` con rutas en
