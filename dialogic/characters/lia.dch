@@ -10,12 +10,40 @@
 "style": "",
 "suffix": ""
 },
-&"default_portrait": "",
+&"default_portrait": "crying",
 &"description": "",
 &"display_name": "Lía",
 &"mirror": false,
 &"nicknames": [""],
 &"offset": Vector2(0, 0),
-&"portraits": {},
+&"portraits": {
+"crying": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/lia/lia_crying.png\""
+},
+"mirror": true,
+"offset": Vector2(-40, 0),
+"scale": 0.625,
+"scene": ""
+},
+"happy": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/lia/lia_happy.png\""
+},
+"mirror": true,
+"offset": Vector2(-40, 0),
+"scale": 0.625,
+"scene": ""
+},
+"surprised": {
+"export_overrides": {
+"image": "\"res://dialogic/portraits/lia/lia_surprised.png\""
+},
+"mirror": true,
+"offset": Vector2(-40, 0),
+"scale": 0.625,
+"scene": ""
+}
+},
 &"scale": 1.0
 }

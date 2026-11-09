@@ -938,6 +938,35 @@ dos se ven a la misma escala y no saltan al cambiar de expresión).
   voz?", "¿sabes bien la dirección?", "¿Mi número?" y "Bueno..."), y
   `leo_store_farewell` (`friendly`).
 
+### Ilustraciones de Lía
+
+Como Leo: **siempre en `rightmost`**, enfrente de Alice, se queda en pantalla
+toda la conversación (`join` en su primera línea, `update lia (...)` para
+cambiar de expresión, `leave lia` antes de que se vaya o termine el timeline).
+
+- **Archivos:** `dialogic/portraits/lia/lia_<expresión>.png` (332×480). Las
+  originales son de 2000×3000 y Lía ocupa x 674–1403, y 74–1550. Se recortan
+  las tres con el mismo marco (x 650–1430, y 54–1180: de la cabeza a un poco
+  más arriba de las rodillas, como Alice y Leo) y se reducen a 480 px de alto.
+- **Volteadas en el juego, no en el archivo:** en los dibujos Lía mira a la
+  derecha, así que cada retrato de `lia.dch` lleva `mirror: true` para que mire
+  hacia Alice. Si llegan ilustraciones nuevas, se guardan tal cual y se activa
+  `mirror`.
+- **Más pequeña que los adultos:** `scale: 0.625` (480/768 de alto de pantalla)
+  en vez del 0.832 de Alice y Leo, porque es una niña de siete años; la cabeza
+  le queda más abajo que la de ellos. `offset: (-40, 0)` como Leo.
+- **Expresiones** (archivo original → id): HiPaint_…186581 (boca abierta, mano
+  en la boca, mira arriba) → `surprised`; HiPaint_…200362 (llora) → `crying`,
+  por defecto; HiPaint_…207882 (sonríe con la mano abierta) → `happy`.
+- **Dónde:** `plaza_lia_meet` (`crying` cuando pide ayuda, `surprised` en
+  "¿En serio?", las preguntas y cuando ve a Alice bloqueada, `happy` al
+  ponerse en marcha, al respirar con Alice y al reírse "¡Qué tonta!") y
+  `plaza_lia_fountain` (`crying` en "¿Y si no aparece?" y "¿Te vas a ir?",
+  `surprised` en "¿Eso es un gato?" y "¡MAMÁ!", `happy` al dibujar y al darle
+  el dibujo). Sale con `leave lia` justo antes de `lia_leaves`. Las líneas
+  sueltas con los ayudantes (`plaza_ice_cream`, `plaza_dog_lady`,
+  `plaza_teen`) siguen sin retrato.
+
 ---
 
 ## 7. Convenciones
