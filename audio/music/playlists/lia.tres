@@ -1,0 +1,12 @@
+[gd_resource type="AudioStreamPlaylist" load_steps=3 format=3]
+
+[ext_resource type="AudioStream" path="res://audio/music/lia_pocketful_of_wonder.ogg" id="1_lia_pocketful_of_wonder"]
+[ext_resource type="AudioStream" path="res://audio/music/lia_little_wanderer.ogg" id="2_lia_little_wanderer"]
+
+[resource]
+shuffle = true
+loop = true
+fade_time = 2.0
+stream_count = 2
+stream_0 = ExtResource("1_lia_pocketful_of_wonder")
+stream_1 = ExtResource("2_lia_little_wanderer")

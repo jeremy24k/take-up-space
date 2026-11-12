@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/demo_end/demo_end.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://ccc3tsusdl0mp" path="res://fonts/m3x6.ttf" id="2_m3x6"]
 [ext_resource type="Script" path="res://global/scene_audio.gd" id="sa_script"]
-[ext_resource type="AudioStream" path="res://audio/music/demo_end_breeze.ogg" id="sa_music"]
+[ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/theme.tres" id="sa_music"]
 [ext_resource type="Texture2D" path="res://ui/cover.aseprite" id="cover_art"]
 
 [node name="DemoEnd" type="Control"]

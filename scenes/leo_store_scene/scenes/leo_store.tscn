@@ -21,7 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://x3oe33hpvdf4" path="res://global/thought_trigger.tscn" id="15_thought"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 [ext_resource type="AudioStream" uid="uid://bjl5xwobxvxmi" path="res://audio/ambience/leo_store.ogg" id="sa_ambience"]
-[ext_resource type="AudioStream" uid="uid://bw8hlc0q6spvg" path="res://audio/music/leo_guitar.ogg" id="sa_music"]
+[ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/leo_store.tres" id="sa_music"]
 [ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jw86w"]

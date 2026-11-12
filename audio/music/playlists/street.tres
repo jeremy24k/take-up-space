@@ -1,0 +1,16 @@
+[gd_resource type="AudioStreamPlaylist" load_steps=5 format=3]
+
+[ext_resource type="AudioStream" path="res://audio/music/street_first_steps_a.ogg" id="1_street_first_steps_a"]
+[ext_resource type="AudioStream" path="res://audio/music/street_first_steps_b.ogg" id="2_street_first_steps_b"]
+[ext_resource type="AudioStream" path="res://audio/music/street_first_steps_c.ogg" id="3_street_first_steps_c"]
+[ext_resource type="AudioStream" path="res://audio/music/street_first_steps_d.ogg" id="4_street_first_steps_d"]
+
+[resource]
+shuffle = true
+loop = true
+fade_time = 2.0
+stream_count = 4
+stream_0 = ExtResource("1_street_first_steps_a")
+stream_1 = ExtResource("2_street_first_steps_b")
+stream_2 = ExtResource("3_street_first_steps_c")
+stream_3 = ExtResource("4_street_first_steps_d")

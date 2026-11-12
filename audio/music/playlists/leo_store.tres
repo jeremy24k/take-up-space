@@ -1,0 +1,12 @@
+[gd_resource type="AudioStreamPlaylist" load_steps=3 format=3]
+
+[ext_resource type="AudioStream" path="res://audio/music/leo_nervous_little_heart.ogg" id="1_leo_nervous_little_heart"]
+[ext_resource type="AudioStream" path="res://audio/music/leo_butterfly_timing.ogg" id="2_leo_butterfly_timing"]
+
+[resource]
+shuffle = true
+loop = true
+fade_time = 2.0
+stream_count = 2
+stream_0 = ExtResource("1_leo_nervous_little_heart")
+stream_1 = ExtResource("2_leo_butterfly_timing")

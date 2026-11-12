@@ -125,6 +125,11 @@ const LIA_CRY_ANIMATION := "cry"
 @onready var lia_bark: SpeechBark = $MiddleLayer/NPCS/Lia/Bark
 @onready var lia_mom: CharacterBody2D = $MiddleLayer/NPCS/LiaMom
 @onready var sun_filter: CanvasModulate = $LightsContainer/SunFilter
+## The plaza plays the street music (its SceneAudio); while Lía is with
+## Alice her own music plays instead.
+@onready var scene_audio: SceneAudio = $SceneAudio
+const LIA_MUSIC: AudioStream = preload("res://audio/music/playlists/lia.tres")
+const LIA_MUSIC_DB: float = -10.0
 @onready var fountain_area: Area2D = $StoryAreas/FountainArea
 @onready var subway_area: Area2D = $StoryAreas/SubwayArea
 ## Who helps look for the mother: talk area -> clue id. Each one has a clue
@@ -204,6 +209,7 @@ func _restore_stage() -> void:
 			_greet_the_plaza()
 		GameManager.PlazaStage.WITH_LIA, GameManager.PlazaStage.KNOWS_FOUNTAIN:
 			sun_filter.color = SKY_ARRIVAL
+			SoundManager.set_music(LIA_MUSIC, LIA_MUSIC_DB)
 			lia.global_position = player.global_position + Vector2(-LIA_FOLLOW_GAP, 0)
 			_start_lia_following()
 		GameManager.PlazaStage.LIA_HOME:
@@ -277,6 +283,7 @@ func _on_dialogic_signal(argument: Variant) -> void:
 	match argument:
 		"lia_grabs_sleeve":
 			_open_crosswalks()
+			SoundManager.set_music(LIA_MUSIC, LIA_MUSIC_DB)
 			_advance_to(GameManager.PlazaStage.WITH_LIA, SEARCH_START_LINES)
 			_start_lia_following()
 		"focus_on_lia":
@@ -507,6 +514,8 @@ func _family_leaves() -> void:
 	await leaving.finished
 	_set_npc_active(lia, false)
 	_set_npc_active(lia_mom, false)
+	# Lía is gone: back to the street music.
+	SoundManager.set_music(scene_audio.music, scene_audio.music_volume_db)
 
 # =========================
 # The station

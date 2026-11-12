@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://scenes/language_select/language_select.gd" id="1_script"]
 [ext_resource type="FontFile" path="res://fonts/m3x6.ttf" id="2_font"]
+[ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
+[ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/theme.tres" id="sa_music"]
 
 [node name="LanguageSelect" type="Control"]
 layout_mode = 3
@@ -82,3 +84,8 @@ theme_override_font_sizes/font_size = 32
 text = "Flechas o WASD: moverse      Espacio: interactuar
 Arrows or WASD: move      Space: interact"
 horizontal_alignment = 1
+
+[node name="SceneAudio" type="Node" parent="."]
+script = ExtResource("sa_script")
+music = ExtResource("sa_music")
+music_volume_db = -6.0
