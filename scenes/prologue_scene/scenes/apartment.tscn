@@ -37,7 +37,7 @@
 [ext_resource type="Script" uid="uid://ch2na585imoao" path="res://scenes/prologue_scene/scenes/apartment.gd" id="apartment_script"]
 [ext_resource type="Texture2D" uid="uid://cv5do0r5plhl4" path="res://ui/cover.aseprite" id="cover_art"]
 [ext_resource type="AudioStream" uid="uid://drgbunl5y658x" path="res://audio/ambience/apartment.ogg" id="sa_ambience"]
-[ext_resource type="AudioStream" uid="uid://dr0okn8w5hpgi" path="res://audio/music/apartment_morning.ogg" id="sa_music"]
+[ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/apartment.tres" id="sa_music"]
 [ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0oi55"]

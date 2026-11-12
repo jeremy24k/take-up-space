@@ -2036,15 +2036,26 @@ ella, con `ambience`/`music` y su volumen en el inspector. Hueco vacío =
 silencio (lo anterior se apaga). Una escena sin `SceneAudio` deja sonar lo que
 hubiera.
 
+**Música propia** (ElevenLabs, 2026-11-11, ver `audio/CREDITS.md`): cada
+momento es una **lista** (`audio/music/playlists/<nombre>.tres`,
+`AudioStreamPlaylist`, orden aleatorio, en bucle, 2 s de fundido entre
+pistas), no un archivo en bucle: así alterna las variantes. Las pistas están
+igualadas a −21 LUFS (FFmpeg `loudnorm`) y el volumen de cada escena se ajusta en su
+`SceneAudio`. Para añadir una variante, se mete el OGG en la lista. Si dos
+escenas seguidas usan la misma lista (calle → plaza), la música sigue sin
+cortarse.
+
 | Escena | Ambiente | Música |
 |---|---|---|
-| Apartamento | `apartment` (salón, tráfico lejano; −2 dB) | `apartment_morning` (−8 dB, debajo de los diálogos) |
-| Andén | `metro_platform` (andén + gente) | — |
+| Selección de idioma (menú) | — | `theme` (−6 dB) |
+| Apartamento | `apartment` (salón, tráfico lejano; −2 dB) | `apartment` (−8 dB, debajo de los diálogos) |
+| Andén | `metro_platform` (andén + gente) | — (falta la del metro) |
 | Vagón | (su `TrainAmbience` propio, `train_ride`, que se apaga al dormirse) | — |
 | Estación desconocida | `unknown_station` (andén vacío, apagado) | — |
-| Calle | `street` | `lost_melancholic` (−12 dB, casi de fondo) |
-| Tienda de Leo | `leo_store` (nevera) | `leo_guitar` (−6 dB) |
-| Fin de la demo | — | `demo_end_breeze` |
+| Calle | `street` | `street` (−12 dB, casi de fondo) |
+| Plaza | `street` | `street` (−12 dB); `lia` (−10 dB) desde `lia_grabs_sleeve` hasta que Lía se va con su madre (`plaza.gd`, `LIA_MUSIC`) |
+| Tienda de Leo | `leo_store` (nevera) | `leo_store` (−6 dB) |
+| Fin de la demo | — | `theme` |
 
 **Efectos y dónde se disparan:**
 - **Tren:** `metro_stations.gd` hace sonar la llegada al llamar al tren y la
