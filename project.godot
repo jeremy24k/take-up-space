@@ -89,13 +89,20 @@ directories/dtl_directory={
 "metro_is_entering_station": "res://dialogic/timeline/metro/metro_is_entering_station.dtl",
 "metro_station": "res://dialogic/timeline/metro/metro_station.dtl",
 "plaza_dog_lady": "res://dialogic/timeline/plaza/plaza_dog_lady.dtl",
+"plaza_dog_lady_after": "res://dialogic/timeline/plaza/plaza_dog_lady_after.dtl",
+"plaza_dog_lady_extra": "res://dialogic/timeline/plaza/plaza_dog_lady_extra.dtl",
 "plaza_dog_lady_idle": "res://dialogic/timeline/plaza/plaza_dog_lady_idle.dtl",
 "plaza_ice_cream": "res://dialogic/timeline/plaza/plaza_ice_cream.dtl",
+"plaza_ice_cream_after": "res://dialogic/timeline/plaza/plaza_ice_cream_after.dtl",
+"plaza_ice_cream_extra": "res://dialogic/timeline/plaza/plaza_ice_cream_extra.dtl",
 "plaza_ice_cream_idle": "res://dialogic/timeline/plaza/plaza_ice_cream_idle.dtl",
 "plaza_lia_fountain": "res://dialogic/timeline/plaza/plaza_lia_fountain.dtl",
 "plaza_lia_meet": "res://dialogic/timeline/plaza/plaza_lia_meet.dtl",
+"plaza_lia_pigeons": "res://dialogic/timeline/plaza/plaza_lia_pigeons.dtl",
 "plaza_missed_train": "res://dialogic/timeline/plaza/plaza_missed_train.dtl",
 "plaza_teen": "res://dialogic/timeline/plaza/plaza_teen.dtl",
+"plaza_teen_after": "res://dialogic/timeline/plaza/plaza_teen_after.dtl",
+"plaza_teen_extra": "res://dialogic/timeline/plaza/plaza_teen_extra.dtl",
 "plaza_teen_idle": "res://dialogic/timeline/plaza/plaza_teen_idle.dtl",
 "rotten_food": "res://dialogic/timeline/apartment/rotten_food.dtl",
 "street_ad_column": "res://dialogic/timeline/street/street_ad_column.dtl",
@@ -188,7 +195,7 @@ translation/add_separator=true
 translation/intern/save_mode=0
 translation/intern/file_mode=0
 translation/intern/translation_folder="res://translations"
-translation/id_counter=868
+translation/id_counter=973
 
 [display]
 

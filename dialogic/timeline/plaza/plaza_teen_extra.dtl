@@ -1,0 +1,17 @@
+(El chico sigue en la banca, con los auriculares puestos.) #id:392
+join lia (happy) rightmost
+lia: ¿Le decimos que ya sabemos dónde está? #id:393
+join alice (nervous) leftmost
+alice: No hace falta. Está... ocupado. #id:394
+update lia (surprised)
+lia: ¡Pero nos ayudó! #id:395
+(Alice duda. Luego se acerca y, esta vez sin esperar, da dos golpecitos en la banca con los nudillos.) #id:396
+headphones_teen: (se quita un auricular) ¿Mm? #id:397
+update alice (neutral)
+alice: La fuente. Tenías razón. ...Gracias. #id:398
+headphones_teen: (se encoge de hombros, pero casi sonríe) Ya. #id:399
+update alice (relaxed)
+(Se vuelve a poner el auricular. Esta vez, a Alice no se le queda pegada ninguna sensación.) #id:39a
+leave alice
+leave lia
+[signal arg="lia_extra:teen"]

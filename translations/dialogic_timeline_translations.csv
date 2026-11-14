@@ -630,9 +630,9 @@ Text/285/text,¿Te... te perdiste?,Did... did you get lost?
 Text/286/text,Busco a mi mamá. Pero no sé... no sé dónde... y el señor de allí me dijo que me quedara quieta pero pasó mucho y ella no...,I'm looking for my mom. But I don't know... I don't know where... and the man over there told me to stay put but it's been so long and she didn't...
 Text/287/text,"(también quiere llorar, pero se contiene) ¿Cómo te llamas?","(she wants to cry too, but holds it in) What's your name?"
 Text/288/text,Lía.,Lía.
-Text/289/text,"Yo soy Alice. Y... y vamos a encontrar a tu mamá, ¿sí?","I'm Alice. And... and we're going to find your mom, okay?"
-Text/28a/text,¿En serio?,Really?
-Text/28b/text,(no está segura de nada. Pero asiente.),(she isn't sure of anything. But she nods.)
+Text/289/text,Yo soy Alice. Y... podemos buscarla. A tu mamá. Si quieres.,I'm Alice. And... we can look for her. Your mom. If you want.
+Text/28a/text,¿Ahora?,Now?
+Text/28b/text,(mira la escalera del metro. Un minuto más. O dos.) Ahora.,(looks at the metro stairs. One more minute. Or two.) Now.
 Text/28c/text,"(Lía se levanta de la banca y, sin preguntar, se agarra de la manga de Alice.)","(Lía gets up from the bench and, without asking, grabs Alice's sleeve.)"
 Text/28d/text,¿Por dónde buscamos?,Where do we look?
 Text/28e/text,(la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se aparta.),(the small hand squeezes her arm. The touch makes her tense up. But she doesn't pull away.)
@@ -648,21 +648,21 @@ Choice/296/text,"Nerviosa, pero intentándolo","Nervous, but trying"
 Choice/296/disabled_text,,
 Text/297/text,Eh... bueno... podríamos... ¿viste a tu mamá por dónde?,Um... well... we could... where did you see your mom?
 Text/298/text,(la mira con los ojos muy abiertos) ¿Tú también estás asustada?,"(stares at her, wide-eyed) Are you scared too?"
-Text/299/text,Mi mamá dice que cuando uno está asustado hay que respirar.,My mom says that when you're scared you have to breathe.
-Text/29a/text,(Lía respira hondo. Alice la imita sin pensar. Una vez. Otra.),(Lía takes a deep breath. Alice copies her without thinking. Once. Again.)
-Text/29b/text,Sí. Estoy asustada. Pero igual vamos a buscar.,Yes. I'm scared. But we're going to look anyway.
-Text/29c/text,"Está bien. Si estamos las dos, menos asustadas.","Okay. If there's two of us, we're less scared."
+Text/299/text,Mi mamá dice que cuando uno está asustado hay que respirar. Así.,My mom says when you're scared you have to breathe. Like this.
+Text/29a/text,"(Lía toma tanto aire que se le inflan los cachetes. Lo suelta de golpe, con ruido, como un globo que se desinfla.)","(Lía takes in so much air her cheeks puff out. She lets it all go at once, noisily, like a balloon going flat.)"
+Text/29b/text,"...Un poco. Sí, estoy asustada. Pero igual vamos a buscar.","...A little. Yes, I'm scared. But we'll look anyway."
+Text/29c/text,"Vale. Si estamos las dos, menos asustadas.","Okay. If there's two of us, we're less scared."
 Text/29d/text,Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza.,My mom has a pink dress. And long hair. And a big bag. She went by the plaza entrance.
 Text/29e/text,Perfecto. Vamos a buscar a la señora del vestido rosa.,Perfect. Let's go find the lady in the pink dress.
 Choice/29f/text,Bloqueada por el contacto,Frozen by the touch
 Choice/29f/disabled_text,,
 Text/2a0/text,(la mano en su brazo. Se congela. La piel le hormiguea. No puede hablar.),(the hand on her arm. She freezes. Her skin tingles. She can't speak.)
 Text/2a1/text,¿Alice? ¿Te pasó algo?,Alice? Is something wrong?
-Text/2a2/text,(Lía no la suelta. Le da una palmadita en la mano.),(Lía doesn't let go. She pats her hand.)
-Text/2a3/text,Está bien. Mi mamá también se pone así a veces.,It's okay. My mom gets like that sometimes too.
-Text/2a4/text,"(No la apura. Solo espera. Poco a poco, a Alice le dejan de temblar los dedos.)","(She doesn't rush her. She just waits. Little by little, Alice's fingers stop shaking.)"
+Text/2a2/text,"(Lía no la suelta. La mira de abajo arriba, muy seria. Le mueve la manga, como quien comprueba si un juguete todavía funciona.)","(Lía doesn't let go. She looks her up and down, very serious. She jiggles her sleeve, like someone checking whether a toy still works.)"
+Text/2a3/text,¿Estás jugando a las estatuas?,Are you playing statues?
+Text/2a4/text,"(Lía se queda quieta, con un brazo en alto y la boca abierta. Aguanta dos segundos. Tres. Se le escapa la risa.)","(Lía freezes, one arm up and her mouth open. She holds it two seconds. Three. A laugh slips out.)"
 Text/2a5/text,Lo siento.,I'm sorry.
-Text/2a6/text,No pasa nada. Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos?,It's okay. My mom has a pink dress. And a big bag. And she went by the plaza entrance. Shall we go?
+Text/2a6/text,Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos?,My mom has a pink dress. And a big bag. And she went out the plaza entrance. Shall we go?
 Text/2a7/text,Sí. Vamos.,Yes. Let's go.
 Text/2a8/text,(Unos pasitos detrás de ella. Rápidos. Desordenados.),(Little footsteps behind her. Quick. Clumsy.)
 Text/2a9/text,¡Espera!,Wait!
@@ -689,8 +689,8 @@ Text/2bb/text,"Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa
 ,,
 Text/2d2/text,(Llegan a la fuente. No hay nadie con vestido rosa.),(They reach the fountain. There's nobody in a pink dress.)
 Text/2d3/text,(la respiración se le entrecorta) ¿Y si no aparece?,(her breath catches) What if she doesn't come?
-Text/2d4/text,No pienses eso. Tu mamá te está buscando. Eso dijeron. No te va a dejar de buscar.,Don't think that. Your mom is looking for you. That's what they said. She won't stop looking.
-Text/2d5/text,(aprieta los labios. Asiente.),(presses her lips together. Nods.)
+Text/2d4/text,Seguro que te está buscando.,I'm sure she's looking for you.
+Text/2d5/text,¿Y si no me encuentra?,What if she doesn't find me?
 Text/2d6/text,(el agua de la fuente cae. Siente que el tiempo se escapa.),(the fountain's water falls. She feels time slipping away.)
 Choice/2d7/text,"Esperar en la fuente, donde la mamá podría volver","Wait by the fountain, where the mom might come back"
 Choice/2d7/disabled_text,,
@@ -723,9 +723,9 @@ Text/2ef/text,No sé... no sé dónde más buscar...,I don't know... I don't kno
 Text/2f0/text,(los ojos se le llenan de lágrimas) ¿Te vas a ir?,(her eyes fill with tears) Are you going to leave?
 Text/2f1/text,No. No me voy.,No. I'm not leaving.
 Text/2f2/text,(pero las manos le tiemblan. La fuente le da vueltas.),(but her hands are shaking. The fountain is spinning.)
-Text/2f3/text,(le aprieta la mano) Respira. Mi mamá dice que hay que respirar.,(squeezes her hand) Breathe. My mom says you have to breathe.
-Text/2f4/text,"(Alice la imita. Una vez. Otra. El temblor no se va del todo, pero la plaza deja de girar.)","(Alice copies her. Once. Again. The shaking doesn't go away completely, but the plaza stops spinning.)"
-Text/2f5/text,"¿Tienes papel? Mi mamá dice que cuando estoy nerviosa dibuje. Si dibujamos juntas, las dos nos calmamos.","Do you have paper? My mom says to draw when I'm nervous. If we draw together, we'll both calm down."
+Text/2f3/text,"(le aprieta la mano, muy seria) Mi mamá dice... dice que hay que soplar como si fueran velas. Así.","(squeezes her hand, very serious) My mom says... she says you have to blow like they're candles. Like this."
+Text/2f4/text,"(Alice la imita. Una vela. Otra. El temblor no se va del todo, pero la plaza deja de girar.)","(Alice copies her. One candle. Another. The shaking doesn't go away completely, but the plaza stops spinning.)"
+Text/2f5/text,"¿Tienes papel? Cuando estoy nerviosa, mi mamá me deja dibujar.","Do you have paper? When I'm nervous, my mom lets me draw."
 Text/2f6/text,(saca una libreta arrugada. Dibuja algo torcido. Un círculo que quería ser un gato.),(takes out a crumpled notebook. She draws something crooked. A circle that wanted to be a cat.)
 Text/2f7/text,¿Eso es un gato?,Is that a cat?
 Text/2f8/text,Wilson.,Wilson.
@@ -735,26 +735,25 @@ Text/2fb/text,(Pero las dos se ríen. Un poquito.),(But they both laugh. Just a 
 Text/2fc/text,¡LÍA!,LÍA!
 Text/2fd/text,¡MAMÁ!,MOM!
 Text/2fe/text,(Una mujer con vestido rosa. Se abrazan en medio de la plaza. La mamá llora. Lía llora.),(A woman in a pink dress. They hug in the middle of the plaza. The mom cries. Lía cries.)
-Text/2ff/text,¿Estás bien? Muchas gracias por quedarte con ella.,Are you okay? Thank you so much for staying with her.
-Text/300/text,(asiente. No puede hablar.),(nods. She can't speak.)
-Text/301/text,(le da una palmada en el hombro) Tranquila. Ya pasó.,(pats her shoulder) It's okay. It's over.
-Text/302/text,(pero siente que no pasó del todo. Algo en ella todavía tiembla.),(but she feels it isn't quite over. Something in her is still shaking.)
+Text/2ff/text,¿Eras tú? Lía dice que estuviste con ella todo el rato. Gracias.,Was it you? Lía says you were with her the whole time. Thank you.
+Text/300/text,(asiente. Quiere decir algo. No le sale.),(nods. She wants to say something. It won't come out.)
+Text/301/text,"(le pone una mano en el hombro) Gracias, de verdad.","(puts a hand on her shoulder) Thank you, really."
 Text/303/text,El dibujo. (lo saca del bolsillo y se lo da),The drawing. (takes it out of her pocket and gives it to her)
-Text/304/text,"(Dos figuras de palo agarradas de la mano. Una con gafas redondas. Un sol, algo que podría ser una fuente. Abajo: ""ALICE Y LIA"".)","(Two stick figures holding hands. One with round glasses. A sun, something that might be a fountain. At the bottom: ""ALICE AND LIA"".)"
-Text/305/text,No me quedó muy bien. Pero es para ti.,It didn't come out very good. But it's for you.
-Text/306/text,(los dedos le tiemblan) Está bien. Me gusta.,(her fingers tremble) It's okay. I like it.
+Text/304/text,"(Dos niñas de la mano. Una con gafas redondas. Detrás, la fuente. Arriba, un sol enorme. Abajo: ""ALICE Y LIA"". Por detrás de la hoja, torcido, el gato de Alice.)","(Two girls holding hands. One with round glasses. Behind them, the fountain. Above, a huge sun. At the bottom: ""ALICE Y LIA"". On the back of the page, crooked, Alice's cat.)"
+Text/305/text,Es para que te acuerdes de mí.,It's so you remember me.
+Text/306/text,(los dedos le tiemblan. Quiere decirle algo. Lo que sea. No le sale nada.),(her fingers are shaking. She wants to tell her something. Anything. Nothing comes out.)
 Text/307/text,"Cuídate, Alice.","Take care, Alice."
-Text/308/text,(Lía agita la mano desde el hombro de su mamá. Alice agita la suya.),(Lía waves from her mom's shoulder. Alice waves back.)
-Text/309/text,(No ayudé bien. Pero ayudé.),(I didn't help well. But I helped.)
+Text/308/text,"(Lía agita la mano desde el hombro de su mamá. Alice tarda en levantar la suya. Cuando lo hace, ya están lejos.)","(Lía waves from her mom's shoulder. Alice is slow to raise her own hand. By the time she does, they're far away.)"
+Text/309/text,(No pude despedirme como quería. Pero al menos... ya está con su mamá.),(I couldn't say goodbye the way I wanted. But at least... she's with her mom now.)
 Text/30a/text,¿Eras tú? ¿Tú estabas con ella?,Was it you? Were you with her?
 Text/30b/text,Sí. Estábamos... esperando.,Yes. We were... waiting.
 Text/30c/text,"Gracias. Gracias, de verdad. No sabes cómo te lo agradezco.","Thank you. Really, thank you. You don't know how grateful I am."
 Text/30d/text,"Espera, espera. (saca el dibujo doblado y se lo da a Alice)","Wait, wait. (takes out the folded drawing and gives it to Alice)"
-Text/30e/text,"(Una niña con gafas redondas y una mochila, y otra más pequeña de su mano. Una fuente y un sol enorme. En la esquina: ""ALICE Y LIA"".)","(A girl with round glasses and a backpack, and a smaller one holding her hand. A fountain and a huge sun. In the corner: ""ALICE AND LIA"".)"
+Text/30e/text,"(Dos niñas de la mano. Una con gafas redondas y una mochila; la otra, más pequeña. Detrás, la fuente. Arriba, un sol enorme que ocupa media hoja. Abajo, con letra temblorosa: ""ALICE Y LIA"".)","(Two girls holding hands. One with round glasses and a backpack; the other, smaller. Behind them, the fountain. Above, a huge sun that takes up half the page. At the bottom, in shaky letters: ""ALICE Y LIA"".)"
 Text/30f/text,Es para que te acuerdes de mí.,It's so you remember me.
 Text/310/text,"(lo toma con cuidado) Gracias, Lía.","(takes it carefully) Thank you, Lía."
 Text/311/text,"Vamos, pequeña. Ya es tarde.","Come on, sweetie. It's late."
-Text/312/text,"(Lía se gira un par de veces para mirarla. En la última, agita la mano con fuerza.)","(Lía turns around a couple of times to look at her. On the last one, she waves hard.)"
+Text/312/text,(Lía se gira una vez. Y otra. Y otra más. Cada vez agita la mano con más fuerza.),(Lía turns around once. And again. And once more. Each time she waves harder.)
 Text/313/text,(agita la suya. No tan fuerte. Pero la agita.),(she waves back. Not as hard. But she waves.)
 Text/314/text,(mira el reloj en la pared de la fuente. Se le hace un nudo en el estómago.),(looks at the clock on the fountain wall. Her stomach knots up.)
 Text/315/text,El metro...,The metro...
@@ -767,7 +766,6 @@ Text/31a/text,(No tengo dinero. No tengo teléfono. No sé dónde estoy.),(I hav
 Text/31b/text,"(Y ahora, ni siquiera tengo el metro.)",(And now I don't even have the metro.)
 Text/31c/text,(aprieta el dibujo de Lía contra el pecho),(presses Lía's drawing against her chest)
 Text/31d/text,Ayudé a alguien. Eso hice.,I helped someone. That's what I did.
-Text/31e/text,(No sabe si fue suficiente. Pero fue algo.),(She doesn't know if it was enough. But it was something.)
 Text/31f/text,(se pone los auriculares),(puts on her headphones)
 ,,
 Text/321/text,(Un señor mayor está junto a su camión de helados. Tiene cara de no tener ninguna prisa.),(An older man stands by his ice-cream van. He looks like he's in no hurry at all.)
@@ -847,3 +845,84 @@ Text/361/text,(Ya volvió a su mundo. No pienso molestarlo otra vez.),(He's back
 ,,
 Text/362/text,(La niña sigue llorando.),(The girl is still crying.)
 Text/363/text,(tiene que ser rápido. El metro no la va a esperar.),(it has to be quick. The metro won't wait for her.)
+Text/374/text,(Solo preguntarle qué le pasa. Un minuto. Nada más.),(Just ask her what's wrong. One minute. That's all.)
+Text/375/text,(mira la escalera. Mira a la niña. Otra vez la escalera.),(looks at the stairs. Looks at the girl. The stairs again.)
+Text/376/text,"(da un paso. Luego otro. Las piernas le tiemblan, pero avanza.)","(takes a step. Then another. Her legs are shaking, but she keeps going.)"
+Text/377/text,¿Funcionó?,Did it work?
+Text/378/text,Yo soy buenísima a las estatuas. Mira.,I'm super good at statues. Look.
+Text/379/text,"(Y sin saber muy bien por qué, a Alice le dejan de temblar los dedos.)","(And without quite knowing why, Alice's fingers stop shaking.)"
+Text/37a/text,¿Por qué? Ganaste tú. Yo me reí.,Why? You won. I laughed.
+Text/37b/text,...Vale. Buscamos a tu mamá.,...Okay. We'll look for your mom.
+Text/37c/text,(No sabe muy bien por qué ha dicho que sí. Quizá porque decir que no le cuesta más.),(She's not sure why she said yes. Maybe because saying no costs her more.)
+Text/37d/text,(Lo dice tan tranquilo que casi se lo cree.),(He says it so calmly she almost believes it.)
+Text/37e/text,(en un susurro enorme) Lo dijiste superfuerte.,(in a huge whisper) You said it super loud.
+Text/37f/text,(Sí. Lo dijo superfuerte. Y no se ha muerto nadie.),(Yes. She said it super loud. And nobody died.)
+Text/380/text,(El señor de los helados las ve llegar y levanta una ceja.),(The ice-cream man sees them coming and raises an eyebrow.)
+Text/381/text,"¿Qué tal, pequeña? ¿Nada todavía?","How's it going, little one? Nothing yet?"
+Text/382/text,¡Ya sabemos que se fue a la fuente!,We know she went to the fountain!
+Text/383/text,"¿Ah, sí? Pues vais bien. Yo también la vi ir para allá, con su vestido rosa.","Oh yeah? Then you're on the right track. I saw her heading that way too, in her pink dress."
+Text/384/text,(Tres personas la han visto ir a la fuente. Ya no puede ser casualidad.),(Three people have seen her go to the fountain. It can't be a coincidence anymore.)
+Text/385/text,"(le guiña un ojo a Lía) El helado sigue en pie, ¿eh? Para cuando vengas con tu mamá.","(winks at Lía) The ice cream offer still stands, okay? For when you come back with your mom."
+Text/386/text,¡De chocolate!,Chocolate!
+Text/387/text,(sonríe sin darse cuenta),(smiles without realizing)
+Text/389/text,(Otra vez no. Otra vez no.),(Not again. Not again.)
+Text/38a/text,¡Toby!,Toby!
+Text/38b/text,¿Y? ¿Apareció tu mamá?,So? Did your mom turn up?
+Text/38c/text,Está en la fuente. Ya lo sabemos.,She's at the fountain. We know now.
+Text/38d/text,"¡Qué bien! Yo la vi ir para allá, ¿eh? Corre, que te estará esperando.","Great! I saw her go that way, you know. Hurry, she'll be waiting for you."
+Text/38e/text,"(Toby se sienta sobre el pie de Alice. Así, sin más. Como si el pie fuera suyo.)",(Toby sits on Alice's foot. Just like that. As if the foot were his.)
+Text/38f/text,(no se mueve. Esta vez no es miedo. Es que pesa. Y está calentito.),(doesn't move. This time it isn't fear. He's just heavy. And warm.)
+Text/390/text,Le gustas. Mi mamá dice que los perros saben quién es buena persona.,He likes you. My mom says dogs know who's a good person.
+Text/391/text,(no sabe qué contestar. Le rasca la cabeza a Toby. Una vez.),(doesn't know what to say. She scratches Toby's head. Once.)
+Text/392/text,"(El chico sigue en la banca, con los auriculares puestos.)","(The boy is still on the bench, headphones on.)"
+Text/393/text,¿Le decimos que ya sabemos dónde está?,Should we tell him we know where she is?
+Text/394/text,No hace falta. Está... ocupado.,No need. He's... busy.
+Text/395/text,¡Pero nos ayudó!,But he helped us!
+Text/396/text,"(Alice duda. Luego se acerca y, esta vez sin esperar, da dos golpecitos en la banca con los nudillos.)","(Alice hesitates. Then she steps closer and, without waiting this time, knocks twice on the bench.)"
+Text/397/text,(se quita un auricular) ¿Mm?,(takes one earbud out) Mm?
+Text/398/text,La fuente. Tenías razón. ...Gracias.,The fountain. You were right. ...Thanks.
+Text/399/text,"(se encoge de hombros, pero casi sonríe) Ya.","(shrugs, but almost smiles) Sure."
+Text/39a/text,"(Se vuelve a poner el auricular. Esta vez, a Alice no se le queda pegada ninguna sensación.)","(He puts the earbud back in. This time, no feeling sticks to Alice.)"
+Text/3cc/text,(Alice se para a su lado. Lía se agacha muy despacio, con las manos en las rodillas.),"(Alice stops beside her. Lía crouches down very slowly, hands on her knees.)"
+Text/39c/text,No creo que debas acercarte tanto...,I don't think you should get that close...
+Text/39d/text,¿Por qué?,Why?
+Text/39e/text,Bueno... porque puede asustarse.,Well... because it might get scared.
+Text/39f/text,¿La paloma o tú?,The pigeon or you?
+Text/3a0/text,"...Las dos, creo.","...Both, I think."
+Text/3a1/text,(La paloma gorda sale volando. Lía da un saltito hacia atrás y se ríe a carcajadas.),(The fat pigeon flies off. Lía hops back and bursts out laughing.)
+Text/3a2/text,¡Se asustó ella! Y tú no.,She got scared! And you didn't.
+Text/3a3/text,(se le escapa una sonrisa. Pequeña. Pero se le escapa.),(a smile slips out. A small one. But it slips out.)
+Text/3a4/text,Entonces... seguiremos buscándola.,Then... we'll keep looking for her.
+Text/3a5/text,(se sorbe la nariz. Asiente.),(sniffles. Nods.)
+Text/3a6/text,(tapa la hoja con el brazo) ¡No mires! Todavía no.,(covers the page with her arm) Don't look! Not yet.
+Text/3a7/text,¿Y qué haces?,And what do you do?
+Text/3a8/text,...Me pongo los auriculares.,...I put my headphones on.
+Text/3a9/text,Pero si no escuchas nada.,But you don't listen to anything.
+Text/3aa/text,(No. Pero ayuda.),(No. But it helps.)
+Text/3ab/text,(Lía sopla. Fuerte. Demasiado fuerte.),(Lía blows. Hard. Way too hard.)
+Text/3ac/text,Dibuja tú también.,You draw too.
+Text/3ad/text,(lo dobla con cuidado y lo guarda en el bolsillo de dentro.),(folds it carefully and puts it in her inside pocket.)
+Text/3ae/text,(lo dobla por las mismas marcas y lo guarda en el bolsillo de dentro. No en la mochila. En el bolsillo.),(folds it along the same creases and puts it in her inside pocket. Not in the backpack. In her pocket.)
+Text/3b2/text,(La corredora se ha parado en la acera a recuperar el aliento. Toby las ve y empieza a mover la cola. Todo el perro mueve la cola.),(The jogger has stopped on the sidewalk to catch her breath. Toby sees them and starts wagging his tail. The whole dog wags.)
+Text/3b3/text,"(asiente muy seria, como una experta) Ya lo sabíamos. Nos lo dijeron dos personas.","(nods very seriously, like an expert) We already knew. Two people told us."
+Text/3b4/text,(suelta una carcajada) ¡Vaya! Entonces llego tarde.,(bursts out laughing) Well! Then I'm late.
+Text/3b5/text,"(sin dejar de rascarle las orejas) A la fuente. Eso ya lo sabíamos. Pero Toby no, ¿a que no, Toby?","(still scratching his ears) To the fountain. We already knew that. But Toby didn't, did you, Toby?"
+Text/3b6/text,"(Toby mueve la cola, como si lo supiera desde siempre.)","(Toby wags his tail, as if he'd known all along.)"
+Text/3b7/text,"(susurrando, pero no mucho) Eso ya lo sabíamos...","(whispering, but not much) We already knew that..."
+Text/3b8/text,"(se lleva un dedo a los labios, roja)","(puts a finger to her lips, red-faced)"
+Text/3bc/text,¿La encontró? ¿A su mamá?,Did she find her? Her mom?
+Text/3bd/text,(asiente. Le sale una sonrisa pequeña.) Sí.,(nods. A small smile slips out.) Yes.
+Text/3be/text,"Pues eso se merece un helado. Otro día, ¿eh?","Well, that deserves an ice cream. Another day, okay?"
+Text/3bf/text,"Ya estoy recogiendo, pero si quieres uno de fresa, te lo pongo rápido.","I'm packing up, but if you want a strawberry one, I'll get it for you quick."
+Text/3c0/text,(niega con la cabeza. Hoy no.),(shakes her head. Not today.)
+Text/3c1/text,¡Eh! ¿Encontró a su mamá la pequeña?,Hey! Did the little one find her mom?
+Text/3c2/text,Sí. En la fuente.,Yes. At the fountain.
+Text/3c3/text,"(Toby le da un golpecito en la mano con el hocico, como si también quisiera saberlo.)","(Toby nudges her hand with his nose, as if he wanted to know too.)"
+Text/3c4/text,(sin aliento) Última vuelta y a casa...,(out of breath) Last lap and home...
+Text/3c5/text,(Toby le olfatea los zapatos a Alice y sale detrás de su dueña.),(Toby sniffs Alice's shoes and runs off after his owner.)
+Text/3c6/text,"(El chico levanta la vista del teléfono. Mira al lado de Alice, donde antes estaba la niña. Luego la mira a ella.)","(The boy looks up from his phone. He looks beside Alice, where the girl used to be. Then he looks at her.)"
+Text/3c7/text,...¿Todo bien?,...Everything okay?
+Text/3c8/text,Sí. Ya está con su mamá.,Yes. She's with her mom now.
+Text/3c9/text,(Él asiente y vuelve a sus auriculares.),(He nods and goes back to his headphones.)
+Text/3ca/text,(Sigue con los auriculares puestos. Ni la mira.),(He still has his headphones on. He doesn't even look at her.)
+Text/3cb/text,(Esta vez no hace falta molestarlo.),(No need to bother him this time.)

@@ -263,12 +263,12 @@ func _swap_one_thought() -> void:
 			pool.append(text)
 	if pool.is_empty():
 		return
-	var word: ThoughtWord = candidates.pick_random()
+	var slipping: ThoughtWord = candidates.pick_random()
 	var new_text: String = pool[randi() % pool.size()]
-	var tween := word.create_tween()
-	tween.tween_property(word, "modulate:a", 0.0, SWAP_FADE)
-	tween.tween_callback(_replace_thought.bind(word, new_text))
-	tween.tween_property(word, "modulate:a", 1.0, SWAP_FADE)
+	var tween := slipping.create_tween()
+	tween.tween_property(slipping, "modulate:a", 0.0, SWAP_FADE)
+	tween.tween_callback(_replace_thought.bind(slipping, new_text))
+	tween.tween_property(slipping, "modulate:a", 1.0, SWAP_FADE)
 
 func _replace_thought(word: ThoughtWord, new_text: String) -> void:
 	# Picked (hidden) while fading out: the next scatter brings it back as is.

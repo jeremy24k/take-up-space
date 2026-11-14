@@ -1,0 +1,18 @@
+join lia (happy) rightmost
+(Alice se para a su lado. Lía se agacha muy despacio, con las manos en las rodillas.) #id:3cc
+join alice (nervous) leftmost
+alice: No creo que debas acercarte tanto... #id:39c
+update lia (surprised)
+lia: ¿Por qué? #id:39d
+alice: Bueno... porque puede asustarse. #id:39e
+update lia (happy)
+lia: ¿La paloma o tú? #id:39f
+update alice (worried)
+alice: ...Las dos, creo. #id:3a0
+[signal arg="pigeons_fly"]
+(La paloma gorda sale volando. Lía da un saltito hacia atrás y se ríe a carcajadas.) #id:3a1
+lia: ¡Se asustó ella! Y tú no. #id:3a2
+update alice (relaxed)
+alice: (se le escapa una sonrisa. Pequeña. Pero se le escapa.) #id:3a3
+leave alice
+leave lia

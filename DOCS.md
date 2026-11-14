@@ -1370,6 +1370,10 @@ Si se mueve un área, mantener las dos reglas.
     volteado según hacia dónde va, así un sprite dibujado solo de lado sirve
     para cualquier ruta. Para estar quieto usa `idle_<dir>`, si no
     `idle_front`, si no `idle_side`.
+  - **`follow_trail(lider, distancia, velocidad)` / `stop_trail()`**
+    (2026-11-13): sigue el camino real del líder (una cola de sus posiciones)
+    a `distancia` px por detrás, con `move_and_slide` y sin ser sólido.
+    Pensado para quien va de la mano o de la manga (Lía); ver "La plaza (Lía)".
   - **`follow(lider, offset)` / `stop_following()`**: el NPC se queda a un
     `offset` fijo del líder, como un perro con correa. No se cambia de lado
     al girar (a la ida va detrás y a la vuelta delante, o al revés). Lo
@@ -2204,22 +2208,45 @@ plaza de noche (Clara). **Lía tiene su propio sprite** desde 2026-11-05
 `walk_front/side/back`); es un `WalkingNPC` con `frames = lia.aseprite`. `_slide()`
 reproduce el ciclo de caminar (`play_move()`) en los `WalkingNPC` y al final
 los deja quietos mirando hacia donde iban; su madre (columna 3 de
-`npcs_sprite_sheet`) todavía se desliza. Siguiendo a Alice, Lía se acerca a su
-sitio con un acercamiento suave (`LIA_FOLLOW_STIFFNESS`, como
-`WalkingNPC.follow()`), así que mientras Alice camina va a su mismo ritmo un
-paso por detrás. Antes iba a velocidad fija (120 px/s, más que Alice con la
-manga agarrada): la alcanzaba, se paraba un fotograma, arrancaba el
-siguiente... y ese tirón continuo la hacía ver borrosa. Solo vuelve a `idle`
-cuando Alice está quieta y Lía ya llegó, tras 0,15 s (`LIA_STOP_DELAY`).
+`npcs_sprite_sheet`) todavía se desliza.
+
+**Lía sigue el rastro de Alice** (2026-11-13, `WalkingNPC.follow_trail()`):
+Alice va dejando un punto cada 3 px por donde pasa y Lía va al punto que queda
+`LIA_FOLLOW_GAP` (24 px) atrás en ese camino, hasta `LIA_FOLLOW_SPEED`
+(130 px/s), con `move_and_slide` contra el mapa (máscara 1; ella no es sólida,
+así que nunca empuja a Alice). Solo pisa por donde pasó Alice: ya no atraviesa
+paredes, farolas ni la calzada, y al girar Alice no salta al otro lado. Si se
+queda atascada lejos más de 1,2 s, salta al rastro. Su colisión se reduce a
+los pies (`LIA_FEET`, 10 × 6, en `_shrink_lia_body()`), como la de Alice.
+`_lia_takes_sleeve()` / `_lia_lets_go_sleeve()` la enganchan y la sueltan
+(cutscenes, Toby, palomas, curiosidad, fuente). El llanto que oye Alice al
+llegar es `audio/sfx/lia_crying_loop.ogg` (bucle) en un `AudioStreamPlayer2D`
+de Lía (−4 dB, se apaga a 360 px), solo en `ARRIVED`; empieza en un punto al
+azar y suena más fuerte al acercarse. Bajo cada globo de "¡Mamá!" baja a
+−16 dB y vuelve (`_duck_crying()`), y sigue durante el foco del metro. Se
+apaga con fundido de 1 s al hablarle (su `TalkArea`) o, en la ruta del metro,
+al terminar el minijuego (`_play_puzzle()`); también, por si acaso, al ir
+Alice a ella, al correr ella hacia Alice y al agarrarle la manga.
 La animación `cry` de `lia.aseprite` la usa `_lia_waits_crying()` al esperar
 en la banca.
 
 ### Recorrido
+**Textos: "Escena Lia v2"** (aprobada 2026-11-12; fuente
+`narrative/twee/escena_lia_v2.twee`, de la sesión de Guion). Ids nuevos de
+Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
+
 1. **Llegada** (`ARRIVED`). Nube: "Llegué. Solo falta bajar al metro y...",
    "...¿Alguien está llorando?". Lía (`MiddleLayer/NPCS/Lia`) llora
    junto a la banca con baranda que está encima de la entrada del metro, en la
    acera de abajo (1110, 1060), al mismo lado de la calle que Alice; su `Bark`
    (`SpeechBark`) dice "¡Mamá!" cada 4 s si Alice está a menos de 360 px.
+   **Prisa de Alice** (`ARRIVAL_BEATS`, `_think_about_lia`): tras los dos
+   pensamientos de llegada, tres más, una vez cada uno y al menos 4 s
+   (`ARRIVAL_BEAT_GAP`) entre ellos: "Está sola. ¿Dónde están sus padres?"
+   cuando Lía entra en pantalla; "Alguien la va a ayudar. Alguien que no
+   tenga un tren que coger." a 160 px de Lía o 200 px del metro; "...Debería
+   preguntarle qué le pasa. Pero el metro..." a 100 px de Lía o 130 px del
+   metro. Cada entrada es `[frase, distancia a Lía, distancia al metro]`.
    **Pasos peatonales cerrados hasta conocer a Lía** (2026-11-06): el primer
    objetivo de Alice es el metro, que está de este lado de la calle. Los tres
    pasos (`MapBoundaries/Crosswalks/CrosswalkLeft`, `Middle`, `Right`, en
@@ -2259,8 +2286,14 @@ en la banca.
      Cada señal de movimiento pausa Dialogic mientras dura. Al terminar, la
      cámara vuelve a Alice y se desbloquea.
    Todas terminan en `[signal arg="lia_grabs_sleeve"]` (`WITH_LIA`): Lía la
-   sigue agarrada de la manga (Alice camina a ×0.75) y le va soltando
-   preguntas (`LIA_QUESTIONS`) en el `Bark`.
+   sigue agarrada de la manga (Alice camina a ×0.75) y le va hablando en su
+   `Bark` (ver "Burbujas de Lía" más abajo). Al empezar, nube
+   (`SEARCH_START_LINES`): "Alguien en la plaza tiene que haberla visto." y
+   "Solo hasta encontrar a su mamá. Después, el metro.". Si Alice vuelve al
+   metro durante la búsqueda: sin pistas, "El tren todavía no ha pasado." /
+   "Primero, su mamá." (`SUBWAY_WITH_LIA_LINES`); con 1 o 2,
+   "Aquí no hay nadie con vestido rosa." / "Vamos, Lía. Por aquí no es."
+   (`SUBWAY_SEARCHING_LINES`).
 3. **La búsqueda** (`WITH_LIA`). Tres personas pueden ayudar, en el orden
    que el jugador quiera (o ninguno); con **2 pistas** (`LIA_CLUES_NEEDED`)
    Alice sabe que tiene que ir a la fuente (`KNOWS_FOUNTAIN`). En cada una,
@@ -2303,9 +2336,76 @@ en la banca.
    Cada pista se manda con `[signal arg="lia_clue:<id>"]` y se guarda en
    `GameManager.lia_clues`. `plaza.gd` (`_refresh_helpers`) les cambia el
    `timeline_name`: la de la pista solo mientras se busca y no se les ha
-   preguntado; si no, `<timeline>_idle` (una línea antes de Lía y otra
-   después). Tras la primera pista sale "Mejor preguntarle a alguien más..."
-   y tras la segunda "La fuente. Vamos a la fuente.".
+   preguntado; en `KNOWS_FOUNTAIN`, al que nunca se le preguntó,
+   `<timeline>_extra` (conversación opcional completa, ver abajo); si no,
+   `<timeline>_idle` (una línea antes de Lía y otra después). Tras la
+   primera pista sale "Mejor preguntarle a alguien más..." y tras la segunda
+   "La fuente. Vamos a la fuente.".
+
+   **Con 2 pistas (`KNOWS_FOUNTAIN`)** (2026-11-12, opción A del usuario):
+   - Los ayudantes **que ya ayudaron** ofrecen una vez su despedida
+     `plaza_<ayudante>_extra` (`plaza_ice_cream_extra`,
+     `plaza_dog_lady_extra`, `plaza_teen_extra`), que termina con
+     `[signal arg="lia_extra:<id>"]`; luego pasan a `_idle`.
+   - El **que falta** ofrece su conversación completa normal, con una
+     variante para "ya sabemos lo de la fuente": un bloque
+     `if {GameManager.lia_knows_fountain}:` dentro de su timeline (getter de
+     `GameManager`, verdadero en `KNOWS_FOUNTAIN`). Su `lia_clue` final ya no
+     suma pista ni lanza pensamientos: `_add_clue` lo apunta en
+     `GameManager.lia_extras` y pasa a `_idle`.
+   - Variantes (textos de Guion): el heladero cambia "¡Hacia la fuente!"
+     (`#id:328`, que pasa a un `else`) por dos líneas tras `#id:327`; la
+     corredora añade dos tras `#id:343`; el chico dos tras `#id:35b` (sigue
+     la burla de "superfuerte" si le subió la voz).
+   La de la corredora reutiliza `toby_comes` / `lia_lets_go` /
+   `lia_holds_on` (Toby se le sienta en el pie). El chico tiene además dos
+   líneas al final si Alice le subió la voz (`[signal arg="lia_teen_loud"]`
+   → `GameManager.lia_teen_loud`).
+
+   **Burbujas de Lía** (2026-11-12): los textos están en
+   `scenes/plaza_scene/scenes/lia_chatter.gd` (`LiaChatter`), en tres fases
+   según las pistas: `EARLY` (0), `MIDDLE` (1) y `LATE` (2, camino a la
+   fuente). Cada entrada es `[frase de Lía, respuesta de Alice]`. Lía dice
+   una cada 20–30 s (`LIA_CHATTER_EVERY`), sin repetir hasta agotar la fase,
+   y empieza de nuevo al cambiar de fase. Alice contesta **en voz alta**, en
+   su propio `SpeechBark` (lo crea `plaza.gd` sobre su cabeza,
+   `ALICE_BARK_OFFSET`), 1,4 s después; una respuesta `""` = se queda
+   callada. Nada sale durante una conversación. Cada frase necesita su fila
+   en `game_text.csv`. Seis pares por fase.
+
+   **Lía y las palomas** (2026-11-12, rediseñado el 2026-11-13; opcional,
+   una sola vez, no da pista): empieza como una curiosidad y solo pasa a la
+   caja si Alice se queda. Con Lía de la manga (`WITH_LIA` o
+   `KNOWS_FOUNTAIN`), la primera vez que Alice se acerca a un grupo de
+   palomas, el grupo avisa (`PigeonFlock.player_approached`) y `plaza.gd`
+   (`_on_pigeons_approached`) lo pone en `calm` para que Alice no lo
+   espante. No arranca si Lía ya está mirando otra curiosidad, durante el
+   enfriamiento de 15 s (`CURIOSITY_COOLDOWN`), en una cutscene o durante
+   una conversación. Lía suelta la manga, corre hasta 18 px del grupo y dice
+   sus burbujas; Alice contesta en la suya (`LiaCuriosity`, entrada
+   `"Pigeons"`; mismo formato que los puntos de curiosidad, con `lia_after`
+   = lo que grita Lía si Alice sigue andando). Alice camina libre a
+   velocidad normal. Cada frame (`_watch_alice_by_the_pigeons`):
+   - **Se queda**: cuando ya acabaron las burbujas (no corta las de Lía),
+     Alice sin moverse **y sin pulsar dirección** (empujar una pared no
+     cuenta) a menos de `PIGEON_STAY_DISTANCE` (85 px) de Lía durante
+     `PIGEON_STAY_TIME` (2 s) → `_pigeons_up_close()`: se bloquea y suena
+     `plaza_lia_pigeons`, que empieza con Alice ya parada a su lado (la
+     línea «¡Mira! ¡Esa es más gorda!» pasó a ser globito); su
+     `[signal arg="pigeons_fly"]` hace volar el grupo lejos de Lía
+     (`fly_away_from`; si no, vuelan al terminar).
+   - **Sigue andando**: a más de `PIGEON_LEAVE_DISTANCE` (110 px) de Lía,
+     o empieza una conversación → `_lia_leaves_the_pigeons(true)`: Lía dice
+     su `lia_after` y vuelve a la manga; el grupo deja `calm` y es un grupo
+     normal (Alice puede espantarlo después).
+   - **Nada de eso** en `PIGEON_WAIT` (8 s) tras las burbujas → Lía vuelve
+     sola, sin frase.
+   Las dos salidas ponen el enfriamiento de curiosidades y devuelven a Alice
+   la velocidad de la manga. Cuenta como visto en ambos casos
+   (`GameManager.lia_pigeons_seen` se pone al empezar). Los umbrales son
+   amplios porque Alice nota el grupo a ~70 px de Lía. Textos de Guion
+   (una sola versión para `early` y `late`: tres globitos de Lía, «Lía...»
+   de Alice y «¡Espérame! ¡Adiós, paloma gorda!» al irse).
 4. **La fuente** (`StoryAreas/FountainArea`, solo en `KNOWS_FOUNTAIN`):
    `plaza_lia_fountain`. Lía se pone al lado de Alice y viene la **tercera
    decisión** (esperar +2 / buscar a seguridad +1 / pánico −1 y final
@@ -2314,21 +2414,81 @@ en la banca.
    lado de Lía; `lia_drawing_given` añade `dibujo_lia`; `lia_leaves` se las
    lleva a `FamilyExit` mientras siguen las líneas. Termina con el reloj de
    la fuente: Alice ya sabe que perdió el tren (`LIA_HOME`, camina a ×0.8,
-   "ya no corre").
+   "ya no corre"). En la v2, Alice contesta "Entonces... seguiremos
+   buscándola." en todas las rutas (antes solo si no se acercó primero), el
+   dibujo es "para que te acuerdes de mí" en los dos finales y Alice lo
+   guarda en el bolsillo de dentro. El agridulce ya no pesa como un fracaso:
+   solo cambia que Alice no consigue despedirse.
 5. **La reja** (`SubwayArea` en `LIA_HOME`): `plaza_missed_train`, cae la
    noche, se pone los auriculares y el interludio de *Transicion_Clara*
-   (`NIGHT_LINES`) lleva a `demo_end`.
+   (`NIGHT_LINES`; en la v2 "Tiene el número de Leo y el dibujo de Lía en el
+   bolsillo." es una sola línea) lleva a `demo_end`.
 Con cada pista nueva, al acabar el diálogo sale un pensamiento con el
 siguiente sitio (`CLUE_*_LINES`).
+
+**La etapa nunca retrocede** (2026-11-13): `_advance_to()` ignora una etapa
+igual o anterior y `_add_clue()` solo cuenta pistas en `WITH_LIA`. Antes, el
+ayudante que faltaba, consultado después de la fuente, volvía a poner
+`KNOWS_FOUNTAIN` y el reencuentro se repetía. **Después de que Lía se va**
+(`LIA_HOME`, `MISSED_TRAIN`), los tres ayudantes usan
+`plaza_<ayudante>_after` (textos de Guion, con retratos de Alice), con dos
+versiones según si Alice habló con ese ayudante con Lía
+(`{GameManager.lia_met_ice_cream}`, `lia_met_dog_lady`, `lia_met_teen`:
+dio pista o tuvo su conversación; `GameManager.lia_has_met(id)`).
+
+**Toby y Lía, en fila** (2026-11-13): cuando Toby viene a Alice, se pone a
+`TOBY_BESIDE_ALICE` (20 px) del lado contrario a la corredora y Lía, a jugar
+con él, a `LIA_BESIDE_TOBY` (38 px) del mismo lado (`_away_from_jogger()`).
+Corredora | Alice | Toby | Lía, sin taparse.
+
+**Puntos de curiosidad** (2026-11-13): `CuriosityPoints/<Nombre>` en
+plaza.tscn (`CuriosityPoint`, `global/curiosity_point.gd`: un `Marker2D`
+`@tool` con `trigger_radius` 48 y `look_distance` 16, que dibuja ambos en el
+editor). Con Lía de la manga, la primera vez que Alice pasa a menos de
+`trigger_radius` de uno, Lía suelta la manga, corre hasta él, dice sus frases
+en su burbuja y Alice contesta en la suya (`LiaCuriosity`,
+`scenes/plaza_scene/scenes/lia_curiosity.gd`, por nombre de nodo; frases en
+`game_text.csv`). Cada punto tiene versión `early` (sin pistas) y `late`
+(desde la primera); el camión la parte en `late_met` / `late_not_met` según
+si ya hablaron con el heladero (`"helper"`). Opcional `lia_after`: una última
+frase de Lía tras la respuesta de Alice. Alice puede esperar o seguir: si se aleja 90 px
+(`CURIOSITY_LEAVE_DISTANCE`) o empieza una conversación, Lía vuelve corriendo
+a la manga. Una vez por punto (`GameManager.lia_curiosities_seen`) y 15 s
+entre uno y otro (`CURIOSITY_COOLDOWN`). Mientras Lía mira, Alice camina a
+velocidad normal. Puntos (8): `PetShopWindow`, `CoffeeBoard`, `IceCreamVan`,
+`Guitarist`, `Picnic`, `RedBike`, `GardenTables`, `AdColumn` (la columna de
+anuncios verde junto al café, (580, 1100)). Textos de Guion. Las palomas empiezan igual que una curiosidad (no
+coinciden con otra: comparten `_exploring`/enfriamiento) y son el único
+momento que puede acabar en caja, si Alice se queda (ver arriba).
+
+**Arreglos del mapa** (2026-11-13):
+- Edificio con fachada diagonal (acera del metro, abajo a la izquierda): sus
+  tiles de esquina (`Buildings`, atlas 33–34 × 10–11) bloqueaban el cuadrado
+  entero. Ahora (34,10) y (34,11) no tienen colisión y (33,11) tiene un
+  triángulo que sigue la diagonal. **Ojo: esas celdas están volteadas en
+  horizontal** (alternativa 4096), así que el polígono del tileset va en
+  espejo. El tile (34,11) estaba además suelto en la celda (9,33), fuera del
+  edificio, y bloqueaba 32 px de acera a la derecha; al quitarle la colisión
+  al tile ya no bloquea (sigue dibujado; si es un tile perdido, que lo mire
+  Arte).
+- Fuente: toda ella se ordenaba en y = 603 (su base), así que Alice quedaba
+  detrás en las esquinas de abajo y a los lados. Ahora (tileset de
+  `WallsSuperior`, fuente 2, atlas 19–26 × 9–14) las filas de arriba (columna
+  central y borde de atrás) se ordenan en el centro, y = 557; las del borde
+  delantero, cada una en su base (571, 587, 603); los tiles diagonales de las
+  esquinas de abajo, en 591.
 
 ### Estado en `GameManager`
 `plaza_stage` (`PlazaStage`: `ARRIVED`, `WITH_LIA`, `KNOWS_FOUNTAIN`,
 `LIA_HOME`, `MISSED_TRAIN`), `lia_clues`, `lia_confidence`,
-`lia_approached_first`, `lia_tried_to_leave` y `lia_outcome`
-(`"feliz"`/`"agridulce"`). Señales: `lia_approached_first`,
-`lia_tried_to_leave`, `lia_bittersweet`, `lia_confidence:<n>`. Las de la
-escena (`lia_grabs_sleeve`, `lia_clue:<id>`, `lia_lets_go`,
-`lia_holds_on`, `time_passes`, `lia_mom_arrives`, `lia_drawing_given`, `lia_leaves`) las
+`lia_approached_first`, `lia_tried_to_leave`, `lia_outcome`
+(`"feliz"`/`"agridulce"`), `lia_extras`, `lia_pigeons_seen`,
+`lia_teen_loud` y `lia_curiosities_seen`. Señales: `lia_approached_first`, `lia_tried_to_leave`,
+`lia_bittersweet`, `lia_confidence:<n>`, `lia_extra:<id>`, `lia_teen_loud`.
+Las de la escena (`lia_grabs_sleeve`, `lia_clue:<id>`, `lia_lets_go`,
+`lia_holds_on`, `toby_comes`, `pigeons_fly`, `focus_on_lia`,
+`alice_goes_to_lia`, `alice_turns_away`, `lia_comes_to_alice`,
+`time_passes`, `lia_mom_arrives`, `lia_drawing_given`, `lia_leaves`) las
 atiende `plaza.gd`. `_restore_stage()` monta la escena según el paso, así que
 se puede recargar en cualquier momento.
 
@@ -2402,7 +2562,21 @@ con `queue_free()` al salir de la pantalla; el grupo se borra con la última
 (y como red de seguridad, a los 8 s). Vuelven al recargar la escena. **El sprite no tiene animación de vuelo:** se alternan el fotograma
 de alas arriba de `peck` y el de `stand`. Si se dibuja una tag
 `<color>_fly`, se usa sola. Tampoco hay sonido de aleteo: `takeoff_sound`
-está vacío. En la plaza hay seis grupos en `MiddleLayer/Pigeons`.
+está vacío. En la plaza hay nueve grupos en `MiddleLayer/Pigeons`.
+**Para que una escena monte algo con ellas** (2026-11-12): cada grupo se
+apunta al grupo de Godot `pigeon_flock`. Emite `player_approached` una vez,
+cuando Alice llega a `scare_distance + notice_margin` (28 px), justo antes de
+espantarlas. Si la escena pone `calm = true` en ese momento (las señales
+corren al instante), Alice ya no las espanta. `fly_away_from(punto)` las hace
+volar lejos de ese punto, y `has_flown()` dice si ya se fueron. Lo usa el
+momento de Lía con las palomas.
+**Sonido** (2026-11-13, archivos de la sesión de Sonido): al despegar, un
+aleteo por bandada (`takeoff_sound` = `audio/sfx/pigeon_takeoff.ogg`, −5 dB,
+`takeoff_volume_db`). En el suelo, de vez en cuando (cada 5–11 s,
+`coo_interval`), un arrullo al azar de `coo_sounds` (`pigeon_coo_1..3.ogg`,
+−12 dB) desde la bandada, en un `AudioStreamPlayer2D` que se apaga con la
+distancia y solo si Alice está a menos de 160 px (`coo_hearing_distance`).
+Son los valores por defecto del script: todas las bandadas los tienen.
 **Es `@tool`:** en el editor cada grupo dibuja una vista previa quieta (4
 palomas, o `count` si no es 0), el rectángulo donde se reparten (`spread`,
 amarillo) y, en rojo, más o menos hasta dónde puede llegar Alice antes de que

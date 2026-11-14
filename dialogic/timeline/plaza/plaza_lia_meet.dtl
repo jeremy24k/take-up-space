@@ -1,13 +1,20 @@
 (Una niña pequeña llora sola en una banca. Se frota los ojos con los puños cerrados.) #id:275
+join alice (nervous) leftmost
 alice: (tiene que ser rápido. El metro no la va a esperar.) #id:363
+alice: (Solo preguntarle qué le pasa. Un minuto. Nada más.) #id:374
 jump approach
 label metro
 [signal arg="focus_on_lia"]
 (La niña sigue llorando.) #id:362
 (Nadie se detiene. La gente pasa de largo.) #id:276
+join alice (worried) leftmost
 alice: (podría seguir caminando. Nadie la obliga a meterse. Pero no puede dejar de mirarla.) #id:277
+alice: (mira la escalera. Mira a la niña. Otra vez la escalera.) #id:375
+leave alice
 [signal arg="anxiety_puzzle:plaza_lia"]
 if {anxiety_result} == "ask":
+	join alice (scared) leftmost
+	alice: (da un paso. Luego otro. Las piernas le tiemblan, pero avanza.) #id:376
 	[signal arg="alice_goes_to_lia"]
 	jump approach
 elif {anxiety_result} == "leave":
@@ -15,6 +22,7 @@ elif {anxiety_result} == "leave":
 	(Alice baja la mirada y da media vuelta. Un paso. Otro.) #id:27b
 	jump chase
 else:
+	join alice (scared) leftmost
 	(Alice no avanza. Pero tampoco se va. Las piernas no le responden.) #id:27c
 	(La niña levanta la cabeza. La ve. Se pone de pie de un salto.) #id:27d
 	[signal arg="lia_comes_to_alice"]
@@ -28,6 +36,7 @@ else:
 	lia: ¿Me ayudas? Por favor. #id:283
 	jump forced
 label approach
+update alice (nervous)
 alice: (Es solo una niña, se repite. Solo una niña.) #id:278
 join lia (crying) rightmost
 lia: ¿Tú... tú me vas a ayudar? #id:279
@@ -37,23 +46,27 @@ alice: (traga saliva) #id:27a
 (Alice se arrodilla para quedar más baja. No sabe si eso ayuda, pero le parece menos intimidante.) #id:284
 alice: ¿Te... te perdiste? #id:285
 lia: Busco a mi mamá. Pero no sé... no sé dónde... y el señor de allí me dijo que me quedara quieta pero pasó mucho y ella no... #id:286
+update alice (worried)
 alice: (también quiere llorar, pero se contiene) ¿Cómo te llamas? #id:287
 lia: Lía. #id:288
-alice: Yo soy Alice. Y... y vamos a encontrar a tu mamá, ¿sí? #id:289
+update alice (nervous)
+alice: Yo soy Alice. Y... podemos buscarla. A tu mamá. Si quieres. #id:289
 update lia (surprised)
-lia: ¿En serio? #id:28a
-alice: (no está segura de nada. Pero asiente.) #id:28b
+lia: ¿Ahora? #id:28a
+alice: (mira la escalera del metro. Un minuto más. O dos.) Ahora. #id:28b
 (Lía se levanta de la banca y, sin preguntar, se agarra de la manga de Alice.) #id:28c
 update lia (happy)
 lia: ¿Por dónde buscamos? #id:28d
 alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se aparta.) #id:28e
 - Calmada, aunque por dentro no lo está #id:28f
+	update alice (neutral)
 	alice: (respira hondo) Primero... cuéntame cómo era tu mamá. Qué ropa traía. #id:290
 	lia: Un vestido rosa. Y pelo largo. Y tenía una bolsa de esas grandes, de tela. #id:291
 	alice: ¿Y por dónde la viste por última vez? #id:292
 	lia: (señala la entrada de la plaza) Allí. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293
 	update lia (crying)
 	lia: Pero pasó mucho, y pasó mucha gente, y yo me asusté y me levanté... y ya no supe dónde estaba. #id:294
+	update alice (worried)
 	alice: (algo se le retuerce adentro) Está bien. Vamos a buscar. #id:295
 	[signal arg="lia_confidence:2"]
 - Nerviosa, pero intentándolo #id:296
@@ -61,26 +74,34 @@ alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 	update lia (surprised)
 	lia: (la mira con los ojos muy abiertos) ¿Tú también estás asustada? #id:298
 	update lia (happy)
-	lia: Mi mamá dice que cuando uno está asustado hay que respirar. #id:299
-	alice: (Lía respira hondo. Alice la imita sin pensar. Una vez. Otra.) #id:29a
-	alice: Sí. Estoy asustada. Pero igual vamos a buscar. #id:29b
-	lia: Está bien. Si estamos las dos, menos asustadas. #id:29c
+	lia: Mi mamá dice que cuando uno está asustado hay que respirar. Así. #id:299
+	(Lía toma tanto aire que se le inflan los cachetes. Lo suelta de golpe, con ruido, como un globo que se desinfla.) #id:29a
+	lia: ¿Funcionó? #id:377
+	update alice (relaxed)
+	alice: ...Un poco. Sí, estoy asustada. Pero igual vamos a buscar. #id:29b
+	lia: Vale. Si estamos las dos, menos asustadas. #id:29c
 	lia: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza. #id:29d
 	alice: Perfecto. Vamos a buscar a la señora del vestido rosa. #id:29e
 	[signal arg="lia_confidence:1"]
 - Bloqueada por el contacto #id:29f
+	update alice (scared)
 	alice: (la mano en su brazo. Se congela. La piel le hormiguea. No puede hablar.) #id:2a0
 	update lia (surprised)
 	lia: ¿Alice? ¿Te pasó algo? #id:2a1
-	(Lía no la suelta. Le da una palmadita en la mano.) #id:2a2
+	(Lía no la suelta. La mira de abajo arriba, muy seria. Le mueve la manga, como quien comprueba si un juguete todavía funciona.) #id:2a2
 	update lia (happy)
-	lia: Está bien. Mi mamá también se pone así a veces. #id:2a3
-	(No la apura. Solo espera. Poco a poco, a Alice le dejan de temblar los dedos.) #id:2a4
+	lia: ¿Estás jugando a las estatuas? #id:2a3
+	lia: Yo soy buenísima a las estatuas. Mira. #id:378
+	(Lía se queda quieta, con un brazo en alto y la boca abierta. Aguanta dos segundos. Tres. Se le escapa la risa.) #id:2a4
+	update alice (relaxed)
+	(Y sin saber muy bien por qué, a Alice le dejan de temblar los dedos.) #id:379
 	alice: Lo siento. #id:2a5
-	lia: No pasa nada. Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos? #id:2a6
+	lia: ¿Por qué? Ganaste tú. Yo me reí. #id:37a
+	lia: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos? #id:2a6
 	alice: Sí. Vamos. #id:2a7
 	[signal arg="lia_confidence:-1"]
 leave lia
+leave alice
 [signal arg="lia_grabs_sleeve"]
 [end_timeline]
 label chase
@@ -88,6 +109,7 @@ label chase
 [signal arg="lia_comes_to_alice"]
 join lia (crying) rightmost
 lia: ¡Espera! #id:2a9
+join alice (shocked) leftmost
 (La niña le agarra la manga con una fuerza que no parece de una niña de siete años.) #id:2aa
 lia: ¿Por qué no me ayudas? ¿Por qué te vas? #id:2ab
 lia: Yo... yo me perdí. Y no encuentro a mi mamá. Y tú te ibas. #id:2ac
@@ -95,7 +117,9 @@ lia: Por favor. Quédate conmigo. Solo un rato. #id:2ad
 [signal arg="lia_tried_to_leave"]
 [signal arg="lia_confidence:-1"]
 label forced
+update alice (nervous)
 alice: (traga saliva. La niña sigue agarrando su manga con fuerza.) #id:2ae
+update alice (worried)
 alice: Yo... yo también estoy perdida. #id:2af
 update lia (surprised)
 lia: (parpadea) ¿Las dos? Entonces... ¿ninguna sabe dónde está? #id:2b0
@@ -103,15 +127,23 @@ alice: No. #id:2b1
 lia: (aprieta los labios, muy seria) Bueno. Entonces tenemos que ayudarnos las dos. #id:2b2
 lia: ¿Tú por qué estás perdida? ¿Te pasó algo? ¿Vives sola? ¿Tienes mascota? ¿Cómo se llama? #id:2b3
 lia: Mi mamá dice que hay que hacer preguntas para conocer a la gente. Por eso pregunto. #id:2b4
+update alice (neutral)
 alice: Yo... tengo un gato. Wilson. #id:2b5
 lia: ¿Y por qué estás perdida? #id:2b6
+update alice (nervous)
 alice: Me dormí en el metro. #id:2b7
 update lia (happy)
 lia: (se ríe) ¡Qué tonta! #id:2b8
+update alice (relaxed)
 alice: (no sabe si ofenderse. Pero la risa le hace un cosquilleo en el pecho.) #id:2b9
 update lia (crying)
 lia: Mi mamá se fue por la entrada de la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba
 update lia (happy)
 lia: Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí? #id:2bb
+update alice (neutral)
+alice: ...Vale. Buscamos a tu mamá. #id:37b
+update alice (worried)
+alice: (No sabe muy bien por qué ha dicho que sí. Quizá porque decir que no le cuesta más.) #id:37c
 leave lia
+leave alice
 [signal arg="lia_grabs_sleeve"]

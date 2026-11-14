@@ -1,0 +1,12 @@
+if {GameManager.lia_met_teen}:
+	(El chico levanta la vista del teléfono. Mira al lado de Alice, donde antes estaba la niña. Luego la mira a ella.) #id:3c6
+	headphones_teen: ...¿Todo bien? #id:3c7
+	join alice (relaxed) leftmost
+	alice: Sí. Ya está con su mamá. #id:3c8
+	(Él asiente y vuelve a sus auriculares.) #id:3c9
+	leave alice
+else:
+	(Sigue con los auriculares puestos. Ni la mira.) #id:3ca
+	join alice (neutral) leftmost
+	alice: (Esta vez no hace falta molestarlo.) #id:3cb
+	leave alice

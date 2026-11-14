@@ -1,0 +1,20 @@
+(La corredora se ha parado en la acera a recuperar el aliento. Toby las ve y empieza a mover la cola. Todo el perro mueve la cola.) #id:3b2
+[signal arg="toby_comes"]
+join alice (scared) leftmost
+alice: (Otra vez no. Otra vez no.) #id:389
+[signal arg="lia_lets_go"]
+join lia (happy) rightmost
+lia: ¡Toby! #id:38a
+lady_with_dog: ¿Y? ¿Apareció tu mamá? #id:38b
+lia: Está en la fuente. Ya lo sabemos. #id:38c
+lady_with_dog: ¡Qué bien! Yo la vi ir para allá, ¿eh? Corre, que te estará esperando. #id:38d
+(Toby se sienta sobre el pie de Alice. Así, sin más. Como si el pie fuera suyo.) #id:38e
+update alice (relaxed)
+alice: (no se mueve. Esta vez no es miedo. Es que pesa. Y está calentito.) #id:38f
+lia: Le gustas. Mi mamá dice que los perros saben quién es buena persona. #id:390
+update alice (nervous)
+alice: (no sabe qué contestar. Le rasca la cabeza a Toby. Una vez.) #id:391
+[signal arg="lia_holds_on"]
+leave alice
+leave lia
+[signal arg="lia_extra:dog_lady"]
