@@ -13,6 +13,11 @@ extends Node2D
 ## area they stand in and how close Alice can get, to help placing it; the
 ## real birds are made, at random, when the game starts.
 signal flew_away
+## Alice came within scare_distance + notice_margin for the first time,
+## just before she would scare them. A scene can set `calm` in its handler
+## (signals run at once) to keep them on the ground and stage something
+## (Lía running up to them), then call fly_away_from() itself.
+signal player_approached
 
 const FRAMES: SpriteFrames = preload("res://global/npcs/assets/pigeons.aseprite")
 const SHADOW_SCENE: PackedScene = preload("res://global/character_shadow.tscn")
@@ -47,6 +52,10 @@ const FEET_OFFSET := Vector2(0, -7)
 	set(value):
 		scare_distance = value
 		queue_redraw()
+## How much earlier than scare_distance player_approached is emitted.
+@export var notice_margin: float = 28.0
+## While on, Alice walking up to them does not scare them.
+var calm: bool = false
 ## Flight speed: they leave at takeoff_speed and speed up to max_speed.
 @export var takeoff_speed: float = 70.0
 @export var max_speed: float = 280.0
@@ -54,12 +63,29 @@ const FEET_OFFSET := Vector2(0, -7)
 ## On takeoff they grow a little, as if coming closer to the camera.
 @export var takeoff_scale: float = 1.3
 @export var takeoff_grow_time: float = 0.35
-## Played once when they take off. Leave empty for silence.
-@export var takeoff_sound: AudioStream
+## Played once per flock when they take off. Leave empty for silence.
+@export var takeoff_sound: AudioStream = preload("res://audio/sfx/pigeon_takeoff.ogg")
+@export_range(-40.0, 12.0, 0.5, "suffix:dB") var takeoff_volume_db: float = -5.0
+## Cooing now and then while they are on the ground: one of these at random,
+## every coo_interval seconds, from the flock (AudioStreamPlayer2D, fading
+## out with distance) and only while Alice is within coo_hearing_distance.
+## Empty = silent flock.
+@export var coo_sounds: Array[AudioStream] = [
+	preload("res://audio/sfx/pigeon_coo_1.ogg"),
+	preload("res://audio/sfx/pigeon_coo_2.ogg"),
+	preload("res://audio/sfx/pigeon_coo_3.ogg"),
+]
+@export var coo_interval: Vector2 = Vector2(5.0, 11.0)
+@export_range(-40.0, 12.0, 0.5, "suffix:dB") var coo_volume_db: float = -12.0
+@export var coo_hearing_distance: float = 160.0
 
 var _birds: Array[AnimatedSprite2D] = []
+var _coo_player: AudioStreamPlayer2D
 var _player: Node2D
 var _flown: bool = false
+var _noticed: bool = false
+## Where the scare came from: they fly away from this point.
+var _scare_origin := Vector2.ZERO
 ## Birds in the air -> their flight direction.
 var _flying: Dictionary = {}
 ## Safety net: a bird that never shows on screen never "leaves" it.
@@ -75,10 +101,20 @@ func _ready() -> void:
 		set_process(false)
 		_refresh_preview()
 		return
+	# Scenes find every flock through this group (e.g. the plaza's pigeon
+	# moment with Lía).
+	add_to_group(&"pigeon_flock")
 	var total := count if count > 0 else randi_range(3, 4)
 	for i in total:
 		_birds.append(_make_bird())
 	_player = get_tree().get_first_node_in_group("player") as Node2D
+	if not coo_sounds.is_empty():
+		_coo_player = AudioStreamPlayer2D.new()
+		_coo_player.bus = &"SFX"
+		_coo_player.volume_db = coo_volume_db
+		_coo_player.max_distance = coo_hearing_distance
+		add_child(_coo_player)
+		_schedule_coo()
 
 func _make_bird() -> AnimatedSprite2D:
 	var bird := AnimatedSprite2D.new()
@@ -185,6 +221,20 @@ func _walk(bird: AnimatedSprite2D, color: String) -> float:
 	return duration
 
 # =========================
+# Cooing
+# =========================
+func _schedule_coo() -> void:
+	get_tree().create_timer(randf_range(coo_interval.x, coo_interval.y)).timeout.connect(_coo)
+
+func _coo() -> void:
+	if _flown or not is_inside_tree():
+		return
+	if _player and global_position.distance_to(_player.global_position) <= coo_hearing_distance 			and not _coo_player.playing:
+		_coo_player.stream = coo_sounds.pick_random()
+		_coo_player.play()
+	_schedule_coo()
+
+# =========================
 # Personal space
 # =========================
 ## Where a new bird can appear: inside spread and min_gap away from the
@@ -214,10 +264,24 @@ func _is_free_path(bird: AnimatedSprite2D, from: Vector2, to: Vector2) -> bool:
 func _physics_process(_delta: float) -> void:
 	if _flown or _player == null:
 		return
+	var nearest := INF
 	for bird in _birds:
-		if bird.global_position.distance_to(_player.global_position) < scare_distance:
-			_take_off()
-			return
+		nearest = minf(nearest, bird.global_position.distance_to(_player.global_position))
+	if not _noticed and nearest < scare_distance + notice_margin:
+		_noticed = true
+		player_approached.emit()
+	if not calm and nearest < scare_distance:
+		fly_away_from(_player.global_position)
+
+## Has the whole group take off now, away from `point` (e.g. Lía).
+func fly_away_from(point: Vector2) -> void:
+	if _flown:
+		return
+	_scare_origin = point
+	_take_off()
+
+func has_flown() -> bool:
+	return _flown
 
 # =========================
 # Taking off
@@ -225,19 +289,21 @@ func _physics_process(_delta: float) -> void:
 func _take_off() -> void:
 	_flown = true
 	set_physics_process(false)
+	if _coo_player:
+		_coo_player.stop()
 	if takeoff_sound:
-		SoundManager.play_sfx(takeoff_sound)
+		SoundManager.play_sfx(takeoff_sound, takeoff_volume_db)
 	for bird in _birds:
 		_fly(bird)
 	flew_away.emit()
 	get_tree().create_timer(MAX_FLIGHT_TIME).timeout.connect(queue_free)
 
-## Away from Alice and up, each with its own small delay and angle. They
+## Away from the scare (usually Alice) and up, each with its own small delay and angle. They
 ## draw above everything while in the air, and their shadows stay behind.
 ## A bird is freed as soon as it leaves the screen; the flock goes with
 ## the last one.
 func _fly(bird: AnimatedSprite2D) -> void:
-	var away := (bird.global_position - _player.global_position).normalized()
+	var away := (bird.global_position - _scare_origin).normalized()
 	if away == Vector2.ZERO:
 		away = Vector2.RIGHT
 	var direction := (away + Vector2(0, -1.2)).normalized().rotated(randf_range(-0.35, 0.35))

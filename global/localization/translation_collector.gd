@@ -131,8 +131,8 @@ static func _collect_from_script(path: String, found: Array[String]) -> void:
 	# String literals the code wraps in tr() (e.g. a label set from code).
 	var source := FileAccess.get_file_as_string(path)
 	var calls := RegEx.create_from_string(r'\btr\("((?:[^"\\]|\\.)*)"\)')
-	for call in calls.search_all(source):
-		_add_value(call.get_string(1).c_unescape(), found)
+	for tr_call in calls.search_all(source):
+		_add_value(tr_call.get_string(1).c_unescape(), found)
 	# Constants that read like sentences (e.g. LOST_LINES, STUMBLE_LINE).
 	var constants: Dictionary = script.get_script_constant_map()
 	for constant_name in constants:

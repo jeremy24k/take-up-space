@@ -64,6 +64,35 @@ var lia_approached_first: bool = false
 var lia_tried_to_leave: bool = false
 ## Who already gave a clue about Lía's mother ("ice_cream", "dog_lady", "teen").
 var lia_clues: Array[String] = []
+## Helpers already talked to once Alice knows about the fountain (their
+## goodbye "_extra" talk, or the full talk of the one she never asked):
+## [signal arg="lia_extra:<clue id>"] or a late lia_clue (plaza.gd).
+var lia_extras: Array[String] = []
+## Alice has her two clues and is on her way to the fountain. Read by the
+## helpers' timelines ({GameManager.lia_knows_fountain}) for their variant.
+var lia_knows_fountain: bool:
+	get:
+		return plaza_stage == PlazaStage.KNOWS_FOUNTAIN
+## True once Lía stopped to watch the pigeons (it happens only once).
+var lia_pigeons_seen: bool = false
+## Curiosity points Lía already went to look at (CuriosityPoint names).
+var lia_curiosities_seen: Array[String] = []
+## Whether Alice talked to a plaza helper with Lía (they gave their clue, or
+## their talk once she knew about the fountain). The getters are for the
+## timelines: {GameManager.lia_met_ice_cream} and so on.
+func lia_has_met(helper: String) -> bool:
+	return lia_clues.has(helper) or lia_extras.has(helper)
+var lia_met_ice_cream: bool:
+	get:
+		return lia_has_met("ice_cream")
+var lia_met_dog_lady: bool:
+	get:
+		return lia_has_met("dog_lady")
+var lia_met_teen: bool:
+	get:
+		return lia_has_met("teen")
+## True if Alice shouted at the boy with headphones (Lía teases her about it).
+var lia_teen_loud: bool = false
 ## "feliz" or "agridulce": how well Alice held up until the mother came.
 var lia_outcome: String = "feliz"
 
@@ -192,6 +221,8 @@ func _on_dialogic_signal(argument: String) -> void:
 			lia_tried_to_leave = true
 		"lia_bittersweet":
 			lia_outcome = "agridulce"
+		"lia_teen_loud":
+			lia_teen_loud = true
 		"headphones_on":
 			set_headphones_on_head(true)
 		"headphones_off":
@@ -202,6 +233,10 @@ func _on_dialogic_signal(argument: String) -> void:
 				leo_confidence += int(argument.get_slice(":", 1))
 			elif argument.begins_with("lia_confidence:"):
 				lia_confidence += int(argument.get_slice(":", 1))
+			elif argument.begins_with("lia_extra:"):
+				var helper := argument.get_slice(":", 1)
+				if not lia_extras.has(helper):
+					lia_extras.append(helper)
 
 # =========================
 # Quest progression

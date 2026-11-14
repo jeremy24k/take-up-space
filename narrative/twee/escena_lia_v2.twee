@@ -1,0 +1,769 @@
+:: StoryTitle
+Escena Lia v2
+
+:: StoryData
+{
+  "ifid": "4BE212B2-356A-4BCE-911B-C3B256354D61",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Leeme"
+}
+
+:: Leeme
+ESCENA DE LÍA — VERSIÓN 2 (borrador de escritura, 2026-11-12)
+
+Basada en lo que hay HOY en el juego (plaza_lia_meet, plaza_ice_cream, plaza_dog_lady, plaza_teen, plaza_lia_fountain, plaza_missed_train, los _idle y las frases de plaza.gd), con el enfoque del documento de dirección.
+
+Frase guía: Alice llegó a la plaza queriendo llegar a casa. Se marchó sin llegar a ninguna parte, pero sabiendo que había acompañado a alguien que la necesitaba.
+
+CÓMO LEER LAS MARCAS
+#id:2a8 = línea que ya existe en el juego, sin cambios.
+#id:2a8 ✎ = línea existente retocada (se conserva el id para la traducción; hay que rehacer el inglés).
+✚ = línea nueva (necesita id y traducción).
+💭 = pensamiento en la nube de arriba (ThoughtBox; se traduce por su texto en game_text.csv).
+🗨 = burbuja corta sobre la cabeza (SpeechBark), no para el juego.
+📌 = nota para Código: señales, estado, movimiento.
+Lo que va sin icono es la caja de diálogo de abajo (Dialogic).
+
+QUÉ CAMBIA, EN CORTO
+1. Llegada: tres pensamientos nuevos de "quiero ayudar, pero tengo prisa".
+2. Encuentro: Lía deja de hablar como una terapeuta. Respira o juega como una niña de siete años y, cuando sabe algo, es porque se lo dice su mamá. Alice acepta buscar por compromiso, todavía sin vínculo.
+3. Búsqueda: cada ayudante tiene una reacción propia de Alice y una versión nueva para cuando ya saben lo de la fuente (la tercera pista, opcional). Burbujas de Lía en tres grupos con respuesta de Alice. Momento nuevo y opcional con las palomas.
+4. Fuente: Alice responde como Alice ("seguiremos buscándola"), para todas las rutas. Lía recuerda cosas de su mamá en vez de dar lecciones. El dibujo es el mismo en los dos finales y siempre es "para que te acuerdes de mí". Nueva frase final del agridulce.
+5. Último tren: igual, pero con menos pensamientos seguidos. Solo queda "Ayudé a alguien. Eso hice." y el dibujo contra el pecho dice el resto.
+
+[[Empezar por la llegada|Acto1 Llegada]]
+
+Índice: [[Acto1 Llegada]] · [[Encuentro Metro]] · [[Busqueda Plaza]] · [[Burbujas Lia]] · [[Palomas]] · [[Fuente Llegada]] · [[Acto5 Ultimo Tren]]
+
+:: Acto1 Llegada
+📌 ACTO 1. Alice sale a la acera del metro. Los pasos peatonales están cerrados. Lía está junto a la banca, encima de la entrada del metro.
+
+💭 Llegué. Solo falta bajar al metro y... (existente)
+💭 ...¿Alguien está llorando? (existente)
+
+🗨 Lía, cada pocos segundos si Alice está cerca (existentes, sin cambios):
+«¡Mamá...!» · «(snif) ¿Mamá?» · «¡MAMÁ!»
+
+📌 Pensamientos nuevos, una sola vez cada uno. Primero cuando Alice ve a Lía por primera vez; los otros dos al acercarse a ella o a la escalera del metro.
+💭 Está sola. ¿Dónde están sus padres? ✚
+💭 Alguien la va a ayudar. Alguien que no tenga un tren que coger. ✚
+💭 ...Debería preguntarle qué le pasa. Pero el metro... ✚
+
+📌 Si intenta cruzar un paso peatonal (existente):
+💭 No me conviene alejarme. La entrada del metro debería estar por aquí cerca.
+
+[[Hablarle a la niña antes de bajar|Encuentro Directo]]
+[[Ignorarla y llegar al metro|Encuentro Metro]]
+
+:: Encuentro Directo
+📌 ACTO 2, ruta A. Alice habla con Lía por su cuenta (su "..."). Cuenta como Acercarse, sin minijuego.
+
+(Una niña pequeña llora sola en una banca. Se frota los ojos con los puños cerrados.) #id:275
+Alice: (tiene que ser rápido. El metro no la va a esperar.) #id:363
+Alice: (Solo preguntarle qué le pasa. Un minuto. Nada más.) ✚
+
+[[Continuar|Rama Acercarse]]
+
+:: Encuentro Metro
+📌 ACTO 2, ruta B. Alice llega a la escalera sin haberle hablado. Se detiene y la cámara va hasta Lía (focus_on_lia).
+
+(La niña sigue llorando.) #id:362
+(Nadie se detiene. La gente pasa de largo.) #id:276
+Alice: (podría seguir caminando. Nadie la obliga a meterse. Pero no puede dejar de mirarla.) #id:277
+Alice: (mira la escalera. Mira a la niña. Otra vez la escalera.) ✚
+
+📌 Minijuego de ansiedad plaza_lia, sin cambios:
+[[Arma «¿Estás bien? ¿Dónde está tu mamá?» (acercarse)|Rama Acercarse Metro]]
+[[Arma «Tengo que irme.» (seguir caminando)|Rama Pasa]]
+[[No contesta a tiempo (quedarse quieta)|Rama Espera]]
+
+:: Rama Acercarse Metro
+📌 alice_goes_to_lia: la cámara vuelve y Alice camina hasta Lía.
+
+Alice: (da un paso. Luego otro. Las piernas le tiemblan, pero avanza.) ✚
+
+[[Continuar|Rama Acercarse]]
+
+:: Rama Acercarse
+Alice: (Es solo una niña, se repite. Solo una niña.) #id:278
+Lía: ¿Tú... tú me vas a ayudar? #id:279
+Alice: (traga saliva) #id:27a
+📌 lia_approached_first · lia_confidence +1
+
+(Alice se arrodilla para quedar más baja. No sabe si eso ayuda, pero le parece menos intimidante.) #id:284
+Alice: ¿Te... te perdiste? #id:285
+Lía: Busco a mi mamá. Pero no sé... no sé dónde... y el señor de allí me dijo que me quedara quieta pero pasó mucho y ella no... #id:286
+Alice: (también quiere llorar, pero se contiene) ¿Cómo te llamas? #id:287
+Lía: Lía. #id:288
+Alice: Yo soy Alice. Y... podemos buscarla. A tu mamá. Si quieres. #id:289 ✎
+📌 Antes: "Y... y vamos a encontrar a tu mamá, ¿sí?". Era una promesa demasiado segura para Alice en este punto.
+Lía: ¿Ahora? #id:28a ✎
+Alice: (mira la escalera del metro. Un minuto más. O dos.) Ahora. #id:28b ✎
+(Lía se levanta de la banca y, sin preguntar, se agarra de la manga de Alice.) #id:28c
+Lía: ¿Por dónde buscamos? #id:28d
+Alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se aparta.) #id:28e
+
+📌 Segunda decisión, menú normal:
+[[Calmada, aunque por dentro no lo está|Rama Calmada]] #id:28f
+[[Nerviosa, pero intentándolo|Rama Nerviosa]] #id:296
+[[Bloqueada por el contacto|Rama Bloqueada]] #id:29f
+
+:: Rama Calmada
+Alice: (respira hondo) Primero... cuéntame cómo era tu mamá. Qué ropa traía. #id:290
+Lía: Un vestido rosa. Y pelo largo. Y tenía una bolsa de esas grandes, de tela. #id:291
+Alice: ¿Y por dónde la viste por última vez? #id:292
+Lía: (señala la entrada de la plaza) Allí. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293
+Lía: Pero pasó mucho, y pasó mucha gente, y yo me asusté y me levanté... y ya no supe dónde estaba. #id:294
+Alice: (algo se le retuerce adentro) Está bien. Vamos a buscar. #id:295
+📌 lia_confidence +2
+
+[[Continuar|Fin Encuentro]]
+
+:: Rama Nerviosa
+Alice: Eh... bueno... podríamos... ¿viste a tu mamá por dónde? #id:297
+Lía: (la mira con los ojos muy abiertos) ¿Tú también estás asustada? #id:298
+Lía: Mi mamá dice que cuando uno está asustado hay que respirar. Así. #id:299 ✎
+(Lía toma tanto aire que se le inflan los cachetes. Lo suelta de golpe, con ruido, como un globo que se desinfla.) #id:29a ✎
+📌 Antes: "Lía respira hondo. Alice la imita sin pensar." Ahora Lía lo intenta como lo haría una niña: lo recuerda de su mamá, pero lo hace a su manera.
+Lía: ¿Funcionó? ✚
+Alice: ...Un poco. Sí, estoy asustada. Pero igual vamos a buscar. #id:29b ✎
+Lía: Vale. Si estamos las dos, menos asustadas. #id:29c ✎
+Lía: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza. #id:29d
+Alice: Perfecto. Vamos a buscar a la señora del vestido rosa. #id:29e
+📌 lia_confidence +1
+
+[[Continuar|Fin Encuentro]]
+
+:: Rama Bloqueada
+Alice: (la mano en su brazo. Se congela. La piel le hormiguea. No puede hablar.) #id:2a0
+Lía: ¿Alice? ¿Te pasó algo? #id:2a1
+(Lía no la suelta. La mira de abajo arriba, muy seria. Le mueve la manga, como quien comprueba si un juguete todavía funciona.) #id:2a2 ✎
+Lía: ¿Estás jugando a las estatuas? #id:2a3 ✎
+📌 Antes: "Está bien. Mi mamá también se pone así a veces." Sonaba a adulta que entiende el bloqueo. Una niña de siete años no lo entiende: lo convierte en un juego.
+Lía: Yo soy buenísima a las estatuas. Mira. ✚
+(Lía se queda quieta, con un brazo en alto y la boca abierta. Aguanta dos segundos. Tres. Se le escapa la risa.) #id:2a4 ✎
+(Y sin saber muy bien por qué, a Alice le dejan de temblar los dedos.) ✚
+Alice: Lo siento. #id:2a5
+Lía: ¿Por qué? Ganaste tú. Yo me reí. ✚
+Lía: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos? #id:2a6
+Alice: Sí. Vamos. #id:2a7
+📌 lia_confidence -1
+
+[[Continuar|Fin Encuentro]]
+
+:: Rama Pasa
+📌 ACTO 2, Seguir caminando. alice_turns_away: Alice mira hacia la escalera.
+
+(Alice baja la mirada y da media vuelta. Un paso. Otro.) #id:27b
+(Unos pasitos detrás de ella. Rápidos. Desordenados.) #id:2a8
+📌 lia_comes_to_alice: Lía corre hasta ella.
+Lía: ¡Espera! #id:2a9
+(La niña le agarra la manga con una fuerza que no parece de una niña de siete años.) #id:2aa
+Lía: ¿Por qué no me ayudas? ¿Por qué te vas? #id:2ab
+Lía: Yo... yo me perdí. Y no encuentro a mi mamá. Y tú te ibas. #id:2ac
+Lía: Por favor. Quédate conmigo. Solo un rato. #id:2ad
+📌 lia_tried_to_leave · lia_confidence -1
+
+[[Continuar|Encuentro Forzado]]
+
+:: Rama Espera
+📌 ACTO 2, Quedarse quieta.
+
+(Alice no avanza. Pero tampoco se va. Las piernas no le responden.) #id:27c
+(La niña levanta la cabeza. La ve. Se pone de pie de un salto.) #id:27d
+📌 lia_comes_to_alice
+Lía: ¡Tú! ¡Tú llevas rato mirándome! #id:27e
+Alice: (abre la boca, pero no sale nada) #id:27f
+Lía: ¿Me vas a ayudar o solo te gusta mirar a las niñas que lloran? #id:280
+Alice: (la pregunta le golpea el pecho) #id:281
+Lía: Es que... mi mamá se fue. Dijo que volvía pero no volvió. Y yo tengo miedo. #id:282
+Lía: ¿Me ayudas? Por favor. #id:283
+
+[[Continuar|Encuentro Forzado]]
+
+:: Encuentro Forzado
+Alice: (traga saliva. La niña sigue agarrando su manga con fuerza.) #id:2ae
+Alice: Yo... yo también estoy perdida. #id:2af
+Lía: (parpadea) ¿Las dos? Entonces... ¿ninguna sabe dónde está? #id:2b0
+Alice: No. #id:2b1
+Lía: (aprieta los labios, muy seria) Bueno. Entonces tenemos que ayudarnos las dos. #id:2b2
+Lía: ¿Tú por qué estás perdida? ¿Te pasó algo? ¿Vives sola? ¿Tienes mascota? ¿Cómo se llama? #id:2b3
+Lía: Mi mamá dice que hay que hacer preguntas para conocer a la gente. Por eso pregunto. #id:2b4
+Alice: Yo... tengo un gato. Wilson. #id:2b5
+Lía: ¿Y por qué estás perdida? #id:2b6
+Alice: Me dormí en el metro. #id:2b7
+Lía: (se ríe) ¡Qué tonta! #id:2b8
+Alice: (no sabe si ofenderse. Pero la risa le hace un cosquilleo en el pecho.) #id:2b9
+Lía: Mi mamá se fue por la entrada de la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba
+Lía: Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí? #id:2bb
+Alice: ...Vale. Buscamos a tu mamá. ✚
+Alice: (No sabe muy bien por qué ha dicho que sí. Quizá porque decir que no le cuesta más.) ✚
+📌 Las dos líneas nuevas cierran el encuentro: Alice acepta, pero todavía por compromiso.
+
+[[Continuar|Fin Encuentro]]
+
+:: Fin Encuentro
+📌 Todas las rutas terminan aquí: lia_grabs_sleeve. Cambia la música a la de Lía, se abren los pasos peatonales y Lía camina pegada a la manga (Alice va más lenta).
+
+💭 Alguien en la plaza tiene que haberla visto. (existente)
+💭 Solo hasta encontrar a su mamá. Después, el metro. ✚
+📌 Este pensamiento nuevo va justo después del existente. Marca desde dónde empieza Alice: ayuda porque no puede dejarla sola, no porque quiera.
+
+[[Empezar la búsqueda|Busqueda Plaza]]
+
+:: Busqueda Plaza
+📌 ACTO 3. Tres personas a quien preguntar, en cualquier orden; bastan dos pistas. Con dos pistas, la tercera sigue disponible con una conversación nueva ("ya saben lo de la fuente"), que no da pista ni cambia nada.
+
+Con 0 o 1 pista (dan pista):
+[[Heladero|Heladero]] · [[Corredora con Toby|Corredora]] · [[Chico de auriculares|Chico]]
+
+Con 2 pistas, los dos ayudantes YA consultados ofrecen una despedida, una vez cada uno (`_extra`, no dan pista):
+[[Heladero, despedida|Heladero Despues]] · [[Corredora, despedida|Corredora Despues]] · [[Chico, despedida|Chico Despues]]
+
+Con 2 pistas, el ayudante al que NO preguntaron mantiene su conversación completa, opcional, con un final retocado porque ya saben lo de la fuente (no suma pista):
+[[Heladero, sin preguntar antes|Heladero Ya Saben]] · [[Corredora, sin preguntar antes|Corredora Ya Saben]] · [[Chico, sin preguntar antes|Chico Ya Saben]]
+
+Antes de conocer a Lía y después de la fuente:
+[[Frases sueltas de los tres|Ayudantes Idle]]
+
+📌 Las conversaciones "ya saben lo de la fuente" van en `plaza_ice_cream_extra`, `plaza_dog_lady_extra` y `plaza_teen_extra`. Las palomas, en `plaza_lia_pigeons`.
+
+Siempre durante la búsqueda:
+[[Burbujas de Lía|Burbujas Lia]] · [[Lía se para a mirar cosas|Lia Curiosa]] · [[Palomas (opcional, una vez)|Palomas]] · [[Si Alice vuelve al metro|Metro Con Lia]]
+
+📌 Pensamientos al conseguir pistas (existentes):
+Con 1 pista: 💭 Mejor preguntarle a alguien más, por si acaso.
+Con 2 pistas: 💭 La fuente. Vamos a la fuente.
+
+[[Ir a la fuente (con 2 pistas)|Fuente Llegada]]
+
+:: Heladero
+📌 Reacción propia de Alice: Lía le roba la pregunta a media frase, y Alice casi se cree que encontrar a alguien puede ser fácil.
+
+(Un señor mayor está junto a su camión de helados. Tiene cara de no tener ninguna prisa.) #id:321
+Alice: D-disculpe... ¿usted... ha visto a una... #id:322
+Lía: (se pone de puntillas) ¡Señor! ¿Vio a mi mamá? ¡Tiene vestido rosa! #id:323
+Alice: (se le corta la frase a la mitad. Se le suben los colores.) #id:324
+Heladero: (sonríe, sin apuro) A ver, a ver. De una en una. (mira a Alice) ¿Qué me decías? #id:325
+Alice: U-una señora... con vestido rosa. Es su mamá. #id:326
+Heladero: Vestido rosa... Sí. Pasó por aquí caminando hacia la fuente. Hará unos veinte minutos. #id:327
+Lía: ¡Hacia la fuente! (tira de la manga de Alice) #id:328
+Heladero: Tranquila, pequeña. Si iba buscándote, no se va a ir muy lejos. #id:329
+Alice: (Lo dice tan tranquilo que casi se lo cree.) ✚
+Alice: G-gracias. #id:32a
+Heladero: (le guiña un ojo a Lía) Y cuando la encuentres, vuelves por un helado. #id:32b
+
+📌 Solo si Alice no se acercó a Lía por su cuenta (existente):
+Lía: ¿Tú qué estabas comprando? Antes, digo. #id:32c
+Alice: Comida para mi gato. #id:32d
+Lía: ¿Y se te perdió? #id:32e
+Alice: No. Yo me perdí. #id:32f
+Lía: Pero ahora estás conmigo. Entonces estás más perdida que antes. #id:330
+Alice: (no puede evitar una pequeña risa) Supongo que sí. #id:331
+
+📌 lia_clue:ice_cream
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Heladero Despues
+📌 Va en `plaza_ice_cream_extra`. Despedida del heladero si ya les dio pista antes; sale una vez cuando ya tienen las dos pistas. No da pista (Código añade al final la señal lia_extra).
+
+(El señor de los helados las ve llegar y levanta una ceja.) ✚
+Heladero: ¿Qué tal, pequeña? ¿Nada todavía? ✚
+Lía: ¡Ya sabemos que se fue a la fuente! ✚
+Heladero: ¿Ah, sí? Pues vais bien. Yo también la vi ir para allá, con su vestido rosa. ✚
+Alice: (Tres personas la han visto ir a la fuente. Ya no puede ser casualidad.) ✚
+Heladero: (le guiña un ojo a Lía) El helado sigue en pie, ¿eh? Para cuando vengas con tu mamá. ✚
+Lía: ¡De chocolate! ✚
+Alice: (sonríe sin darse cuenta) ✚
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Corredora
+📌 Reacción propia de Alice: incomodidad física con Toby. Lía se olvida de todo por el perro y Alice, sin la mano en la manga, se siente rara.
+
+(Una mujer joven que sale a correr con un perro enorme se para a tomar aire. El perro las ve y viene directo hacia ellas, moviendo la cola.) #id:335
+📌 toby_comes
+Alice: (se queda tiesa. El perro le olfatea las rodillas.) #id:336
+📌 lia_lets_go
+Lía: (le suelta la manga) ¡Un perrito! ¡Es enorme! ¿Cómo se llama? #id:337
+Corredora: Toby. No se preocupen, es un trozo de pan. #id:338
+(Toby se apoya contra las piernas de Alice. Pesa. Está caliente. No se aparta.) #id:339
+Alice: (No te muevas. No te muevas.) #id:33a
+(Lía le rasca las orejas a Toby y se ríe. Ya no se acuerda de nada más.) #id:33b
+
+[[Preguntar igual, con el perro encima|Corredora Pregunta]] #id:33c
+[[Apartarse un paso antes de hablar|Corredora Aparta]] #id:33e
+
+:: Corredora Pregunta
+Alice: P-perdón... ¿vio a una señora con vestido rosa? Es la mamá de ella. #id:33d
+📌 lia_confidence +1
+
+[[Continuar|Corredora Final]]
+
+:: Corredora Aparta
+Alice: (da un paso atrás. Toby la sigue. Otro paso. Toby también.) #id:33f
+Corredora: (tira de la correa, apenada) Perdona, es que le caes bien. #id:340
+Alice: ...¿Vio a una señora con vestido rosa? Es la mamá de ella. #id:341
+
+[[Continuar|Corredora Final]]
+
+:: Corredora Final
+Corredora: Ay, sí. Hace un rato. Iba muy preocupada, preguntando por una niña. #id:342
+Corredora: Se fue hacia la fuente. #id:343
+Alice: Lía. Lía, vamos. #id:344
+Lía: (abraza a Toby una última vez) ¡Adiós, Toby! #id:345
+📌 lia_holds_on
+Alice: (vuelve a sentir la mano de Lía en la manga. Casi le alivia.) #id:346
+📌 lia_clue:dog_lady
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Corredora Despues
+📌 Va en `plaza_dog_lady_extra`. Despedida de la corredora si ya les dio pista antes; sale una vez cuando ya tienen las dos pistas. No da pista. Puede usar los mismos movimientos de Toby (toby_comes, lia_lets_go, lia_holds_on).
+
+(La corredora se ha parado en la acera a recuperar el aliento. Toby las ve y empieza a mover la cola. Todo el perro mueve la cola.) ✚
+Alice: (Otra vez no. Otra vez no.) ✚
+Lía: ¡Toby! ✚
+Corredora: ¿Y? ¿Apareció tu mamá? ✚
+Lía: Está en la fuente. Ya lo sabemos. ✚
+Corredora: ¡Qué bien! Yo la vi ir para allá, ¿eh? Corre, que te estará esperando. ✚
+(Toby se sienta sobre el pie de Alice. Así, sin más. Como si el pie fuera suyo.) ✚
+Alice: (no se mueve. Esta vez no es miedo. Es que pesa. Y está calentito.) ✚
+Lía: Le gustas. Mi mamá dice que los perros saben quién es buena persona. ✚
+Alice: (no sabe qué contestar. Le rasca la cabeza a Toby. Una vez.) ✚
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Chico
+📌 Reacción propia de Alice: practica hablar más alto. Le sale fatal, o le sale demasiado, pero la oyen.
+
+(Un chico sentado en la banca, con auriculares grandes y la cara metida en el teléfono.) #id:34b
+Alice: Eh... perdona. #id:34c
+(Nada. Ni la mira.) #id:34d
+Alice: (más bajito todavía) Perdona... #id:34e
+Lía: (le tira de la manga) No te oye. ¡Más fuerte! #id:34f
+Alice: (Está ocupado. No quiere que nadie le hable. Yo tampoco querría.) #id:350
+
+[[Subir la voz|Chico Voz]] #id:351
+[[Hacerle gestos|Chico Gestos]] #id:354
+
+:: Chico Voz
+Alice: ¡P-PERDONA! #id:352
+(Le sale mucho más fuerte de lo que quería. Una señora se da vuelta. Alice quiere desaparecer.) #id:353
+📌 lia_confidence +1 · marca chico_voz para la línea extra del final
+
+[[Continuar|Chico Final]]
+
+:: Chico Gestos
+Alice: (agita la mano delante del teléfono, roja de vergüenza) #id:355
+(El chico levanta la vista como si hubiera visto un fantasma.) #id:356
+
+[[Continuar|Chico Final]]
+
+:: Chico Final
+Chico: (se quita un auricular) ¿Qué? #id:357
+Alice: ¿V-viste a una señora con vestido rosa? #id:358
+Chico: No. No he visto a nadie. #id:359
+Lía: (se desinfla) #id:35a
+Chico: (señala con la barbilla) Pero si se perdió, la fuente está allá, al otro lado. Todo el mundo queda ahí. #id:35b
+Alice: Gracias. Perdón por... molestarte. #id:35c
+(Antes de que termine la frase, ya se volvió a poner el auricular.) #id:35d
+Alice: (Ahí está. La sensación de haber molestado. Se le queda pegada.) #id:35e
+
+📌 Solo si eligió subir la voz:
+Lía: (en un susurro enorme) Lo dijiste superfuerte. ✚
+Alice: (Sí. Lo dijo superfuerte. Y no se ha muerto nadie.) ✚
+
+📌 lia_clue:teen
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Chico Despues
+📌 Va en `plaza_teen_extra`. Despedida del chico si ya les dio pista antes; sale una vez cuando ya tienen las dos pistas. No da pista. Alice repite lo que practicó con él, y ahora le sale.
+
+(El chico sigue en la banca, con los auriculares puestos.) ✚
+Lía: ¿Le decimos que ya sabemos dónde está? ✚
+Alice: No hace falta. Está... ocupado. ✚
+Lía: ¡Pero nos ayudó! ✚
+(Alice duda. Luego se acerca y, esta vez sin esperar, da dos golpecitos en la banca con los nudillos.) ✚
+Chico: (se quita un auricular) ¿Mm? ✚
+Alice: La fuente. Tenías razón. ...Gracias. ✚
+Chico: (se encoge de hombros, pero casi sonríe) Ya. ✚
+(Se vuelve a poner el auricular. Esta vez, a Alice no se le queda pegada ninguna sensación.) ✚
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Heladero Ya Saben
+📌 Conversación completa de `plaza_ice_cream`, cuando NO le habían preguntado y ya tienen las dos pistas. Todo igual salvo esto. No suma pista: sin `lia_clue`.
+
+Tras #id:327 ("...hacia la fuente. Hará unos veinte minutos."), en lugar de #id:328 ("¡Hacia la fuente!"):
+Lía: (asiente muy seria, como una experta) Ya lo sabíamos. Nos lo dijeron dos personas. ✚
+Heladero: (suelta una carcajada) ¡Vaya! Entonces llego tarde. ✚
+📌 Después sigue igual desde #id:329 ("Tranquila, pequeña...").
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Corredora Ya Saben
+📌 Conversación completa de `plaza_dog_lady`, cuando NO le habían preguntado y ya tienen las dos pistas. Todo igual salvo esto. No suma pista: sin `lia_clue`.
+
+Tras #id:343 ("Se fue hacia la fuente."), antes de #id:344 ("Lía. Lía, vamos."):
+Lía: (sin dejar de rascarle las orejas) A la fuente. Eso ya lo sabíamos. Pero Toby no, ¿a que no, Toby? ✚
+(Toby mueve la cola, como si lo supiera desde siempre.) ✚
+📌 #id:342 ("Iba muy preocupada, preguntando por una niña.") se queda: no es una pista nueva, es saber que su mamá también la busca.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Chico Ya Saben
+📌 Conversación completa de `plaza_teen`, cuando NO le habían preguntado y ya tienen las dos pistas. Todo igual salvo esto. No suma pista: sin `lia_clue`.
+
+Tras #id:35b ("...la fuente está allá, al otro lado. Todo el mundo queda ahí."), antes de #id:35c ("Gracias. Perdón por... molestarte."):
+Lía: (susurrando, pero no mucho) Eso ya lo sabíamos... ✚
+Alice: (se lleva un dedo a los labios, roja) ✚
+📌 La línea extra de "Lo dijiste superfuerte" (si subió la voz) se mantiene.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Ayudantes Sin Lia
+📌 Después de que Lía se va con su madre (LIA_HOME, y también de noche en MISSED_TRAIN). Sustituyen a las frases sueltas "de después" (#id:334, #id:349/34a, #id:361), que hablaban como si Lía siguiera allí.
+📌 Alice vuelve sola, con prisa hacia el metro y todavía algo removida. Nada reabre la búsqueda ni da pistas.
+📌 "Le habían preguntado" = ese ayudante dio pista o tuvo su conversación con Lía.
+
+HELADERO
+Si le habían preguntado:
+Heladero: ¿La encontró? ¿A su mamá? ✚
+Alice: (asiente. Le sale una sonrisa pequeña.) Sí. ✚
+Heladero: Pues eso se merece un helado. Otro día, ¿eh? ✚
+Si no:
+Heladero: Ya estoy recogiendo, pero si quieres uno de fresa, te lo pongo rápido. ✚
+Alice: (niega con la cabeza. Hoy no.) ✚
+
+CORREDORA CON TOBY
+Si le habían preguntado:
+Corredora: ¡Eh! ¿Encontró a su mamá la pequeña? ✚
+Alice: Sí. En la fuente. ✚
+(Toby le da un golpecito en la mano con el hocico, como si también quisiera saberlo.) ✚
+Si no:
+Corredora: (sin aliento) Última vuelta y a casa... ✚
+(Toby le olfatea los zapatos a Alice y sale detrás de su dueña.) ✚
+
+CHICO DE AURICULARES
+Si le habían preguntado:
+(El chico levanta la vista del teléfono. Mira al lado de Alice, donde antes estaba la niña. Luego la mira a ella.) ✚
+Chico: ...¿Todo bien? ✚
+Alice: Sí. Ya está con su mamá. ✚
+(Él asiente y vuelve a sus auriculares.) ✚
+Si no:
+(Sigue con los auriculares puestos. Ni la mira.) ✚
+Alice: (Esta vez no hace falta molestarlo.) ✚
+
+[[Volver al metro|Acto5 Ultimo Tren]]
+
+:: Lia Curiosa
+📌 LÍA SE PARA A MIRAR COSAS. Lista final de Código. Con Lía de la manga, la primera vez que Alice pasa cerca de un punto, Lía suelta la manga y va a mirarlo. Dice 1 o 2 frases en su burbuja y Alice contesta en la suya (o no contesta). Si Alice se aleja, Lía vuelve corriendo a la manga. Una vez por punto, con al menos 15 s entre uno y otro.
+📌 "Temprano" = antes de la primera pista; "tarde" = con una pista o más. Alice evoluciona como en las burbujas: corta e incómoda al principio, más suelta y pendiente de Lía después.
+📌 Todas las líneas son ✚. "—" = Alice no contesta.
+
+PetShopWindow · escaparate de la tienda de mascotas
+Temprano: 🗨 Lía: ¡Una tienda de animales! ¿Hay perritos? → 🗨 Alice: No veo ninguno.
+Tarde: 🗨 Lía: ¿Tú tienes animales? Yo quiero un perro, pero mi mamá dice que la casa es pequeña. → 🗨 Alice: Yo tengo un gato. Cabe en cualquier sitio.
+
+CoffeeBoard · pizarra del café (a unos pasos del escaparate: suena distinta, aquí Lía lee)
+📌 Si la pizarra dice otra cosa, se cambia la palabra que lee Lía.
+Temprano: 🗨 Lía: ¿Qué pone ahí? Yo leo despacito. → 🗨 Alice: Pone «café».
+Tarde: 🗨 Lía: Ca... fé. ¡Lo leí sola! → 🗨 Alice: Muy bien. Más rápido que yo.
+
+IceCreamVan · camión de helados (junto al heladero)
+Temprano: 🗨 Lía: ¡Un camión de helados! ¡Es rosa! → 🗨 Alice: ...Sí. Muy rosa.
+Tarde, si ya hablaron con el heladero: 🗨 Lía: El señor dijo que luego me da un helado. De chocolate. → 🗨 Alice: Si te lo prometió, te lo dará.
+Tarde, si no: 🗨 Lía: Cuando encontremos a mi mamá, le pido un helado. Y otro para ti. → 🗨 Alice: ...De fresa, entonces.
+
+Guitarist · guitarrista debajo de la fuente
+Temprano: 🗨 Lía: Toca bonito. ¿Por qué nadie le da dinero? → 🗨 Alice: No lo sé.
+Tarde: 🗨 Lía: ¡Mi mamá canta esa! Bueno, canta otra. Pero parecida. → 🗨 Alice: Parecida también cuenta.
+
+Picnic · mantel con una chica y su perrito
+Temprano: 🗨 Lía: ¡Un perrito! ¿Lo puedo tocar? → 🗨 Alice: Mejor no. No es nuestro.
+Tarde: 🗨 Lía: Cuando encontremos a mi mamá, podemos hacer un picnic. Tú también vienes. → 🗨 Alice: ...Ya veremos.
+
+RedBike · bici roja bajo un árbol
+Temprano: 🗨 Lía: ¡Una bici roja! Cuando sea mayor voy a tener una igual. → —
+Tarde: 🗨 Lía: ¿Tú sabes ir en bici? → 🗨 Alice: Sé caerme. Eso se me da muy bien.
+
+GardenTables · carrito con sombrilla y mesas, junto a una pareja que charla
+Temprano: 🗨 Lía: ¿Esos dos son novios? → 🗨 Alice: No lo sé. No mires tanto.
+Tarde: 🗨 Lía: Si me siento en esa mesa, ¿parezco mayor? → 🗨 Alice: Un poco. Como de ocho.
+
+AdColumn · columna de anuncios junto al café (opcional)
+Temprano: 🗨 Lía: ¿Por qué esa columna tiene papeles pegados? → 🗨 Alice: Son anuncios.
+Tarde: 🗨 Lía: Cuando sea mayor voy a poner un anuncio. «Se busca mamá». ...No, mejor no. → 🗨 Alice: Mejor no. Seguimos buscando.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Ayudantes Idle
+📌 Frases sueltas que ya existen, sin cambios. Las de "antes de Lía" siguen igual. Las de "después" sirven mientras Lía va con Alice; cuando Lía ya se fue, las sustituyen las de [[Ayudantes Sin Lia]].
+
+Heladero, antes de Lía:
+Heladero: ¡Helados! ¿Uno de fresa para el camino? #id:332
+Alice: (niega con la cabeza, rápido) #id:333
+Heladero, después:
+Heladero: Hacia la fuente, ¿eh? Suerte. #id:334
+
+Corredora, antes de Lía:
+Corredora: Qué tarde tan bonita, ¿verdad? #id:347
+Alice: (asiente sin mirarla. El perro sí la mira a ella.) #id:348
+Corredora, después:
+Corredora: ¡Suerte con la búsqueda! #id:349
+(Toby mueve la cola.) #id:34a
+
+Chico, antes de Lía:
+(Lleva auriculares y no levanta la vista del teléfono.) #id:35f
+Alice: (Yo también llevo los míos. Mejor no molestarlo.) #id:360
+Chico, después:
+Alice: (Ya volvió a su mundo. No pienso molestarlo otra vez.) #id:361
+
+📌 Ojo: con la versión "Despues" de cada ayudante, la segunda frase del Heladero (#id:334) y de la Corredora (#id:349) queda para cuando ya volvieron de la fuente.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Burbujas Lia
+📌 BURBUJAS DE LÍA DURANTE LA BÚSQUEDA, con la mano en la manga. Sustituyen a LIA_QUESTIONS.
+- Salen cada 20–30 s (lo maneja Código), nunca encima de un diálogo o un pensamiento.
+- Grupo según las pistas: temprano (0), medio (1), tarde (2, camino a la fuente). Sin repetir hasta agotar el grupo.
+- Cada entrada es un par: frase de Lía → respuesta de Alice en voz alta (no en la nube). "(sin respuesta)" = Alice no contesta.
+- La evolución no se dice: se nota en cómo responde Alice.
+
+TEMPRANO (0 pistas). Alice contesta corto, incómoda.
+🗨 Lía: ¿Por qué llevas auriculares si no escuchas nada? (existente) → 🗨 Alice: ...Costumbre. ✚
+🗨 Lía: ¿Vives sola? (existente) → 🗨 Alice: Con mi gato. ✚
+🗨 Lía: Tu pelo parece un nido. Me gusta. (existente) → 🗨 Alice: ...Gracias. Creo. ✚
+🗨 Lía: ¿Por qué caminas mirando el suelo? (existente) → 🗨 Alice: Para no tropezar. ✚
+🗨 Lía: ¿Tú tienes mamá? ¿Dónde está? (existente) → (sin respuesta)
+🗨 Lía: ¿Por qué caminas tan rápido? ✚ → 🗨 Alice: Perdón. ✚
+
+MEDIO (1 pista). Alice contesta con más naturalidad y sigue las bromas.
+🗨 Lía: ¡Mira! ¡Una paloma! ✚ → 🗨 Alice: Es la quinta que me enseñas. ✚
+🗨 Lía: ¿Crees que ese señor conocía a mi mamá? ✚ → 🗨 Alice: No lo sé. Pero la vio. Algo es algo. ✚
+🗨 Lía: Mi mamá tiene un vestido rosa. ¿Ya te lo dije? (existente) → 🗨 Alice: Unas cuantas veces. Rosa. Lo tengo. ✚
+🗨 Lía: ¿Tu gato sabe hacer trucos? ✚ → 🗨 Alice: Sabe esconder zapatos. ✚
+🗨 Lía: Si fueras un animal, ¿cuál serías? ✚ → 🗨 Alice: Un gato. Para dormir todo el día. ✚
+🗨 Lía: Cuando sea grande voy a tener un perro enorme. ✚ → 🗨 Alice: ¿Más grande que tú? ✚
+
+TARDE (2 pistas, camino a la fuente). Alice se preocupa por cómo está Lía.
+🗨 Lía: ¿Falta mucho para la fuente? ✚ → 🗨 Alice: Ya casi. ¿Estás cansada? ✚
+🗨 Lía: ¿Tienes miedo? Yo un poquito. (existente) → 🗨 Alice: Yo también. Un poquito. ✚
+🗨 Lía: ¿Y si mi mamá ya se fue a casa? ✚ → 🗨 Alice: No creo que se haya ido. Todavía nos queda buscarla. ✚
+🗨 Lía: Tengo un poquito de hambre. ✚ → 🗨 Alice: Yo también. Luego buscamos algo, ¿vale? ✚
+🗨 Lía: Ya casi no tengo ganas de llorar. ✚ → 🗨 Alice: Si te vuelven las ganas, no pasa nada. ✚
+🗨 Lía: ¿Tú te habías perdido antes? Antes de hoy, digo. ✚ → 🗨 Alice: Sí. Aunque normalmente me las arreglo sola. ✚
+
+📌 Se quita «¿Wilson es naranja? Yo quiero un perro.»: Lía solo sabe el nombre de Wilson en algunas rutas. «Sabe esconder zapatos» es un guiño a los zapatos que Wilson esconde en el apartamento.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Palomas
+📌 Momento opcional, una sola vez, al pasar junto a un grupo de palomas con Lía de la manga. Dos tramos. No da pistas ni desbloquea nada.
+
+TRAMO 1. Globitos, como una curiosidad (sin caja). Lía suelta la manga y corre hacia las palomas.
+🗨 Lía: ¡Palomas! ✚
+🗨 Lía: ¡Mira! ¡Esa es más gorda! (#id:39b ✎: pasa de la caja a globito)
+🗨 Lía: Ven a verla. ¡Ven! ✚
+🗨 Alice: Lía... ✚
+📌 Formato para Código: {"lia": ["¡Palomas!", "¡Mira! ¡Esa es más gorda!", "Ven a verla. ¡Ven!"], "alice": "Lía..."}
+
+Si el jugador sigue andando, Lía vuelve corriendo a la manga y las palomas se quedan:
+🗨 Lía: ¡Espérame! ¡Adiós, paloma gorda! ✚
+
+TRAMO 2. Si Alice se para y espera a su lado un par de segundos: caja con retratos (`plaza_lia_pigeons`). Arranca desde ahí, sin repetir los globitos.
+(Alice se para a su lado. Lía se agacha muy despacio, con las manos en las rodillas.) ✚
+Alice: No creo que debas acercarte tanto... #id:39c
+Lía: ¿Por qué? #id:39d
+Alice: Bueno... porque puede asustarse. #id:39e
+Lía: ¿La paloma o tú? #id:39f
+Alice: ...Las dos, creo. #id:3a0
+📌 pigeons_fly: aquí despegan las palomas, justo antes de la línea siguiente.
+(La paloma gorda sale volando. Lía da un saltito hacia atrás y se ríe a carcajadas.) #id:3a1
+Lía: ¡Se asustó ella! Y tú no. #id:3a2
+Alice: (se le escapa una sonrisa. Pequeña. Pero se le escapa.) #id:3a3
+📌 Después (lo hace Código): Lía vuelve corriendo y se agarra otra vez de la manga.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Metro Con Lia
+📌 Si Alice vuelve a la entrada del metro durante la búsqueda.
+Con 0 pistas (existentes; todavía es pronto para que piense en el tren):
+💭 El tren todavía no ha pasado.
+💭 Primero, su mamá.
+Con 1 o 2 pistas (la relación ya avanzó: ya no piensa en irse):
+💭 Aquí no hay nadie con vestido rosa. ✚
+💭 Vamos, Lía. Por aquí no es. ✚
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Fuente Llegada
+📌 ACTO 4. Al llegar a la fuente con dos pistas. Retrato de Lía (crying).
+
+(Llegan a la fuente. No hay nadie con vestido rosa.) #id:2d2
+Lía: (la respiración se le entrecorta) ¿Y si no aparece? #id:2d3
+Alice: Seguro que te está buscando. #id:2d4 ✎
+Lía: ¿Y si no me encuentra? #id:2d5 ✎
+Alice: Entonces... seguiremos buscándola. ✚
+Lía: (se sorbe la nariz. Asiente.) ✚
+📌 Antes solo salía si Alice no se acercó primero, y Alice hablaba como alguien seguro ("No pienses eso..."). Ahora sale en todas las rutas y Alice responde como Alice.
+Alice: (el agua de la fuente cae. Siente que el tiempo se escapa.) #id:2d6
+
+📌 Tercera decisión, menú normal:
+[[Esperar en la fuente, donde la mamá podría volver|Fuente Esperar]] #id:2d7
+[[Buscar a alguien de seguridad|Fuente Seguridad]] #id:2e2
+[[Dejarse llevar por el pánico|Fuente Panico]] #id:2ee
+
+:: Fuente Esperar
+Alice: Tu mamá vino hasta la fuente. Si seguimos moviéndonos, igual nos la seguimos perdiendo. #id:2d8
+Lía: ¿Entonces? #id:2d9
+Alice: Esperamos. Aquí. Donde ella ya vino. #id:2da
+📌 time_passes
+(Pasan los minutos. Lía tararea algo bajito. Alice no reconoce la canción, pero la escucha.) #id:2db
+Lía: ¿Tienes papel? Para dibujar. Para que no pase tan lento. #id:2dc
+Alice: (en el fondo de la mochila hay una libreta vieja y un bolígrafo. Se los da.) #id:2dd
+(Lía dibuja con concentración absoluta. Ya no llora. Se le asoma la lengua por la comisura.) #id:2de
+Lía: (tapa la hoja con el brazo) ¡No mires! Todavía no. ✚
+Lía: ¿Tú sabes dibujar? #id:2df
+Alice: No mucho. #id:2e0
+Lía: Yo tampoco. Pero a mi mamá le gustan igual. ...Ya casi. #id:2e1
+📌 lia_confidence +2
+
+[[Continuar|Madre Llega]]
+
+:: Fuente Seguridad
+Alice: Vamos a buscar a alguien que sepa qué hacer. Alguien de seguridad. #id:2e3
+Lía: ¿Y si mi mamá vuelve y no me encuentra? #id:2e4
+Alice: Le decimos dónde vamos a estar. Para que sepa. #id:2e5
+(En el quiosco de información hay un señor mayor.) #id:2e6
+Alice: D-disculpe... esta niña se perdió. Su mamá tiene vestido rosa. La vieron por la fuente hace un rato. #id:2e7
+Señor: (saca una radio) Voy a avisar. Quédense aquí. #id:2e8
+📌 time_passes
+(Pasan los minutos. Lía no dice nada, pero no la suelta.) #id:2e9
+Lía: ¿Tienes algo para dibujar? Para no pensar. #id:2ea
+(Alice le da una libreta vieja y un bolígrafo. Lía dibuja rápido. Trazos pequeños, apretados.) #id:2eb
+Lía: ¿Tú también te pones así cuando estás nerviosa? #id:2ec
+Alice: Sí. #id:2ed
+Lía: ¿Y qué haces? ✚
+Alice: ...Me pongo los auriculares. ✚
+Lía: Pero si no escuchas nada. ✚
+Alice: (No. Pero ayuda.) ✚
+📌 Las cuatro líneas nuevas devuelven la burbuja de los auriculares del principio; ahora Lía la entiende un poco.
+📌 lia_confidence +1
+
+[[Continuar|Madre Llega]]
+
+:: Fuente Panico
+Alice: No sé... no sé dónde más buscar... #id:2ef
+Lía: (los ojos se le llenan de lágrimas) ¿Te vas a ir? #id:2f0
+Alice: No. No me voy. #id:2f1
+Alice: (pero las manos le tiemblan. La fuente le da vueltas.) #id:2f2
+Lía: (le aprieta la mano, muy seria) Mi mamá dice... dice que hay que soplar como si fueran velas. Así. #id:2f3 ✎
+(Lía sopla. Fuerte. Demasiado fuerte.) ✚
+📌 time_passes
+(Alice la imita. Una vela. Otra. El temblor no se va del todo, pero la plaza deja de girar.) #id:2f4 ✎
+📌 Antes: "Respira. Mi mamá dice que hay que respirar." Ahora es un recuerdo de niña ("velas"), no una instrucción.
+Lía: ¿Tienes papel? Cuando estoy nerviosa, mi mamá me deja dibujar. #id:2f5 ✎
+Lía: Dibuja tú también. ✚
+📌 Se quita "Si dibujamos juntas, las dos nos calmamos": era Lía haciendo de terapeuta.
+Alice: (saca una libreta arrugada. Dibuja algo torcido. Un círculo que quería ser un gato.) #id:2f6
+Lía: ¿Eso es un gato? #id:2f7
+Alice: Wilson. #id:2f8
+Lía: Está feo. #id:2f9
+Alice: Sí. #id:2fa
+(Pero las dos se ríen. Un poquito.) #id:2fb
+📌 lia_bittersweet · lia_confidence -1
+
+[[Continuar|Madre Llega]]
+
+:: Madre Llega
+Mamá de Lía: ¡LÍA! #id:2fc
+📌 lia_mom_arrives
+Lía: ¡MAMÁ! #id:2fd
+(Una mujer con vestido rosa. Se abrazan en medio de la plaza. La mamá llora. Lía llora.) #id:2fe
+
+[[Final feliz (esperar o seguridad)|Final Feliz]]
+[[Final agridulce (pánico)|Final Agridulce]]
+
+:: Final Feliz
+Mamá de Lía: ¿Eras tú? ¿Tú estabas con ella? #id:30a
+Alice: Sí. Estábamos... esperando. #id:30b
+Mamá de Lía: Gracias. Gracias, de verdad. No sabes cómo te lo agradezco. #id:30c
+Lía: Espera, espera. (saca el dibujo doblado y se lo da a Alice) #id:30d
+(Dos niñas de la mano. Una con gafas redondas y una mochila; la otra, más pequeña. Detrás, la fuente. Arriba, un sol enorme que ocupa media hoja. Abajo, con letra temblorosa: "ALICE Y LIA".) #id:30e ✎
+Lía: Es para que te acuerdes de mí. #id:30f
+Alice: (lo toma con cuidado) Gracias, Lía. #id:310
+Alice: (lo dobla por las mismas marcas y lo guarda en el bolsillo de dentro. No en la mochila. En el bolsillo.) ✚
+📌 lia_drawing_given
+Mamá de Lía: Vamos, pequeña. Ya es tarde. #id:311
+📌 lia_leaves
+(Lía se gira una vez. Y otra. Y otra más. Cada vez agita la mano con más fuerza.) #id:312 ✎
+Alice: (agita la suya. No tan fuerte. Pero la agita.) #id:313
+
+[[Continuar|Reloj Fuente]]
+
+:: Final Agridulce
+📌 La única diferencia con el final feliz es que Alice no consigue decir lo que siente al despedirse. La madre la agradece igual, el dibujo es el mismo regalo y Alice estuvo cuando hacía falta: no es un castigo por ponerse nerviosa.
+
+Mamá de Lía: ¿Eras tú? Lía dice que estuviste con ella todo el rato. Gracias. #id:2ff ✎
+Alice: (asiente. Quiere decir algo. No le sale.) #id:300 ✎
+Mamá de Lía: (le pone una mano en el hombro) Gracias, de verdad. #id:301 ✎
+📌 Se quita #id:302 "(pero siente que no pasó del todo. Algo en ella todavía tiembla.)": hacía que el final pesara como un fracaso.
+Lía: El dibujo. (lo saca del bolsillo y se lo da) #id:303
+(Dos niñas de la mano. Una con gafas redondas. Detrás, la fuente. Arriba, un sol enorme. Abajo: "ALICE Y LIA". Por detrás de la hoja, torcido, el gato de Alice.) #id:304 ✎
+Lía: Es para que te acuerdes de mí. #id:305 ✎
+Alice: (los dedos le tiemblan. Quiere decirle algo. Lo que sea. No le sale nada.) #id:306 ✎
+Alice: (lo dobla con cuidado y lo guarda en el bolsillo de dentro.) ✚
+📌 lia_drawing_given
+Mamá de Lía: Cuídate, Alice. #id:307
+📌 lia_leaves
+(Lía agita la mano desde el hombro de su mamá. Alice tarda en levantar la suya. Cuando lo hace, ya están lejos.) #id:308 ✎
+Alice: (No pude despedirme como quería. Pero al menos... ya está con su mamá.) #id:309 ✎
+📌 Antes: "(No ayudé bien. Pero ayudé.)"
+
+[[Continuar|Reloj Fuente]]
+
+:: Reloj Fuente
+📌 Común a los dos finales. Vuelve la música de la calle.
+
+Alice: (mira el reloj en la pared de la fuente. Se le hace un nudo en el estómago.) #id:314
+Alice: El metro... #id:315
+Alice: (suelta un juramento bajito que no se atrevería a decir si hubiera alguien cerca) #id:316
+Alice: (ya no corre. Sabe que no va a llegar.) #id:317
+
+[[Volver al metro|Acto5 Ultimo Tren]]
+[[Si de camino habla con los ayudantes (ya sin Lía)|Ayudantes Sin Lia]]
+
+:: Acto5 Ultimo Tren
+📌 ACTO 5. Alice vuelve a la entrada del metro, más lenta. Anochece.
+
+(La reja está bajada. "Último tren: 21:30". Se fue hace diez minutos.) #id:318
+Alice: (se queda frente a la entrada cerrada, sin saber qué hacer) #id:319
+Alice: (No tengo dinero. No tengo teléfono. No sé dónde estoy.) #id:31a
+Alice: (Y ahora, ni siquiera tengo el metro.) #id:31b
+Alice: (aprieta el dibujo de Lía contra el pecho) #id:31c
+Alice: Ayudé a alguien. Eso hice. #id:31d
+📌 Se quita #id:31e "(No sabe si fue suficiente. Pero fue algo.)": el dibujo contra el pecho ya lo dice.
+📌 headphones_on
+Alice: (se pone los auriculares) #id:31f
+
+[[Fundido a negro|Transicion Clara]]
+
+:: Transicion Clara
+📌 Interludio en negro (NIGHT_LINES, existentes; solo cambia la línea del bolsillo):
+
+Alice da la vuelta a la estación cerrada. La noche empieza a caer.
+Las calles se ven diferentes sin la luz del sol. O tal vez es ella, que las mira con otros ojos.
+Tiene el número de Leo y el dibujo de Lía en el bolsillo. ✎
+Tiene hambre. Tiene frío. No sabe dónde va a dormir.
+Pero algo en su pecho no es miedo. No del todo.
+Camina sin rumbo, buscando algún lugar con luz. Y entonces, escucha una voz.
+No llora. Canta.
+
+📌 La línea del bolsillo cambia (antes: "Tiene el número de Leo en el bolsillo. Tiene el dibujo de Lía en la mochila."): en los dos finales Alice guarda el dibujo en el bolsillo de dentro.
+
+(Siguiente escena: Clara)

@@ -24,6 +24,23 @@ columna "Origen" (autor-título-id de Pixabay).
 | sfx/breathing_loop.ogg | lexieva — heavy-girl-breathing-149496 | bucle |
 | sfx/footstep_1..4.ogg | freesound_community — pasos-steps-40285 (Pixabay) | 4 pasos sueltos (los de volumen más parejo), recortados, mismo volumen |
 
+## Efectos de ElevenLabs (Sound Effects, generados por nosotros)
+
+| Archivo | Prompt | Cambios |
+|---|---|---|
+| sfx/lia_crying_loop.ogg | "A 7-year-old girl quietly crying to herself, soft whimpers, wet runny-nose sniffles and snorts, shaky breathing, small hiccup sobs, not loud, not wailing, close and intimate, natural" (v3, Loop On, 14.9 s; variante #2 de 4) | WAV 48 kHz → mono, −21.7 LUFS, pico −4 dB, sin recortar (es un bucle continuo); importado con Loop activado |
+
+## Efectos de Freesound (CC0, dominio público, sin atribución)
+
+| Archivo | Origen | Cambios |
+|---|---|---|
+| sfx/pigeon_coo_1.ogg | 5ro4 — pigeon walking and cooing (freesound.org/s/701282, CC0) | 6.00–7.75 s, filtro 180 Hz–3.5 kHz + reducción de ruido (pasos), fundidos, −20 LUFS |
+| sfx/pigeon_coo_2.ogg | ídem | 19.55–21.20 s, mismo proceso |
+| sfx/pigeon_coo_3.ogg | ídem | 8.10–11.75 s (doble arrullo), mismo proceso |
+| sfx/pigeon_takeoff.ogg | Kinoton — Pigeon, Flies Away, Flapping Wings (freesound.org/s/689998, CC0) | 0.10–3.60 s, fundido de salida 0.6 s, −18 LUFS |
+
+Bajados de la vista previa pública HQ de Freesound (MP3 ~128 kbps), no del original.
+
 ## Música
 
 Toda la música es propia, creada con ElevenLabs Music (2026-11-11). Se pasó de

@@ -70,6 +70,6 @@ func _frame_height(sprite: Node2D) -> float:
 		var animated := sprite as AnimatedSprite2D
 		if animated.sprite_frames == null or not animated.sprite_frames.has_animation(animated.animation):
 			return 0.0
-		var frame := animated.sprite_frames.get_frame_texture(animated.animation, 0)
-		return frame.get_height() if frame else 0.0
+		var first_frame := animated.sprite_frames.get_frame_texture(animated.animation, 0)
+		return float(first_frame.get_height()) if first_frame else 0.0
 	return 0.0

@@ -74,7 +74,9 @@ var _paused_for_player: bool = false
 # =========================
 # Pausing near Alice
 # =========================
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if _trail_leader != null:
+		_walk_the_trail(delta)
 	if pause_near_player <= 0.0 or _walk_tween == null or not _walk_tween.is_valid():
 		return
 	var player := get_tree().get_first_node_in_group("player") as Node2D
@@ -245,6 +247,103 @@ func _patrol_circuit(points: Array[Vector2]) -> void:
 			await get_tree().create_timer(_rest_time()).timeout
 
 # =========================
+# Following someone's trail
+# =========================
+## Walks behind leader (e.g. Lía holding Alice's sleeve) along the path the
+## leader actually took: the leader's positions are kept as a trail and this
+## NPC heads for the point `gap` px back along it, so it only steps where the
+## leader already stepped and never cuts a corner through a wall or jumps to
+## the other side when the leader turns. It moves with move_and_slide against
+## the world (collision mask 1) and is not solid itself, so it never blocks
+## the leader. If it is ever stuck far behind, it hops onto the trail.
+func follow_trail(leader: Node2D, gap: float, max_speed: float) -> void:
+	stop_following()
+	_trail_leader = leader
+	_trail_gap = gap
+	_trail_speed = max_speed
+	_trail = PackedVector2Array([global_position, leader.global_position])
+	_trail_stuck_time = 0.0
+	collision_layer = 0
+	collision_mask = SOLID_COLLISION_LAYER
+
+func stop_trail() -> void:
+	_trail_leader = null
+	velocity = Vector2.ZERO
+
+func is_on_trail() -> bool:
+	return _trail_leader != null
+
+var _trail_leader: Node2D
+var _trail := PackedVector2Array()
+var _trail_gap: float = 24.0
+var _trail_speed: float = 120.0
+var _trail_stuck_time: float = 0.0
+## The leader leaves a trail point every few px; enough of them are kept to
+## cover a long detour.
+const TRAIL_STEP: float = 3.0
+const TRAIL_MAX_POINTS: int = 600
+## Closer than this to its spot it stands still.
+const TRAIL_SETTLE: float = 2.0
+## How fast it closes the gap (higher = tighter).
+const TRAIL_STIFFNESS: float = 8.0
+## Stuck (barely moving while far behind) this long: it hops onto the trail.
+const TRAIL_STUCK_LIMIT: float = 1.2
+
+func _walk_the_trail(delta: float) -> void:
+	if not is_instance_valid(_trail_leader):
+		stop_trail()
+		return
+	var lead := _trail_leader.global_position
+	if lead.distance_to(_trail[_trail.size() - 1]) >= TRAIL_STEP:
+		_trail.append(lead)
+		if _trail.size() > TRAIL_MAX_POINTS:
+			_trail.remove_at(0)
+	var target := _trail_point_behind(_trail_gap)
+	var to_target := target - global_position
+	if to_target.length() <= TRAIL_SETTLE:
+		velocity = Vector2.ZERO
+		_trail_stuck_time = 0.0
+		face_direction(_trail_heading())
+		return
+	var before := global_position
+	velocity = to_target.normalized() * minf(_trail_speed, to_target.length() * TRAIL_STIFFNESS)
+	move_and_slide()
+	var moved := global_position - before
+	if moved.length() > 0.05:
+		play_move(moved)
+	# Pushed against something while the leader gets away: catch up.
+	if moved.length() < 0.2 and to_target.length() > _trail_gap * 2.0:
+		_trail_stuck_time += delta
+		if _trail_stuck_time >= TRAIL_STUCK_LIMIT:
+			global_position = target
+			_trail_stuck_time = 0.0
+	else:
+		_trail_stuck_time = 0.0
+
+## The point `distance` px back along the trail from the leader (or the
+## oldest one if the trail is shorter).
+func _trail_point_behind(distance: float) -> Vector2:
+	var left := distance
+	var i := _trail.size() - 1
+	var point := _trail[i]
+	while i > 0:
+		var previous := _trail[i - 1]
+		var step := point.distance_to(previous)
+		if step >= left:
+			return point.move_toward(previous, left)
+		left -= step
+		point = previous
+		i -= 1
+	return point
+
+## Which way the leader was last going (to look that way when standing).
+func _trail_heading() -> Vector2:
+	var n := _trail.size()
+	if n < 2:
+		return facing
+	return _trail[n - 2].direction_to(_trail[n - 1])
+
+# =========================
 # Following someone
 # =========================
 func _rest_time() -> float:
@@ -260,6 +359,7 @@ func _rest_time() -> float:
 ## leg, towards the next point). Call stop_following() before moving it by
 ## script.
 func follow(leader: Node2D, offset: Vector2 = Vector2(14, 4)) -> void:
+	stop_trail()
 	_leader = leader
 	_follow_offset = offset
 	_leader_last_position = leader.global_position

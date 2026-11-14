@@ -1,0 +1,9 @@
+if {GameManager.lia_met_dog_lady}:
+	lady_with_dog: ¡Eh! ¿Encontró a su mamá la pequeña? #id:3c1
+	join alice (relaxed) leftmost
+	alice: Sí. En la fuente. #id:3c2
+	(Toby le da un golpecito en la mano con el hocico, como si también quisiera saberlo.) #id:3c3
+	leave alice
+else:
+	lady_with_dog: (sin aliento) Última vuelta y a casa... #id:3c4
+	(Toby le olfatea los zapatos a Alice y sale detrás de su dueña.) #id:3c5

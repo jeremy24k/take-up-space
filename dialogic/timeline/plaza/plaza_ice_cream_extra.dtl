@@ -1,0 +1,14 @@
+(El señor de los helados las ve llegar y levanta una ceja.) #id:380
+ice_cream_man: ¿Qué tal, pequeña? ¿Nada todavía? #id:381
+join lia (happy) rightmost
+join alice (neutral) leftmost
+lia: ¡Ya sabemos que se fue a la fuente! #id:382
+ice_cream_man: ¿Ah, sí? Pues vais bien. Yo también la vi ir para allá, con su vestido rosa. #id:383
+update alice (relaxed)
+alice: (Tres personas la han visto ir a la fuente. Ya no puede ser casualidad.) #id:384
+ice_cream_man: (le guiña un ojo a Lía) El helado sigue en pie, ¿eh? Para cuando vengas con tu mamá. #id:385
+lia: ¡De chocolate! #id:386
+alice: (sonríe sin darse cuenta) #id:387
+leave alice
+leave lia
+[signal arg="lia_extra:ice_cream"]

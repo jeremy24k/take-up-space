@@ -1,23 +1,34 @@
 (Una mujer joven que sale a correr con un perro enorme se para a tomar aire. El perro las ve y viene directo hacia ellas, moviendo la cola.) #id:335
 [signal arg="toby_comes"]
+join alice (scared) leftmost
 alice: (se queda tiesa. El perro le olfatea las rodillas.) #id:336
 [signal arg="lia_lets_go"]
+join lia (happy) rightmost
 lia: (le suelta la manga) ¡Un perrito! ¡Es enorme! ¿Cómo se llama? #id:337
 lady_with_dog: Toby. No se preocupen, es un trozo de pan. #id:338
 (Toby se apoya contra las piernas de Alice. Pesa. Está caliente. No se aparta.) #id:339
 alice: (No te muevas. No te muevas.) #id:33a
 (Lía le rasca las orejas a Toby y se ríe. Ya no se acuerda de nada más.) #id:33b
 - Preguntar igual, con el perro encima #id:33c
+	update alice (nervous)
 	alice: P-perdón... ¿vio a una señora con vestido rosa? Es la mamá de ella. #id:33d
 	[signal arg="lia_confidence:1"]
 - Apartarse un paso antes de hablar #id:33e
+	update alice (nervous)
 	alice: (da un paso atrás. Toby la sigue. Otro paso. Toby también.) #id:33f
 	lady_with_dog: (tira de la correa, apenada) Perdona, es que le caes bien. #id:340
 	alice: ...¿Vio a una señora con vestido rosa? Es la mamá de ella. #id:341
 lady_with_dog: Ay, sí. Hace un rato. Iba muy preocupada, preguntando por una niña. #id:342
 lady_with_dog: Se fue hacia la fuente. #id:343
+if {GameManager.lia_knows_fountain}:
+	lia: (sin dejar de rascarle las orejas) A la fuente. Eso ya lo sabíamos. Pero Toby no, ¿a que no, Toby? #id:3b5
+	(Toby mueve la cola, como si lo supiera desde siempre.) #id:3b6
+update alice (neutral)
 alice: Lía. Lía, vamos. #id:344
 lia: (abraza a Toby una última vez) ¡Adiós, Toby! #id:345
 [signal arg="lia_holds_on"]
+update alice (relaxed)
 alice: (vuelve a sentir la mano de Lía en la manga. Casi le alivia.) #id:346
+leave alice
+leave lia
 [signal arg="lia_clue:dog_lady"]

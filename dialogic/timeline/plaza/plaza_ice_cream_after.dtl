@@ -1,0 +1,11 @@
+if {GameManager.lia_met_ice_cream}:
+	ice_cream_man: ¿La encontró? ¿A su mamá? #id:3bc
+	join alice (relaxed) leftmost
+	alice: (asiente. Le sale una sonrisa pequeña.) Sí. #id:3bd
+	ice_cream_man: Pues eso se merece un helado. Otro día, ¿eh? #id:3be
+	leave alice
+else:
+	ice_cream_man: Ya estoy recogiendo, pero si quieres uno de fresa, te lo pongo rápido. #id:3bf
+	join alice (neutral) leftmost
+	alice: (niega con la cabeza. Hoy no.) #id:3c0
+	leave alice
