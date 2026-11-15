@@ -21,7 +21,7 @@ alice: (No te muevas. No te muevas.) #id:33a
 lady_with_dog: Ay, sí. Hace un rato. Iba muy preocupada, preguntando por una niña. #id:342
 lady_with_dog: Se fue hacia la fuente. #id:343
 if {GameManager.lia_knows_fountain}:
-	lia: (sin dejar de rascarle las orejas) A la fuente. Eso ya lo sabíamos. Pero Toby no, ¿a que no, Toby? #id:3b5
+	lia: (sin dejar de rascarle las orejas) A la fuente. Eso ya lo sabíamos. Pero Toby no, ¿verdad que no, Toby? #id:3b5
 	(Toby mueve la cola, como si lo supiera desde siempre.) #id:3b6
 update alice (neutral)
 alice: Lía. Lía, vamos. #id:344

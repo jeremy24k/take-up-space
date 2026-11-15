@@ -24,7 +24,7 @@ const EARLY: Array = [
 	["¿Por qué caminas tan rápido?", "Perdón."],
 ]
 const MIDDLE: Array = [
-	["¡Mira! ¡Una paloma!", "Es la quinta que me enseñas."],
+	["¡Mira! ¡Una paloma!", "Es la quinta que me muestras."],
 	["¿Crees que ese señor conocía a mi mamá?", "No lo sé. Pero la vio. Algo es algo."],
 	["Mi mamá tiene un vestido rosa. ¿Ya te lo dije?", "Unas cuantas veces. Rosa. Lo tengo."],
 	["¿Tu gato sabe hacer trucos?", "Sabe esconder zapatos."],
@@ -35,7 +35,7 @@ const LATE: Array = [
 	["¿Falta mucho para la fuente?", "Ya casi. ¿Estás cansada?"],
 	["¿Tienes miedo? Yo un poquito.", "Yo también. Un poquito."],
 	["¿Y si mi mamá ya se fue a casa?", "No creo que se haya ido. Todavía nos queda buscarla."],
-	["Tengo un poquito de hambre.", "Yo también. Luego buscamos algo, ¿vale?"],
+	["Tengo un poquito de hambre.", "Yo también. Luego buscamos algo, ¿sí?"],
 	["Ya casi no tengo ganas de llorar.", "Si te vuelven las ganas, no pasa nada."],
 	["¿Tú te habías perdido antes? Antes de hoy, digo.", "Sí. Aunque normalmente me las arreglo sola."],
 ]

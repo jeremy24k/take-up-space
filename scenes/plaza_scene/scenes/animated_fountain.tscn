@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" uid="uid://ytlxjd0ggr0u" path="res://scenes/street_scenes/assets/fountain_water.aseprite" id="1_frames"]
+[ext_resource type="AudioStream" uid="uid://ds4pvpfq034ja" path="res://audio/ambience/plaza_fountain_loop.ogg" id="2_water"]
+[ext_resource type="Script" path="res://global/random_start_sound_2d.gd" id="3_sound"]
+
+[node name="AnimatedFountain" type="AnimatedSprite2D"]
+texture_filter = 1
+sprite_frames = ExtResource("1_frames")
+animation = &"flow"
+autoplay = "flow"
+centered = false
+offset = Vector2(0, -101)
+
+[node name="Collision" type="StaticBody2D" parent="."]
+position = Vector2(0, -101)
+
+[node name="Shape" type="CollisionPolygon2D" parent="Collision"]
+polygon = PackedVector2Array(16, 45.2, 32, 36.9, 80, 36.9, 96, 45.2, 96, 48, 102.2, 48, 112, 53.5, 112, 89.6, 100.6, 96, 96, 96, 96, 97.9, 80, 106, 80, 106.9, 70.2, 112, 41.8, 112, 32, 106.9, 32, 106, 16, 97.9, 16, 96, 11.4, 96, 0, 89.6, 0, 53.5, 9.8, 48, 16, 48)
+
+[node name="WaterSound" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(64, -45)
+stream = ExtResource("2_water")
+volume_db = 5.0
+max_distance = 300.0
+attenuation = 1.5
+panning_strength = 0.5
+bus = &"Ambience"
+script = ExtResource("3_sound")

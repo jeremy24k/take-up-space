@@ -75,11 +75,11 @@ alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 	lia: (la mira con los ojos muy abiertos) ¿Tú también estás asustada? #id:298
 	update lia (happy)
 	lia: Mi mamá dice que cuando uno está asustado hay que respirar. Así. #id:299
-	(Lía toma tanto aire que se le inflan los cachetes. Lo suelta de golpe, con ruido, como un globo que se desinfla.) #id:29a
+	(Lía toma tanto aire que se le inflan las mejillas. Lo suelta de golpe, con ruido, como un globo que se desinfla.) #id:29a
 	lia: ¿Funcionó? #id:377
 	update alice (relaxed)
-	alice: ...Un poco. Sí, estoy asustada. Pero igual vamos a buscar. #id:29b
-	lia: Vale. Si estamos las dos, menos asustadas. #id:29c
+	alice: ...Un poco. Sí, estoy asustada. Pero aun así vamos a buscar. #id:29b
+	lia: Bueno. Si estamos las dos, menos asustadas. #id:29c
 	lia: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por allá, hacia la plaza. #id:29d
 	alice: Perfecto. Vamos a buscar a la señora del vestido rosa. #id:29e
 	[signal arg="lia_confidence:1"]
@@ -141,7 +141,7 @@ lia: Mi mamá se fue hacia la plaza. Dijo que iba a comprar algo rápido. Pero n
 update lia (happy)
 lia: Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí? #id:2bb
 update alice (neutral)
-alice: ...Vale. Buscamos a tu mamá. #id:37b
+alice: ...Está bien. Buscamos a tu mamá. #id:37b
 update alice (worried)
 alice: (No sabe muy bien por qué ha dicho que sí. Quizá porque decir que no le cuesta más.) #id:37c
 leave lia

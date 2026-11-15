@@ -54,12 +54,12 @@ update leo (friendly)
 leo: Justo. Ni una moneda más. #id:f9
 alice: (guarda la lata en la mochila) #id:fa
 leo: Para volver... el metro de esta calle es de la línea que termina aquí, en la terminal. #id:fb
-leo: Mejor camina derecho hasta la plaza. Ahí pasa la otra línea, la que va al centro. Desde ahí seguro te ubicas. #id:fc
+leo: Mejor camina derecho hasta la plaza. Ahí pasa la otra línea, la que va al centro. Desde ahí seguro que te orientas. #id:fc
 join alice (relaxed) leftmost
 alice: (siente un alivio enorme) #id:fd
 update leo (thinking)
 leo: Aunque... ¿sabes bien la dirección? Por si necesitas algo más exacto. #id:fe
-alice: Eh... es un edificio gris. Con un balcón chiquito. Hay un árbol enfrente... #id:ff
+alice: Eh... es un edificio gris. Con un balcón pequeño. Hay un árbol enfrente... #id:ff
 update leo (laughing)
 leo: (sonríe) ¿No sabes el nombre de tu calle? #id:100
 update alice (nervous)

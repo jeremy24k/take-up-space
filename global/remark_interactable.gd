@@ -83,6 +83,14 @@ func _start_dialogue(timeline: Variant) -> void:
 		set_deferred("monitoring", false)
 	Dialogic.start(timeline)
 
+## Swaps in other lines (the story moved on) and starts again from the
+## first one. Same lines: nothing changes.
+func set_lines(new_lines: Array[String]) -> void:
+	if lines == new_lines:
+		return
+	lines = new_lines.duplicate()
+	_next_line = 0
+
 func _pick_line() -> String:
 	if pool:
 		return pool.pick_line()

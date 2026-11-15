@@ -27,19 +27,6 @@ const FOOTSTEP_PITCH_RANGE := Vector2(0.92, 1.08)
 ## No two steps closer than this (s): a quick turn could still land on a step
 ## frame right after the last step.
 const FOOTSTEP_MIN_GAP: float = 0.25
-## Behind something tall (the glass tower) Alice would vanish: a flat,
-## see-through copy of her shape is drawn over the scenery instead
-## (set_silhouette, switched on by a SilhouetteZone).
-const SILHOUETTE_COLOR := Color(0.78, 0.7, 1.0, 0.7)
-const SILHOUETTE_Z: int = 20
-const SILHOUETTE_FADE: float = 0.15
-const SILHOUETTE_SHADER := """
-shader_type canvas_item;
-uniform vec4 tint : source_color;
-void fragment() {
-	COLOR = vec4(tint.rgb, texture(TEXTURE, UV).a * tint.a);
-}
-"""
 
 @onready var player_animation: AnimatedSprite2D = $AnimatedSprite2D
 @onready var interaction_detector: Area2D = $InteractionDetector
@@ -59,6 +46,10 @@ void fragment() {
 @export var step_frames: Array[int] = [0, 3]
 @export_range(-40.0, 12.0, 0.5, "suffix:dB") var footstep_volume_db: float = -12.0
 
+## When something tall hides her (a building, a tree, the glass tower), her
+## silhouette shows on the hidden part (AliceXray, global/alice_xray.gd).
+@export var xray_silhouette: bool = true
+
 var _footstep_player: AudioStreamPlayer
 var _last_footstep: int = -1
 var _last_footstep_time: float = -INF
@@ -72,8 +63,6 @@ var can_move: bool = true
 var is_control_locked: bool = false  # True while a scripted sequence owns the player.
 ## Walking speed multiplier, e.g. slower while Lía holds her sleeve.
 var speed_scale: float = 1.0
-var _silhouette: AnimatedSprite2D
-var _silhouette_tween: Tween
 
 # =========================
 # Setup and dialogue hooks
@@ -94,7 +83,9 @@ func _ready() -> void:
 	# A new step never cuts the tail of the previous one.
 	_footstep_player.max_polyphony = 2
 	add_child(_footstep_player)
-	_make_silhouette()
+	if xray_silhouette:
+		# Deferred: the scene has to be in the tree to find its characters.
+		_make_xray.call_deferred()
 	_refresh_outfit()
 
 ## Flip has no signal; it is set in _physics_process, before this runs.
@@ -247,8 +238,8 @@ func _refresh_outfit() -> void:
 ## Every layer shows the same animation, frame and flip as the body, so code
 ## only ever drives player_animation (play_animation, face_direction...).
 func _sync_outfit() -> void:
-	for layer in outfit_layers + [_silhouette]:
-		if layer == null or not layer.visible:
+	for layer in outfit_layers:
+		if not layer.visible:
 			continue
 		if layer.animation != player_animation.animation:
 			layer.animation = player_animation.animation
@@ -256,35 +247,12 @@ func _sync_outfit() -> void:
 		layer.flip_h = player_animation.flip_h
 
 # =========================
-# Silhouette
+# X-ray silhouette
 # =========================
-func _make_silhouette() -> void:
-	_silhouette = AnimatedSprite2D.new()
-	_silhouette.sprite_frames = player_animation.sprite_frames
-	_silhouette.centered = player_animation.centered
-	_silhouette.offset = player_animation.offset
-	_silhouette.z_index = SILHOUETTE_Z
-	var shader := Shader.new()
-	shader.code = SILHOUETTE_SHADER
-	var silhouette_material := ShaderMaterial.new()
-	silhouette_material.shader = shader
-	silhouette_material.set_shader_parameter("tint", SILHOUETTE_COLOR)
-	_silhouette.material = silhouette_material
-	_silhouette.modulate.a = 0.0
-	_silhouette.hide()
-	player_animation.add_child(_silhouette)
-
-## Shows or hides Alice's silhouette over the scenery (see SILHOUETTE_COLOR).
-func set_silhouette(shown: bool) -> void:
-	if _silhouette_tween:
-		_silhouette_tween.kill()
-	if shown:
-		_silhouette.show()
-		_sync_outfit()
-	_silhouette_tween = create_tween()
-	_silhouette_tween.tween_property(_silhouette, "modulate:a", 1.0 if shown else 0.0, SILHOUETTE_FADE)
-	if not shown:
-		_silhouette_tween.tween_callback(_silhouette.hide)
+func _make_xray() -> void:
+	var xray := AliceXray.new()
+	add_child(xray)
+	xray.setup(self, player_animation, outfit_layers)
 
 # =========================
 # Cutscene camera

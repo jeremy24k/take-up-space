@@ -38,6 +38,7 @@ columna "Origen" (autor-título-id de Pixabay).
 | sfx/pigeon_coo_2.ogg | ídem | 19.55–21.20 s, mismo proceso |
 | sfx/pigeon_coo_3.ogg | ídem | 8.10–11.75 s (doble arrullo), mismo proceso |
 | sfx/pigeon_takeoff.ogg | Kinoton — Pigeon, Flies Away, Flapping Wings (freesound.org/s/689998, CC0) | 0.10–3.60 s, fundido de salida 0.6 s, −18 LUFS |
+| ambience/plaza_fountain_loop.ogg | Legnalegna55 — AQUARIUM sound (freesound.org/s/554127, CC0; elegido por el usuario en Pixabay como freesound_community — aquarium-sound-6891, licencia de contenido de Pixabay) | Sustituye a la fuente anterior (2026-11-15, más sutil). Mono, paso alto 70 Hz, 217–267 s → bucle de 50 s con fundido cruzado de 4 s, −28 LUFS (24 kHz, como el original); importado con Loop |
 
 Bajados de la vista previa pública HQ de Freesound (MP3 ~128 kbps), no del original.
 

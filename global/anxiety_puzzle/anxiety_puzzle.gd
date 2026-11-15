@@ -26,6 +26,14 @@ const HINT_BLINKS: int = 3
 ## in place of the prompt. Without it the reshuffle looked like a glitch.
 const STUMBLE_LINE := "No... así no."
 const STUMBLE_LINE_TIME: float = 1.2
+## Alice's reactions (the stumble, the time running out) show big in the
+## middle of the cloud, where the words were, not up in the prompt: there
+## they went unnoticed (2026-11-15). They pop in from POP_FROM scale.
+const CENTER_LINE_FONT_SIZE: int = 72
+const CENTER_LINE_POP_FROM: float = 0.6
+const CENTER_LINE_POP_TIME: float = 0.22
+const CENTER_LINE_FADE: float = 0.2
+const WORDS_ASIDE_FADE: float = 0.15
 ## Thoughts that crowd in while she tries to talk. Real puzzles only: they
 ## float as distractors and swap in and out with the extra_words.
 const INTRUSIVE_THOUGHTS: PackedStringArray = [
@@ -82,6 +90,8 @@ const TIME_OUT_LINES: PackedStringArray = [
 	"(Abre la boca. Ya es tarde.)",
 ]
 const TIME_OUT_HOLD: float = 1.4
+## The words sink and fade first; then her line shows in the middle.
+const TIME_OUT_SINK_TIME: float = 0.5
 const TIME_OUT_SINK: float = 24.0
 ## Right after it opens, Space does nothing for a moment: a press meant to
 ## finish reading the last line must not say the word already selected.
@@ -110,6 +120,7 @@ var _breathing: AudioStreamPlayer
 var _swappable: Array[ThoughtWord] = []
 var _swap_timer: float = 0.0
 var _beat_phase: float = 0.0
+var _center_line: Label
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -398,13 +409,16 @@ func _stumble() -> void:
 	if not _data.relaxed:
 		_time_left -= _data.mistake_penalty
 	sentence_line.modulate = STUMBLE_COLOR
-	_show_stumble_line()
 	var start := sentence_line.position
 	var tween := create_tween()
 	for step in [9, -9, 6, -6, 3, 0]:
 		tween.tween_property(sentence_line, "position:x", start.x + step, 0.04)
-	tween.tween_interval(0.25)
 	await tween.finished
+	# The words step aside and her reaction takes their place for a moment.
+	await _words_aside()
+	await _show_center_line(STUMBLE_LINE, STUMBLE_LINE_TIME, true)
+	if _done:
+		return
 	for child in sentence_line.get_children():
 		child.queue_free()
 	sentence_line.modulate = Color.WHITE
@@ -413,12 +427,53 @@ func _stumble() -> void:
 	_accepting = not _done
 	_blink_answer_starts()
 
-## Shows Alice's reaction where the prompt is, then puts the prompt back.
-func _show_stumble_line() -> void:
-	prompt_label.text = STUMBLE_LINE
-	await get_tree().create_timer(STUMBLE_LINE_TIME).timeout
-	if is_instance_valid(prompt_label) and not _done:
-		prompt_label.text = _data.prompt
+## Fades every word out quickly (they come back with the next scatter).
+func _words_aside() -> void:
+	var fade := create_tween().set_parallel(true)
+	for word in _words:
+		if word.visible:
+			word.release_focus()
+			fade.tween_property(word, "modulate:a", 0.0, WORDS_ASIDE_FADE)
+	await fade.finished
+
+## Alice's reaction big in the middle of the cloud: it pops in (and shakes a
+## little after a mistake), holds, and fades out. Await it.
+func _show_center_line(text: String, hold: float, shake: bool) -> void:
+	if _center_line == null:
+		_center_line = Label.new()
+		_center_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_center_line.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_center_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_center_line.add_theme_font_override("font", FONT)
+		_center_line.add_theme_font_size_override("font_size", CENTER_LINE_FONT_SIZE)
+		_center_line.add_theme_color_override("font_outline_color", WORD_OUTLINE_COLOR)
+		_center_line.add_theme_constant_override("outline_size", WORD_OUTLINE_SIZE)
+		_center_line.add_theme_color_override("font_color", prompt_label.get_theme_color("font_color"))
+		_center_line.position = CLOUD_RECT.position
+		_center_line.size = CLOUD_RECT.size
+		_center_line.pivot_offset = CLOUD_RECT.size / 2.0
+		_center_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		root.add_child(_center_line)
+	_center_line.text = text
+	_center_line.show()
+	_center_line.modulate.a = 0.0
+	_center_line.scale = Vector2.ONE * CENTER_LINE_POP_FROM
+	_center_line.position = CLOUD_RECT.position
+	var pop := create_tween().set_parallel(true)
+	pop.tween_property(_center_line, "modulate:a", 1.0, CENTER_LINE_FADE)
+	pop.tween_property(_center_line, "scale", Vector2.ONE, CENTER_LINE_POP_TIME) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	await pop.finished
+	if shake:
+		var shaking := create_tween()
+		for step in [6, -6, 4, -4, 2, 0]:
+			shaking.tween_property(_center_line, "position:x", CLOUD_RECT.position.x + step, 0.04)
+		await shaking.finished
+	await get_tree().create_timer(hold).timeout
+	var out := create_tween()
+	out.tween_property(_center_line, "modulate:a", 0.0, CENTER_LINE_FADE)
+	await out.finished
+	_center_line.hide()
 
 ## Second hint: after a mistake (or from the start, in a tutorial puzzle), the
 ## words every answer starts with blink, so the player knows where to begin
@@ -519,15 +574,15 @@ func _run_out_of_time() -> void:
 	if _done or not _accepting:
 		return
 	_accepting = false
-	prompt_label.text = _next_time_out_line()
 	var sink := create_tween().set_parallel(true)
 	for word in _words:
 		if word.visible:
 			word.release_focus()
-			sink.tween_property(word, "modulate:a", 0.0, TIME_OUT_HOLD * 0.6)
-			sink.tween_property(word, "base_position:y", word.base_position.y + TIME_OUT_SINK, TIME_OUT_HOLD * 0.6)
-	sink.tween_property(sentence_line, "modulate:a", 0.0, TIME_OUT_HOLD * 0.6)
-	await get_tree().create_timer(TIME_OUT_HOLD).timeout
+			sink.tween_property(word, "modulate:a", 0.0, TIME_OUT_SINK_TIME)
+			sink.tween_property(word, "base_position:y", word.base_position.y + TIME_OUT_SINK, TIME_OUT_SINK_TIME)
+	sink.tween_property(sentence_line, "modulate:a", 0.0, TIME_OUT_SINK_TIME)
+	await sink.finished
+	await _show_center_line(_next_time_out_line(), TIME_OUT_HOLD, false)
 	_finish(SILENCE)
 
 # =========================

@@ -20,7 +20,7 @@ const LINES := {
 		"late": {"lia": ["¿Tú tienes animales?", "Yo quiero un perro, pero mi mamá dice que la casa es pequeña."], "alice": "Yo tengo un gato. Cabe en cualquier sitio."},
 	},
 	"CoffeeBoard": {
-		"early": {"lia": ["¿Qué pone ahí?", "Yo leo despacito."], "alice": "Pone «café»."},
+		"early": {"lia": ["¿Qué dice ahí?", "Yo leo despacito."], "alice": "Dice «café»."},
 		"late": {"lia": ["Ca... fé.", "¡Lo leí sola!"], "alice": "Muy bien. Más rápido que yo."},
 	},
 	"IceCreamVan": {
@@ -38,8 +38,8 @@ const LINES := {
 		"late": {"lia": ["Cuando encontremos a mi mamá, podemos hacer un picnic.", "Tú también vienes."], "alice": "...Ya veremos."},
 	},
 	"RedBike": {
-		"early": {"lia": ["¡Una bici roja!", "Cuando sea mayor voy a tener una igual."], "alice": ""},
-		"late": {"lia": ["¿Tú sabes ir en bici?"], "alice": "Sé caerme. Eso se me da muy bien."},
+		"early": {"lia": ["¡Una bici roja!", "Cuando sea grande voy a tener una igual."], "alice": ""},
+		"late": {"lia": ["¿Tú sabes ir en bici?"], "alice": "Sé caerme. En eso soy muy buena."},
 	},
 	"GardenTables": {
 		"early": {"lia": ["¿Esos dos son novios?"], "alice": "No lo sé. No mires tanto."},
@@ -54,7 +54,7 @@ const LINES := {
 	},
 	"AdColumn": {
 		"early": {"lia": ["¿Por qué esa columna tiene papeles pegados?"], "alice": "Son anuncios."},
-		"late": {"lia": ["Cuando sea mayor voy a poner un anuncio. «Se busca mamá».", "...No, mejor no."], "alice": "Mejor no. Seguimos buscando."},
+		"late": {"lia": ["Cuando sea grande voy a poner un anuncio. «Se busca mamá».", "...No, mejor no."], "alice": "Mejor no. Seguimos buscando."},
 	},
 }
 

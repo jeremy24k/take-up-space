@@ -311,11 +311,11 @@ player.play_animation("sit_down", "idle_front")   # el 2º es fallback si no exi
 `lock_control()` sobrevive a un diálogo que ocurra dentro de la cutscene: al
 terminar el diálogo, Alice sigue bloqueada hasta que llames `unlock_control()`.
 
-**Silueta** (2026-11-14): `set_silhouette(true/false)` muestra u oculta una
-copia plana y semitransparente de su forma (`_silhouette`, creada en código:
-un `AnimatedSprite2D` hijo del cuerpo con un shader de color plano,
-`SILHOUETTE_COLOR`, `z_index` 20) que `_sync_outfit()` mantiene en la misma
-animación y frame. La enciende una `SilhouetteZone` (sección 5).
+**Silueta** (2026-11-15): con `xray_silhouette` (export, activado) el Player
+crea un `AliceXray` (sección 5) al empezar cada escena. En todo el juego,
+cuando algo alto la tapa, se ve su silueta lila justo en la parte tapada.
+(Sustituye a `set_silhouette` y `SilhouetteZone`, que solo servían en la
+torre de cristal.)
 
 **Sprite por capas (2026-10-25).** Alice se dibuja desde un solo archivo,
 `player/alice.aseprite`, con cinco capas: `body` (Alice descalza), `backpack`,
@@ -424,14 +424,50 @@ puerta del salón al baño del piso (`BathroomPassage` en `apartment.tscn`):
 el pasillo entre las dos habitaciones está tapado por baldosas negras de
 `SuperiorLayer` y Alice desaparecía unos 60 px.
 
-### `SilhouetteZone` (`global/silhouette_zone.gd` + `.tscn`)
-Zona detrás de algo alto que tapa a Alice entera (2026-11-14). Mientras su
-cuerpo está dentro, `Player.set_silhouette(true)` dibuja una copia plana y
-semitransparente de su forma (lila, `SILHOUETTE_COLOR`) por encima del
-decorado (`z_index` 20). La forma solo debe cubrir la parte donde queda
-escondida, no por donde pasa por delante. Uso: detrás de la torre de cristal
-de la calle (`GlassTowerSilhouette`). La torre se sigue dibujando encima de la
-calzada: es perspectiva (un edificio alto delante de la calle), no un error.
+### `AliceXray` (`global/alice_xray.gd`) — silueta tipo Diablo
+(2026-11-15; sustituye a `SilhouetteZone`, que solo servía detrás de la
+torre de cristal). Cuando algo alto tapa a Alice (edificios, paredes,
+árboles, la torre), su silueta lila semitransparente sale **solo en la parte
+tapada**, en cualquier escena, sin zonas. Lo crea el Player
+(`xray_silhouette`). Cómo funciona:
+- **¿Qué píxeles están tapados?** Un `SubViewport` que comparte el mundo
+  (`world_2d`) renderiza la zona alrededor de Alice (96×96 px de mundo, al
+  zoom de la cámara y alineada píxel a píxel con la pantalla) **sin ella y sin
+  los personajes**: `canvas_cull_mask` se salta la capa de visibilidad 20
+  (`HIDDEN_LAYER_BIT`), donde se ponen Alice, la propia silueta y los
+  personajes. Donde la pantalla es igual a ese render, Alice no se ve ahí:
+  algo la tapa. Tintes (`CanvasModulate`, atardecer, noche) y luces
+  (`PointLight2D`, también de color) son iguales en los dos renders y se
+  anulan. Antes se probó a comparar con el color que debería tener (con el
+  tinte aplicado), pero las luces de color la daban por tapada.
+- **Personajes:** NPCs, Lía, Toby, Wilson y palomas (`CharacterBody2D` que no
+  sean el Player, y `PigeonFlock`) van a la capa excluida, también los que
+  aparecen después (`node_added`). Así, uno delante de Alice nunca cuenta como
+  algo que la tapa.
+- **Solo lo alto:** la silueta sale si al menos el 70 % de Alice está tapado
+  (`MIN_COVERAGE`). Cada píxel muestrea una rejilla de 6×8 puntos sobre su
+  dibujo (sus límites, cacheados por frame de animación) y cuenta los tapados.
+  Barandillas, setos, bancos, torniquetes o papeleras le tapan como mucho las
+  piernas y parte del cuerpo (la mitad, más o menos) y no la disparan;
+  árboles, edificios y la torre pasan de sobra. **Limitación:** no clasifica
+  por tipo de objeto (las capas mezclan árboles y farolas con setos y bancos,
+  y clasificar baldosa a baldosa obligaría a listar cada una de cada
+  tileset), así que algo alto que la tape menos del 70 % (asoma más de un
+  30 %) no la muestra, y algo bajo que la tapara más (no pasa con el arte
+  actual) sí.
+- **Su forma:** otra `SubViewport` dibuja sin luz una copia de todas sus capas
+  (cuerpo, mochila, zapatos, auriculares), sincronizada cada frame.
+- **El dibujo:** un `Sprite2D` encima de todo el mundo (`z_index` 4000), justo
+  después de un `BackBufferCopy`, con su textura en blanco (si el shader
+  fallara no se pinta nada) y un shader que compara cada píxel.
+  `debug_mask` (uniform) pinta rojo = silueta, amarillo = tapada por algo bajo
+  y verde = visible.
+- **Coste:** prácticamente nulo en las pruebas (~0,1 ms; a 99–100 fps igual,
+  con y sin). Optimización: si ni Alice ni la cámara se mueven, el render sin
+  ella se actualiza cada 2 frames (`STILL_UPDATE_EVERY`); al moverse, cada
+  frame (si no, la silueta parpadearía).
+- La torre de cristal se sigue dibujando encima de la calzada: es perspectiva
+  (un edificio alto delante de la calle), no un error.
 
 ### `ExitArea` (`global/exit_area.gd`)
 Cambia de escena **sola**, al entrar en su radio — sin `[Espacio]`, sin depender
@@ -742,9 +778,12 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   (`project.godot`).
 - Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
   1, así el clic no lo atrapa su capa de input) y por debajo del fundido.
-- **Frase que no lleva a ningún lado:** además de temblar en rojo y
-  reacomodarse, la pista de arriba muestra "No... así no." durante 1,2 s. Sin
-  eso, el reinicio parecía un fallo.
+- **Frase que no lleva a ningún lado:** la frase tiembla en rojo, las
+  palabras se apartan (fundido rápido, `_words_aside`) y "No... así no." sale
+  **grande en el centro** de la nube, donde estaban las palabras, con un pop
+  de escala y un pequeño temblor (`_show_center_line`, 72 px, 1,2 s); luego
+  todo se reacomoda. Hasta el 2026-11-15 salía arriba, en la consigna, y
+  pasaba desapercibida.
 - **Al abrir ya hay una palabra elegida** (2026-11-14, playtest: "al empezar
   no hay ninguna palabra seleccionada"): la primera en orden de lectura
   (arriba a la izquierda, por filas de una palabra de alto), nunca "(...)"
@@ -765,12 +804,13 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   segundo (`BEAT_RATE`) y más hondo cuanto menos tiempo queda (`BEAT_DEPTH`,
   uniform `beat` del shader). Las palabras tiemblan hasta 2 píxeles de arte al
   final (`MAX_JITTER` 6 px de pantalla en `thought_word.gd`; antes 3).
-- **Cuando se acaba el tiempo** (2026-11-14): `_run_out_of_time()` pone en el
-  lugar de la consigna una frase de `TIME_OUT_LINES` (8 de Guion: "(Se queda
-  en blanco.)", "(Un nudo en la garganta. Nada.)"...), al azar y nunca la
-  misma que la vez anterior en cualquier puzzle (`_next_time_out_line`, con
-  una `static var`). Las palabras bajan y se desvanecen y, tras
-  `TIME_OUT_HOLD` (1,4 s), devuelve `"silence"`. Antes el puzzle se cerraba de
+- **Cuando se acaba el tiempo** (2026-11-14): `_run_out_of_time()` hace que
+  las palabras bajen y se desvanezcan (0,5 s) y luego muestra **en el centro**,
+  igual que la de fallo (desde el 2026-11-15), una frase de `TIME_OUT_LINES`
+  (8 de Guion: "(Se queda en blanco.)", "(Un nudo en la garganta. Nada.)"...),
+  al azar y nunca la misma que la vez anterior en cualquier puzzle
+  (`_next_time_out_line`, con una `static var`). Tras `TIME_OUT_HOLD` (1,4 s)
+  devuelve `"silence"`. Antes el puzzle se cerraba de
   golpe y el tester creyó que el juego no registraba sus pulsaciones. Elegir
   "(...)" sigue cerrando directamente.
 - **"Bueno... gracias." con Leo es a propósito:** es la respuesta `"leave"` de
@@ -840,6 +880,10 @@ await npc.walk_to(target_position)    # Tween en línea recta + animación walk_
 
 # El propio NPC decide a dónde ir — la escena solo le pasa "el objetivo".
 npc.resolve_approach_point(target_position)
+
+npc.start_patrol()        # ronda por patrol_points (se coloca en el primero)
+npc.stop_patrol()         # se para donde está, también a mitad de tramo
+npc.start_patrol(true)    # vuelve a la ronda andando desde donde está
 ```
 
 **`pause_near_player`** (px, 0 = nunca): si Alice se acerca a esa distancia
@@ -2167,6 +2211,37 @@ Añadir un tercer idioma: una columna nueva en los CSV, su código en
 `Localization.LANGUAGES` y en `TranslationCollector.LOCALES`, una opción en la
 pantalla de idioma, y versiones de los puzzles.
 
+### Español neutro (2026-11-15)
+Todo el texto en español está en un español neutro de doblaje, sin marcas
+fuertes de España ni de un solo país (revisión de Guion aprobada por el
+usuario: `narrative/revision_espanol_neutro.md`). Al escribir texto nuevo:
+
+| Se usa | Se evita |
+|---|---|
+| auto, estacionado | coche, carro, aparcado |
+| lentes | gafas, anteojos |
+| refrigerador | nevera, frigorífico |
+| boleto (del metro); "ticket" solo para el recibo de la tienda | billete |
+| teléfono | móvil, celular |
+| paso peatonal | paso de cebra |
+| folleto | volante, flyer |
+| tomar (un tren), agarrar (con la mano) | coger |
+| Bueno, Está bien, De acuerdo; coletilla "¿sí?" | vale, ¿vale? |
+| ustedes | vosotros, os, vais |
+| dice (un texto escrito) | pone |
+| mostrar | enseñar (con ese sentido) |
+| a lo mejor, quizá / de todos modos, aun así | igual (con esos sentidos) |
+| cuando sea grande (Lía) | cuando sea mayor |
+| seguro que + verbo | "seguro" sin "que" |
+| "lindo" para personas, "bonito" para cosas | — |
+
+Diminutivos de niña en Lía (poquito, despacito) sí; regionales en la
+narración o en Alice (cachetes, chiquito), no. Al aplicarla se cambiaron solo
+los textos en español: las líneas de las timelines conservan su `#id` (se
+rehízo la columna `es` del CSV y el inglés de las cuatro que cambiaban de
+sentido), y en `game_text.csv` cambiaron a la vez la clave y el texto en el
+código o la escena. También se borraron dos claves que ya no usaba nada.
+
 ---
 
 ## 13. Sonido
@@ -2602,7 +2677,7 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
    - **Se queda**: cuando ya acabaron las burbujas (no corta las de Lía),
      Alice sin moverse **y sin pulsar dirección** (empujar una pared no
      cuenta) a menos de `PIGEON_STAY_DISTANCE` (85 px) de Lía durante
-     `PIGEON_STAY_TIME` (2 s) → `_pigeons_up_close()`: se bloquea y suena
+     `PIGEON_STAY_TIME` (1 s desde el 2026-11-15; antes 2) → `_pigeons_up_close()`: se bloquea y suena
      `plaza_lia_pigeons`, que empieza con Alice ya parada a su lado (la
      línea «¡Mira! ¡Esa es más gorda!» pasó a ser globito); su
      `[signal arg="pigeons_fly"]` hace volar el grupo lejos de Lía
@@ -2656,8 +2731,8 @@ Corredora | Alice | Toby | Lía, sin taparse.
 
 **Puntos de curiosidad** (2026-11-13): `CuriosityPoints/<Nombre>` en
 plaza.tscn (`CuriosityPoint`, `global/curiosity_point.gd`: un `Marker2D`
-`@tool` con `trigger_radius` 48 y `look_distance` 16, que dibuja ambos en el
-editor). Con Lía de la manga, la primera vez que Alice pasa a menos de
+`@tool` con `trigger_radius` 64 (antes 48; `GardenTables`, 72) y
+`look_distance` 16, que dibuja ambos en el editor). Con Lía de la manga, la primera vez que Alice pasa a menos de
 `trigger_radius` de uno, Lía suelta la manga, corre hasta él, dice sus frases
 en su burbuja y Alice contesta en la suya (`LiaCuriosity`,
 `scenes/plaza_scene/scenes/lia_curiosity.gd`, por nombre de nodo; frases en
@@ -2667,12 +2742,47 @@ si ya hablaron con el heladero (`"helper"`). Opcional `lia_after`: una última
 frase de Lía tras la respuesta de Alice. Alice puede esperar o seguir: si se aleja 90 px
 (`CURIOSITY_LEAVE_DISTANCE`) o empieza una conversación, Lía vuelve corriendo
 a la manga. Una vez por punto (`GameManager.lia_curiosities_seen`) y 15 s
-entre uno y otro (`CURIOSITY_COOLDOWN`). Mientras Lía mira, Alice camina a
-velocidad normal. Puntos (8): `PetShopWindow`, `CoffeeBoard`, `IceCreamVan`,
+entre uno y otro (`CURIOSITY_COOLDOWN`).
+**Puntos que no se pierden** (2026-11-15, el usuario pasaba cerca y a veces
+no saltaban). La causa: el punto solo se miraba mientras Alice estaba dentro
+de su radio (48 px), y si en ese momento corrían los 15 s de espera o había
+un pensamiento en pantalla (los pensamientos también son timelines de
+Dialogic), se ignoraba sin recordarlo. Ahora los pensamientos no bloquean
+(solo una conversación, una cutscene o la espera).
+**Segunda vuelta** (2026-11-15, seguían perdiéndose). Comprobado pasando
+andando sin parar junto al guitarrista: Lía corría, decía su primera frase y
+Alice ya estaba a más de 90 px, así que Lía se volvía sin terminar y el punto
+quedaba gastado para siempre (se marcaba como visto al empezar a correr).
+Ahora:
+- Al activarse, Lía avisa primero desde donde está, en su burbuja, con una
+  de `CURIOSITY_CALL_LINES` ("¡Alice, mira!", "¡Espera, espera!", "¡Uy! ¿Qué
+  es eso?", "¡Para! ¡Mira allá!"; al azar, nunca la misma que la anterior), y
+  a los `CURIOSITY_CALL_TIME` (0,7 s) sale corriendo.
+- El punto solo se marca como visto con su primera frase
+  (`_mark_curiosity_seen`); si se corta antes, queda para la próxima vez.
+- Desde esa primera frase, Lía dice todas las del punto aunque Alice siga
+  andando: vuelve a la manga y sigue hablando en su burbuja, que la sigue, y
+  Alice contesta en la suya (`_curiosity_talking`, `_curiosity_still_on`).
+  Solo lo cortan una conversación o una cutscene. Su charla y los avisos de
+  ayudantes esperan mientras tanto.
+- Mientras Lía mira, Alice camina más despacio (`CURIOSITY_SPEED_SCALE`,
+  ×0,6) y Lía se vuelve a 140 px (`CURIOSITY_LEAVE_DISTANCE`, antes 90).
+- Varios pendientes en cola (`_pending_curiosities`): al acabar la espera
+  salta el primero que siga a menos de `CURIOSITY_PENDING_REACH` (120 px).
+- Radio 80 en todos los puntos (todos tienen suelo pisable a menos de 12 px,
+  pero la acera pasa más lejos).
+Probado andando sin parar junto al guitarrista y al picnic: se oyen el aviso,
+las dos frases de Lía y la respuesta de Alice. Puntos (8): `PetShopWindow`, `CoffeeBoard`, `IceCreamVan`,
 `Guitarist`, `Picnic`, `RedBike`, `GardenTables`, `AdColumn` (la columna de
 anuncios verde junto al café, (580, 1100)). Textos de Guion. Las palomas empiezan igual que una curiosidad (no
 coinciden con otra: comparten `_exploring`/enfriamiento) y son el único
 momento que puede acabar en caja, si Alice se queda (ver arriba).
+
+**Picnic** (2026-11-15): el mantel (`Addons`, atlas `47–54 × 0–6`, celdas
+104–111 × 95–101) se dibujaba encima de Alice y Lía, porque cada fila se
+ordenaba a su propia altura. Ahora todas sus baldosas tienen
+`y_sort_origin = -(fila·8 + 8)`: el mantel entero se ordena en su borde de
+arriba y quien se pare encima queda por delante.
 
 **Arreglos del mapa** (2026-11-13):
 - Edificio con fachada diagonal (acera del metro, abajo a la izquierda): sus
@@ -2690,6 +2800,42 @@ momento que puede acabar en caja, si Alice se queda (ver arriba).
   central y borde de atrás) se ordenan en el centro, y = 557; las del borde
   delantero, cada una en su base (571, 587, 603); los tiles diagonales de las
   esquinas de abajo, en 591.
+- **Fuente animada** (2026-11-15): ya no es de tiles. Es un objeto aparte,
+  como el reloj y la taza del apartamento:
+  `scenes/plaza_scene/scenes/animated_fountain.tscn` (`AnimatedSprite2D`,
+  animación `flow` en bucle), instanciada en `MiddleLayer/AnimatedFountain`
+  en (584, 592). El sprite sale de
+  `scenes/street_scenes/assets/fountain_water.aseprite` (128×112, de Arte):
+  la piedra (capa `fountain_base`, abajo del todo) más las capas del agua,
+  de abajo arriba `top_ripple`, `basin_waves`, `lip`, `streams`, `foam` y
+  `drops` (gotitas sueltas), en 16 fotogramas de 110 ms (etiqueta `flow`).
+  La piedra se llamaba `ref_fountain` y estaba oculta; Arte la renombró y la
+  hizo visible porque es parte del sprite. Su `.import` tiene el patrón de
+  exclusión vacío: no le pongas uno que deje fuera `fountain_base`, o la
+  fuente queda sin piedra. Se
+  ordena en un solo punto, y = 592 (el origen del nodo; el dibujo sube con
+  `offset (0, -101)`, `centered` apagado). La colisión, que antes daban los
+  tiles, es un `StaticBody2D` con un polígono que copia la de esos tiles. Se
+  quitaron los 56 tiles de la fuente de `WallsSuperior` (celdas x 36–43,
+  y 31–37); las entradas del tileset (atlas 19–26 × 8–14) siguen ahí sin
+  usarse en la plaza.
+- **Sonido de la fuente** (2026-11-15): `WaterSound`, un
+  `AudioStreamPlayer2D` dentro de `animated_fountain.tscn`, en (64, −45)
+  respecto a la raíz, que es el centro del agua; en el mundo, (648, 547).
+  - Reproduce `audio/ambience/plaza_fountain_loop.ogg` en bucle por el bus
+    `Ambience`. Viaja con la fuente. No usa autoplay: lleva el script
+    `RandomStartSound2D` (`global/random_start_sound_2d.gd`), que lo arranca
+    en un punto al azar del bucle, como el llanto de Lía. Sirve para
+    cualquier otro sonido posicional en bucle (máquinas, otra fuente).
+  - El agua es un acuario, borboteo suave, elegido por el usuario por ser más
+    sutil que la primera fuente. Bucle de 50 s a −28 LUFS (ver
+    `audio/CREDITS.md`).
+  - `volume_db` +5, `max_distance` 300 px, `attenuation` 1.5,
+    `panning_strength` 0.5.
+  - Junto a la fuente queda unos 4 dB por debajo del ambiente de calle: se
+    oye, pero discreto; no subirlo para igualar a la calle. Se apaga antes de llegar a los paseos. Suena en todas las
+    etapas, también de noche.
+  - El que "oye" es la cámara (centrada en Alice).
 
 ### Estado en `GameManager`
 `plaza_stage` (`PlazaStage`: `ARRIVED`, `WITH_LIA`, `KNOWS_FOUNTAIN`,
@@ -2713,6 +2859,46 @@ se puede recargar en cualquier momento.
 - La madre lleva **vestido rosa** (el primer borrador decía abrigo rojo).
 - El quiosco de *Rama_Buscar_Adulto* se cuenta en la narración; el señor de
   la radio es el personaje `plaza_old_man` ("Señor").
+  **Guardia** (2026-11-15): un guardia de seguridad
+  (`MiddleLayer/NPCS/PlazaGuard`, un `WalkingNPC` con el sprite del
+  trabajador del metro, `metro_worker_npc.aseprite`, en `frames`; es otra
+  persona) hace **una ronda** tranquila al suroeste de la fuente toda la tarde
+  (`GuardRoute`, de (470, 680) a (600, 680), 20 px/s, paradas de 4–8 s, se
+  para junto a Alice). Lejos del camino de la madre (este), del guitarista y
+  de las palomas de la fuente. Lleva un `AmbientThought` con dos versiones
+  (`_on_guard_thought`, que las cambia con `RemarkInteractable.set_lines()`
+  y vuelve a la primera): con Lía, "Un guardia." / "Seguro que tiene cosas
+  más importantes que hacer." (y `GameManager.plaza_guard_noticed` lo
+  recuerda); cuando Lía ya se fue, "Sigue con su ronda." / "Como si fuera un
+  día cualquiera.". En la rama, la narración #id:2e6 dice que Alice camina
+  hacia él y, si se había fijado en él, Alice lo recuerda (#id:3d4,
+  `if {GameManager.plaza_guard_noticed}`) antes del minijuego. Antes de esa
+  narración, Lía pregunta "¿Me van a regañar?" (#id:3d5) y Alice la calma
+  (#id:3d6).
+  **Por qué no le preguntan desde el principio** (Guion, aprobado por el
+  usuario): la primera vez que pasan cerca de él buscando (`WITH_LIA`, a
+  `HELPER_HINT_DISTANCE`), Lía dice en su burbuja "¡A ese no! Si le
+  contamos, mi mamá va a saber que me levanté de la banca." y después Alice
+  piensa "...Y yo tendría que hablar con un guardia." / "Mejor le
+  preguntamos a la gente." (`_lia_refuses_guard`, una vez por partida con
+  `GameManager.lia_guard_refused`, nunca encima de otra burbuja, un
+  pensamiento o una conversación). Es un personaje: la silueta no lo cuenta como
+  algo que tapa a Alice.
+  En la rama, `guard_comes` lo para donde esté (`WalkingNPC.stop_patrol()`)
+  y Alice camina hasta él (`GUARD_TALK_DISTANCE`, 22 px) con Lía a su lado.
+  `guard_leaves` lo devuelve a su ronda desde donde está
+  (`start_patrol(true)`; mientras se aleja se le quita `pause_near_player`,
+  que lo dejaba quieto junto a Alice) y Dialogic sigue a los 1,2 s.
+  **Texto final** (Guion, aprobado por el usuario): el personaje es
+  `plaza_guard` ("Guardia"/"Guard", `dialogic/characters/plaza_guard.dch`,
+  sin retrato); `plaza_old_man` ya no se usa. Con el guardia ya al lado sale
+  un **Rompecabezas de la Ansiedad** fácil, `plaza_guard`
+  (`scenes/plaza_scene/puzzles/plaza_guard.tres` + `_en`, en
+  `ANXIETY_PUZZLES` de `plaza.gd`): "Disculpe... / esta niña / se perdió.",
+  2 distractores, 25 s, `hint_from_start`. Si lo arma (`ask`), Alice habla
+  (#id:2e7) y `lia_confidence +1`; si calla o se le acaba el tiempo, Lía habla
+  por las dos (#id:3ce) y Alice asiente (#id:3cf). Las dos ramas siguen en
+  "¿Cómo te llamas?" (#id:3d0–3d3, 2e8) y después `guard_leaves`.
 - El reloj está en la fuente y Alice **ya no corre** al metro (como en el
   Twine): sabe que lo perdió antes de llegar a la reja.
 

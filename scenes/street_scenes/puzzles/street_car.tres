@@ -9,7 +9,7 @@ phrases = {
 "explain": PackedStringArray("Solo...", "me estaba...", "arreglando", "el pelo."),
 "sorry": PackedStringArray("Perdón,", "perdón.")
 }
-extra_words = PackedStringArray("mirando", "coche", "nada", "robar")
+extra_words = PackedStringArray("mirando", "auto", "nada", "robar")
 prompt = "¿Le explico qué hacía... o pido perdón y me voy?"
 time_limit = 15.0
 mistake_penalty = 2.0

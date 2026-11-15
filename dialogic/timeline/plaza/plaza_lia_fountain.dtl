@@ -10,7 +10,7 @@ update alice (worried)
 alice: (el agua de la fuente cae. Siente que el tiempo se escapa.) #id:2d6
 - Esperar en la fuente, donde la mamá podría volver #id:2d7
 	update alice (neutral)
-	alice: Tu mamá vino hasta la fuente. Si seguimos moviéndonos, igual nos la seguimos perdiendo. #id:2d8
+	alice: Tu mamá vino hasta la fuente. Si seguimos moviéndonos, a lo mejor nos la seguimos perdiendo. #id:2d8
 	update lia (surprised)
 	lia: ¿Entonces? #id:2d9
 	alice: Esperamos. Aquí. Donde ella ya vino. #id:2da
@@ -31,10 +31,26 @@ alice: (el agua de la fuente cae. Siente que el tiempo se escapa.) #id:2d6
 	alice: Vamos a buscar a alguien que sepa qué hacer. Alguien de seguridad. #id:2e3
 	lia: ¿Y si mi mamá vuelve y no me encuentra? #id:2e4
 	alice: Le decimos dónde vamos a estar. Para que sepa. #id:2e5
-	(En el quiosco de información hay un señor mayor.) #id:2e6
+	lia: ¿Me van a regañar? #id:3d5
+	alice: No. Nadie te va a regañar. #id:3d6
+	(El guardia de seguridad sigue con su ronda cerca de la fuente. Alice respira hondo y camina hacia él, con Lía de la manga.) #id:2e6
+	[signal arg="guard_comes"]
+	if {GameManager.plaza_guard_noticed}:
+		alice: (El guardia de antes. El que seguro tenía cosas más importantes que hacer.) #id:3d4
 	update alice (nervous)
-	alice: D-disculpe... esta niña se perdió. Su mamá tiene vestido rosa. La vieron por la fuente hace un rato. #id:2e7
-	plaza_old_man: (saca una radio) Voy a avisar. Quédense aquí. #id:2e8
+	[signal arg="anxiety_puzzle:plaza_guard"]
+	if {anxiety_result} == "ask":
+		alice: D-disculpe... esta niña se perdió. Su mamá tiene vestido rosa. La vieron por la fuente hace un rato. #id:2e7
+		[signal arg="lia_confidence:1"]
+	else:
+		lia: (se adelanta, tirando de la manga de Alice) ¡Señor! ¡Señor! Me perdí. Bueno, se perdió mi mamá. Tiene un vestido rosa. #id:3ce
+		alice: (asiente muy rápido. Al menos eso sí le sale.) #id:3cf
+	plaza_guard: (se agacha a la altura de Lía) ¿Cómo te llamas? #id:3d0
+	lia: Lía. ¿Usted es policía? #id:3d1
+	plaza_guard: Casi. Cuido la plaza. #id:3d2
+	plaza_guard: (toma la radio) Atención: niña de siete años, se llama Lía, está en la fuente. Busca a su mamá. Vestido rosa. #id:3d3
+	plaza_guard: Listo, ya avisé a mis compañeros. Quédense aquí, cerca de la fuente. #id:2e8
+	[signal arg="guard_leaves"]
 	[signal arg="time_passes"]
 	(Pasan los minutos. Lía no dice nada, pero no la suelta.) #id:2e9
 	lia: ¿Tienes algo para dibujar? Para no pensar. #id:2ea
@@ -89,7 +105,7 @@ if {GameManager.lia_outcome} == "agridulce":
 	lia_mom: (le pone una mano en el hombro) Gracias, de verdad. #id:301
 	update lia (happy)
 	lia: El dibujo. (lo saca del bolsillo y se lo da) #id:303
-	(Dos niñas de la mano. Una con gafas redondas. Detrás, la fuente. Arriba, un sol enorme. Abajo: "ALICE Y LIA". Por detrás de la hoja, torcido, el gato de Alice.) #id:304
+	(Dos niñas de la mano. Una con lentes redondos. Detrás, la fuente. Arriba, un sol enorme. Abajo: "ALICE Y LIA". Por detrás de la hoja, torcido, el gato de Alice.) #id:304
 	lia: Es para que te acuerdes de mí. #id:305
 	update alice (worried)
 	alice: (los dedos le tiemblan. Quiere decirle algo. Lo que sea. No le sale nada.) #id:306
@@ -108,7 +124,7 @@ else:
 	lia_mom: Gracias. Gracias, de verdad. No sabes cómo te lo agradezco. #id:30c
 	update lia (happy)
 	lia: Espera, espera. (saca el dibujo doblado y se lo da a Alice) #id:30d
-	(Dos niñas de la mano. Una con gafas redondas y una mochila; la otra, más pequeña. Detrás, la fuente. Arriba, un sol enorme que ocupa media hoja. Abajo, con letra temblorosa: "ALICE Y LIA".) #id:30e
+	(Dos niñas de la mano. Una con lentes redondos y una mochila; la otra, más pequeña. Detrás, la fuente. Arriba, un sol enorme que ocupa media hoja. Abajo, con letra temblorosa: "ALICE Y LIA".) #id:30e
 	lia: Es para que te acuerdes de mí. #id:30f
 	update alice (relaxed)
 	alice: (lo toma con cuidado) Gracias, Lía. #id:310
