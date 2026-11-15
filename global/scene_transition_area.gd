@@ -7,6 +7,9 @@ extends "res://global/interactable_area.gd"
 ## Scene loaded when the player interacts with this area.
 @export_file("*.tscn") var target_scene_path: String = ""
 @export var fade_duration: float = 1.0
+## Optional: the Marker2D under SpawnPoints in the target scene where Alice
+## appears (the target scene has to read GameManager.take_spawn_point()).
+@export var spawn_point: String = ""
 
 ## While locked the area reports the attempt instead of changing scene,
 ## so the owning scene can play a dialogue or a thought first.
@@ -43,4 +46,5 @@ func interact() -> void:
 		label.hide()
 
 	transition_started.emit()
+	GameManager.spawn_point = spawn_point
 	FadeTransition.transition_to_scene(target_scene_path, fade_duration)

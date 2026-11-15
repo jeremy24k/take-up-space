@@ -61,6 +61,34 @@ const HEARTBEAT_PITCH := Vector2(1.0, 1.4)
 const BREATHING_DB := Vector2(-40.0, -24.0)
 const BREATHING_FROM: float = 0.6
 const SILENT_DB: float = -60.0
+## The time shows without a clock: the dark edges beat like her heart, a
+## double thump that speeds up (beats per second, calm -> about to freeze)
+## and pushes further in as the time runs out.
+const BEAT_RATE := Vector2(1.0, 2.1)
+const BEAT_DEPTH := Vector2(0.02, 0.09)
+## When the time runs out it must read as Alice freezing, not as the game
+## eating the input: this line takes the prompt's place and the words sink
+## and fade before the puzzle closes. One of these at random, never the
+## same as last time (in any puzzle). Only when the clock runs out, not when
+## she picks "(...)".
+const TIME_OUT_LINES: PackedStringArray = [
+	"(Se le pasa el momento.)",
+	"(Se queda en blanco.)",
+	"(Le arde la cara. Siente que todos la miran.)",
+	"(Le sudan las manos. Ya no sabe qué iba a decir.)",
+	"(Un nudo en la garganta. Nada.)",
+	"(Oye su corazón más fuerte que su voz.)",
+	"(Un vacío en el estómago. Se calla.)",
+	"(Abre la boca. Ya es tarde.)",
+]
+const TIME_OUT_HOLD: float = 1.4
+const TIME_OUT_SINK: float = 24.0
+## Right after it opens, Space does nothing for a moment: a press meant to
+## finish reading the last line must not say the word already selected.
+const OPEN_GRACE: float = 0.5
+## Arrow navigation: how much a word off to the side counts against it
+## compared with one straight ahead.
+const NAV_SIDE_WEIGHT: float = 2.0
 
 @onready var root: Control = $Root
 @onready var vignette: ColorRect = $Root/Vignette
@@ -70,9 +98,6 @@ const SILENT_DB: float = -60.0
 
 var _data: AnxietyPuzzleData
 var _words: Array[ThoughtWord] = []
-## No word has the focus until the first arrow: otherwise Space (for example,
-## to finish reading) said whatever random word happened to be focused.
-var _awaiting_first_focus: bool = true
 var _picked: PackedStringArray = []
 var _time_left: float = 0.0
 var _cooldown: float = 0.0
@@ -84,6 +109,7 @@ var _breathing: AudioStreamPlayer
 ## "(...)" never change, so the puzzle always stays solvable.
 var _swappable: Array[ThoughtWord] = []
 var _swap_timer: float = 0.0
+var _beat_phase: float = 0.0
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -117,6 +143,7 @@ func run(data: AnxietyPuzzleData) -> String:
 	tween.tween_property(root, "modulate:a", 1.0, FADE_TIME)
 	await tween.finished
 	_accepting = true
+	_cooldown = OPEN_GRACE
 	if data.hint_from_start:
 		_blink_answer_starts()
 	var result: String = await finished
@@ -169,7 +196,8 @@ func _spawn_words() -> void:
 	_swap_timer = _next_swap_delay()
 	_scatter_words()
 
-## Places every word at a random free spot of the cloud and focuses one.
+## Places every word at a random free spot of the cloud and selects the
+## first one in reading order, so an arrow or Space always does something.
 func _scatter_words() -> void:
 	_words.shuffle()
 	var taken: Array[Rect2] = []
@@ -178,8 +206,7 @@ func _scatter_words() -> void:
 		word.modulate.a = 1.0
 		_place_word(word, taken)
 		taken.append(Rect2(word.base_position, word.size))
-	if not _awaiting_first_focus:
-		_words[0].grab_focus()
+	_focus_first_word()
 
 ## Moves one word to a random spot of the cloud that none of the taken rects
 ## covers. If the cloud is too crowded for that, it takes the spot that
@@ -281,11 +308,53 @@ func _replace_thought(word: ThoughtWord, new_text: String) -> void:
 			taken.append(Rect2(other.base_position, other.size))
 	_place_word(word, taken)
 
-func _focus_any_visible() -> void:
+## The visible word closest to the top-left corner (reading order). Never
+## "(...)" unless it is the only one left: that one ends the puzzle.
+func _focus_first_word() -> void:
+	var best: ThoughtWord = null
 	for word in _words:
-		if word.visible:
-			word.grab_focus()
-			return
+		if not word.visible or (word.text == SILENCE_WORD and best != null):
+			continue
+		if best == null or best.text == SILENCE_WORD or _reading_order(word) < _reading_order(best):
+			best = word
+	if best:
+		best.grab_focus()
+
+## Rows of about one word height, then left to right.
+func _reading_order(word: ThoughtWord) -> float:
+	return roundf(word.base_position.y / word.size.y) * 100000.0 + word.base_position.x
+
+func _word_center(word: ThoughtWord) -> Vector2:
+	return word.base_position + word.size / 2.0
+
+## The word an arrow leads to from the focused one: the closest one in that
+## direction, preferring the ones straight ahead over the ones off to the
+## side. Godot's own focus search jumped to unexpected words.
+func _word_towards(from: ThoughtWord, direction: Vector2) -> ThoughtWord:
+	var origin := _word_center(from)
+	# Up or down means another row: a word only a few pixels higher is on the
+	# same line and belongs to left/right.
+	var min_ahead := from.size.y * 0.5 if direction.y != 0.0 else 1.0
+	var best: ThoughtWord = null
+	var best_score := INF
+	for word in _words:
+		if word == from or not word.visible:
+			continue
+		var to_word := _word_center(word) - origin
+		var ahead := to_word.dot(direction)
+		if ahead < min_ahead:
+			continue
+		var score := ahead + absf(to_word.cross(direction)) * NAV_SIDE_WEIGHT
+		if score < best_score:
+			best_score = score
+			best = word
+	return best
+
+func _focused_word() -> ThoughtWord:
+	for word in _words:
+		if word.has_focus():
+			return word
+	return null
 
 # =========================
 # Building the sentence
@@ -294,7 +363,6 @@ func _on_word_pressed(word: ThoughtWord) -> void:
 	if not _accepting or _cooldown > 0.0:
 		return
 	_cooldown = PICK_COOLDOWN
-	_awaiting_first_focus = false
 	if word.text == SILENCE_WORD:
 		_finish(SILENCE)
 		return
@@ -302,7 +370,7 @@ func _on_word_pressed(word: ThoughtWord) -> void:
 	_picked.append(word.text)
 	word.hide()
 	sentence_line.add_child(_make_sentence_word(word.text))
-	_focus_any_visible()
+	_focus_first_word()
 
 	var answer := _matching_answer()
 	if answer == "":
@@ -379,13 +447,32 @@ func _make_sentence_word(text: String) -> Label:
 # =========================
 # Time pressure
 # =========================
+## Arrows move between the words here, before the GUI's own navigation.
 func _input(event: InputEvent) -> void:
 	if not _accepting:
 		return
-	if _awaiting_first_focus and ARROW_ACTIONS.any(func(action: StringName) -> bool: return event.is_action_pressed(action)):
-		_awaiting_first_focus = false
-		_focus_any_visible()
+	for action in ARROW_ACTIONS:
+		if not event.is_action_pressed(action, true):
+			continue
 		get_viewport().set_input_as_handled()
+		var current := _focused_word()
+		if current == null:
+			_focus_first_word()
+			return
+		var next := _word_towards(current, _arrow_direction(action))
+		if next:
+			next.grab_focus()
+		return
+
+func _arrow_direction(action: StringName) -> Vector2:
+	match action:
+		&"ui_left":
+			return Vector2.LEFT
+		&"ui_right":
+			return Vector2.RIGHT
+		&"ui_up":
+			return Vector2.UP
+	return Vector2.DOWN
 
 func _process(delta: float) -> void:
 	if not _accepting:
@@ -399,6 +486,9 @@ func _process(delta: float) -> void:
 	_time_left -= delta
 	var pressure := clampf(1.0 - _time_left / _data.time_limit, 0.0, 1.0)
 	vignette.material.set_shader_parameter("pressure", pressure)
+	_beat_phase = fmod(_beat_phase + delta * lerpf(BEAT_RATE.x, BEAT_RATE.y, pressure), 1.0)
+	vignette.material.set_shader_parameter("beat",
+		_heartbeat_pulse(_beat_phase) * lerpf(BEAT_DEPTH.x, BEAT_DEPTH.y, pressure))
 	for word in _words:
 		word.pressure = pressure
 	_heartbeat.volume_db = lerpf(HEARTBEAT_DB.x, HEARTBEAT_DB.y, pressure)
@@ -407,7 +497,38 @@ func _process(delta: float) -> void:
 	_breathing.volume_db = lerpf(BREATHING_DB.x, BREATHING_DB.y, breath)
 	_update_swaps(delta, pressure)
 	if _time_left <= 0.0:
-		_finish(SILENCE)
+		_run_out_of_time()
+
+static var _last_time_out_line: String = ""
+
+func _next_time_out_line() -> String:
+	var choices := Array(TIME_OUT_LINES).filter(func(line: String) -> bool:
+		return line != _last_time_out_line)
+	_last_time_out_line = choices.pick_random()
+	return _last_time_out_line
+
+## Lub-dub: a strong thump and a softer one right after, then rest.
+func _heartbeat_pulse(phase: float) -> float:
+	var lub := exp(-pow(phase / 0.07, 2.0))
+	var dub := 0.6 * exp(-pow((phase - 0.2) / 0.07, 2.0))
+	return maxf(lub, dub)
+
+## She froze: the moment slips away on screen before the puzzle closes, so
+## running out of time reads as part of the story.
+func _run_out_of_time() -> void:
+	if _done or not _accepting:
+		return
+	_accepting = false
+	prompt_label.text = _next_time_out_line()
+	var sink := create_tween().set_parallel(true)
+	for word in _words:
+		if word.visible:
+			word.release_focus()
+			sink.tween_property(word, "modulate:a", 0.0, TIME_OUT_HOLD * 0.6)
+			sink.tween_property(word, "base_position:y", word.base_position.y + TIME_OUT_SINK, TIME_OUT_HOLD * 0.6)
+	sink.tween_property(sentence_line, "modulate:a", 0.0, TIME_OUT_HOLD * 0.6)
+	await get_tree().create_timer(TIME_OUT_HOLD).timeout
+	_finish(SILENCE)
 
 # =========================
 # Ending

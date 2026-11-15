@@ -641,7 +641,7 @@ Choice/28f/disabled_text,,
 Text/290/text,(respira hondo) Primero... cuéntame cómo era tu mamá. Qué ropa traía.,(takes a deep breath) First... tell me what your mom looks like. What she was wearing.
 Text/291/text,"Un vestido rosa. Y pelo largo. Y tenía una bolsa de esas grandes, de tela.",A pink dress. And long hair. And she had one of those big cloth bags.
 Text/292/text,¿Y por dónde la viste por última vez?,And where did you last see her?
-Text/293/text,(señala la entrada de la plaza) Allí. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca.,(points at the plaza entrance) There. She said she was going to buy something quick. That I should stay put on the bench.
+Text/293/text,"(señala al otro lado de la calle, hacia la plaza) Por allá. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca.","(points across the street, toward the plaza) Over there. She said she was going to buy something quick. That I should stay still on the bench."
 Text/294/text,"Pero pasó mucho, y pasó mucha gente, y yo me asusté y me levanté... y ya no supe dónde estaba.","But it took so long, and so many people went by, and I got scared and got up... and then I didn't know where I was."
 Text/295/text,(algo se le retuerce adentro) Está bien. Vamos a buscar.,(something twists inside her) Okay. Let's go look.
 Choice/296/text,"Nerviosa, pero intentándolo","Nervous, but trying"
@@ -652,7 +652,7 @@ Text/299/text,Mi mamá dice que cuando uno está asustado hay que respirar. Así
 Text/29a/text,"(Lía toma tanto aire que se le inflan los cachetes. Lo suelta de golpe, con ruido, como un globo que se desinfla.)","(Lía takes in so much air her cheeks puff out. She lets it all go at once, noisily, like a balloon going flat.)"
 Text/29b/text,"...Un poco. Sí, estoy asustada. Pero igual vamos a buscar.","...A little. Yes, I'm scared. But we'll look anyway."
 Text/29c/text,"Vale. Si estamos las dos, menos asustadas.","Okay. If there's two of us, we're less scared."
-Text/29d/text,Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza.,My mom has a pink dress. And long hair. And a big bag. She went by the plaza entrance.
+Text/29d/text,"Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por allá, hacia la plaza.","My mom has a pink dress. And long hair. And a big bag. She went that way, toward the plaza."
 Text/29e/text,Perfecto. Vamos a buscar a la señora del vestido rosa.,Perfect. Let's go find the lady in the pink dress.
 Choice/29f/text,Bloqueada por el contacto,Frozen by the touch
 Choice/29f/disabled_text,,
@@ -662,7 +662,7 @@ Text/2a2/text,"(Lía no la suelta. La mira de abajo arriba, muy seria. Le mueve 
 Text/2a3/text,¿Estás jugando a las estatuas?,Are you playing statues?
 Text/2a4/text,"(Lía se queda quieta, con un brazo en alto y la boca abierta. Aguanta dos segundos. Tres. Se le escapa la risa.)","(Lía freezes, one arm up and her mouth open. She holds it two seconds. Three. A laugh slips out.)"
 Text/2a5/text,Lo siento.,I'm sorry.
-Text/2a6/text,Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos?,My mom has a pink dress. And a big bag. And she went out the plaza entrance. Shall we go?
+Text/2a6/text,"Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por allá, hacia la plaza. ¿Vamos?","My mom has a pink dress. And a big bag. And she went that way, toward the plaza. Shall we go?"
 Text/2a7/text,Sí. Vamos.,Yes. Let's go.
 Text/2a8/text,(Unos pasitos detrás de ella. Rápidos. Desordenados.),(Little footsteps behind her. Quick. Clumsy.)
 Text/2a9/text,¡Espera!,Wait!
@@ -682,7 +682,7 @@ Text/2b6/text,¿Y por qué estás perdida?,And why are you lost?
 Text/2b7/text,Me dormí en el metro.,I fell asleep on the metro.
 Text/2b8/text,(se ríe) ¡Qué tonta!,(laughs) That's so silly!
 Text/2b9/text,(no sabe si ofenderse. Pero la risa le hace un cosquilleo en el pecho.),(she doesn't know whether to be offended. But the laugh tickles something in her chest.)
-Text/2ba/text,Mi mamá se fue por la entrada de la plaza. Dijo que iba a comprar algo rápido. Pero no volvió.,My mom went by the plaza entrance. She said she was going to buy something quick. But she didn't come back.
+Text/2ba/text,Mi mamá se fue hacia la plaza. Dijo que iba a comprar algo rápido. Pero no volvió.,My mom went toward the plaza. She said she was going to buy something quick. But she didn't come back.
 Text/2bb/text,"Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí?","Let's find my mom and then I'll help you find your house, okay?"
 ,,
 ,,

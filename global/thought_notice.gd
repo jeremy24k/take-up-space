@@ -22,9 +22,18 @@ const BASE_POSITION := Vector2(10, -24)
 const SHOW_DELAY: float = 0.12
 const POP_TIME: float = 0.14
 const HIDE_TIME: float = 0.15
-## Pixels it rises at the top of its bob, and seconds per way.
-const BOB_HEIGHT: float = 1.0
+## Pixels it rises at the top of its bob, and seconds per way. Playtest
+## (2026-11-14): at 1 px the icon went unnoticed.
+const BOB_HEIGHT: float = 2.0
 const BOB_TIME: float = 0.7
+## It pops in with a clear pulse (grows past full size, settles back) and
+## then gives a softer pulse every PULSE_EVERY s while it stays, so a player
+## who missed it still sees it. Scale only: it never changes colour.
+const POP_SCALE: float = 1.6
+const POP_SETTLE_TIME: float = 0.18
+const PULSE_SCALE: float = 1.25
+const PULSE_TIME: float = 0.16
+const PULSE_EVERY: float = 3.5
 
 ## The node it sits over (Alice). Set by ThoughtBox.
 var target: Node2D
@@ -32,6 +41,7 @@ var target: Node2D
 var _sprite := Sprite2D.new()
 var _show_tween: Tween
 var _bob_tween: Tween
+var _pulse_tween: Tween
 var _shown: bool = false
 
 # =========================
@@ -52,6 +62,7 @@ func _process(_delta: float) -> void:
 	if not is_instance_valid(target) or not target.is_inside_tree():
 		# Alice left with the scene: the next set_shown(true) starts over.
 		_shown = false
+		_stop_pulse()
 		hide()
 		return
 	transform = target.get_global_transform_with_canvas()
@@ -86,19 +97,37 @@ func _pop() -> void:
 	_sprite.offset = Vector2.ZERO
 	_sprite.scale = Vector2.ZERO
 	_show_tween = create_tween()
-	_show_tween.tween_property(_sprite, "scale", Vector2.ONE, POP_TIME) \
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	_show_tween.tween_property(_sprite, "scale", Vector2.ONE * POP_SCALE, POP_TIME) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	_show_tween.tween_property(_sprite, "scale", Vector2.ONE, POP_SETTLE_TIME) \
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	_start_bob()
+	_start_pulse()
 
 func _disappear() -> void:
 	if not visible:
 		return
+	_stop_pulse()
 	_show_tween = create_tween()
 	_show_tween.tween_property(self, "modulate:a", 0.0, HIDE_TIME)
 	_show_tween.tween_callback(func() -> void:
 		hide()
 		if _bob_tween and _bob_tween.is_valid():
 			_bob_tween.kill())
+
+## A soft pulse every PULSE_EVERY s, starting after the pop.
+func _start_pulse() -> void:
+	_stop_pulse()
+	_pulse_tween = create_tween().set_loops()
+	_pulse_tween.tween_interval(PULSE_EVERY)
+	_pulse_tween.tween_property(_sprite, "scale", Vector2.ONE * PULSE_SCALE, PULSE_TIME) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	_pulse_tween.tween_property(_sprite, "scale", Vector2.ONE, PULSE_TIME) \
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+
+func _stop_pulse() -> void:
+	if _pulse_tween and _pulse_tween.is_valid():
+		_pulse_tween.kill()
 
 ## Bobs through `offset`, snapped to whole pixels like the NPCs' bubble.
 func _start_bob() -> void:

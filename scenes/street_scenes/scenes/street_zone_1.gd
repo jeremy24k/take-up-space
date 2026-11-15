@@ -130,6 +130,7 @@ const CLUE_REACTIONS := {
 # Lifecycle
 # =========================
 func _ready() -> void:
+	_place_at_spawn_point()
 	_connect_clues()
 	_start_pedestrians()
 	cat_talk_area.interacted.connect(_on_cat_interacted.bind(cat_talk_area))
@@ -144,6 +145,19 @@ func _ready() -> void:
 	car_owner.process_mode = Node.PROCESS_MODE_DISABLED
 	if GameManager.street_car_gone:
 		_remove_car()
+
+## Coming back out of a door (Leo's store): Alice appears in front of it,
+## facing the street, instead of at the metro exit.
+func _place_at_spawn_point() -> void:
+	var point_name := GameManager.take_spawn_point()
+	var point := get_node_or_null("SpawnPoints/" + point_name) as Marker2D
+	if point_name.is_empty() or point == null:
+		return
+	player.global_position = point.global_position
+	player.face_direction(Vector2.DOWN)
+	var camera := player.get_node_or_null("Camera2D") as Camera2D
+	if camera:
+		camera.reset_smoothing()
 
 func _process(delta: float) -> void:
 	_tick_lost_reminder(delta)

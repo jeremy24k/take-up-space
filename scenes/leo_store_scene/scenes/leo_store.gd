@@ -55,6 +55,18 @@ const SEARCH_SHELVES := {
 @onready var exit_to_street: SceneTransitionArea = $InteractableDetectors/ExitToStreet
 @onready var crush_thought: ThoughtTrigger = $ThoughtTriggers/CrushThought
 
+## Trying to leave before paying for Wilson's food (user's lines).
+const LEAVE_REFUSAL_LINES: Array[String] = [
+	"No puedo irme ahora.",
+	"Tengo que encontrar la comida de Wilson.",
+	"Sé que estás nerviosa, Alice, pero tenemos que hacer esto.",
+]
+## Pixels she steps back into the store.
+const LEAVE_REFUSAL_STEP: float = 16.0
+
+var _refusing: bool = false
+var _last_refusal: String = ""
+
 # =========================
 # Lifecycle
 # =========================
@@ -71,8 +83,9 @@ func _ready() -> void:
 	tuna_shelf.interacted.connect(_on_shelf_interacted)
 	_connect_search_shelves()
 	exit_to_street.blocked_interaction.connect(_on_exit_blocked)
-	# Once they talked, leaving goes through Leo's goodbye instead of the street.
-	exit_to_street.is_locked = GameManager.leo_talk_done
+	# The door never lets her straight out: before paying for Wilson's food
+	# she talks herself out of leaving; after, Leo says goodbye.
+	exit_to_street.is_locked = true
 	# The crush thought is a floor line on the way into the aisles. It plays
 	# once in the whole game, not once per visit to the store.
 	if GameManager.leo_crush_thought_shown:
@@ -142,7 +155,7 @@ func _on_dialogic_signal(argument: String) -> void:
 		"leo_greeted":
 			_play_leo_idle()
 		"leo_talk_done":
-			exit_to_street.is_locked = true
+			pass
 		_:
 			if argument.begins_with("anxiety_puzzle:"):
 				_play_anxiety_puzzle(argument.get_slice(":", 1))
@@ -165,8 +178,32 @@ func _on_crush_line_crossed(body: Node2D) -> void:
 # Leaving the store
 # =========================
 func _on_exit_blocked() -> void:
+	if not GameManager.leo_talk_done:
+		_refuse_to_leave()
+		return
 	Dialogic.timeline_ended.connect(_leave_store, CONNECT_ONE_SHOT)
 	Dialogic.start("leo_store_farewell")
+
+## Not without Wilson's food: a thought in the cloud and a step back into the
+## store, like a map edge. The line changes every time (never the last one).
+func _refuse_to_leave() -> void:
+	if _refusing:
+		return
+	_refusing = true
+	var choices := LEAVE_REFUSAL_LINES.filter(func(line: String) -> bool:
+		return line != _last_refusal)
+	_last_refusal = choices.pick_random()
+	var lines: Array[String] = [_last_refusal]
+	ThoughtBox.say(lines)
+	player.lock_control()
+	player.play_animation("walk_back", "idle_back")
+	var step := create_tween()
+	step.tween_property(player, "global_position", player.global_position + Vector2.UP * LEAVE_REFUSAL_STEP, 0.35)
+	await step.finished
+	player.face_direction(Vector2.UP)
+	player.update_interaction_detector_position()
+	player.unlock_control()
+	_refusing = false
 
 func _leave_store() -> void:
 	player.lock_control()

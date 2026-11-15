@@ -7,6 +7,8 @@ extends CanvasLayer
 
 const INTERLUDE_FONT := preload("res://fonts/m3x6.ttf")
 const INTERLUDE_FADE: float = 0.6
+## How fast a line leaves when the player skips it with Space.
+const INTERLUDE_SKIP_FADE: float = 0.2
 ## Seconds a line stays on screen: a base plus a little per character.
 const INTERLUDE_HOLD_BASE: float = 1.6
 const INTERLUDE_HOLD_PER_CHAR: float = 0.04
@@ -96,44 +98,40 @@ func _create_interlude_image() -> void:
 
 func _show_interlude_image(image: Texture2D) -> void:
 	interlude_image.texture = image
-	interlude_image.modulate.a = 0.0
-	interlude_image.show()
-	var fade_in_tween := create_tween()
-	fade_in_tween.tween_property(interlude_image, "modulate:a", 1.0, INTERLUDE_IMAGE_FADE)
-	await fade_in_tween.finished
-
-	_skip_line = false
-	var hold := INTERLUDE_IMAGE_HOLD
-	while hold > 0.0 and not _skip_line:
-		await get_tree().process_frame
-		hold -= get_process_delta_time()
-
-	var fade_out_tween := create_tween()
-	fade_out_tween.tween_property(interlude_image, "modulate:a", 0.0, INTERLUDE_IMAGE_FADE)
-	await fade_out_tween.finished
-	interlude_image.hide()
+	await _show_interlude_item(interlude_image, INTERLUDE_IMAGE_FADE, INTERLUDE_IMAGE_HOLD)
 
 func _show_interlude_line(line: String) -> void:
 	interlude_label.text = line
 	var is_thought := line.begins_with("«")
 	interlude_label.add_theme_color_override("font_color",
 		INTERLUDE_THOUGHT_COLOR if is_thought else INTERLUDE_NARRATION_COLOR)
-	interlude_label.modulate.a = 0.0
-	interlude_label.show()
-	var fade_in_tween := create_tween()
-	fade_in_tween.tween_property(interlude_label, "modulate:a", 1.0, INTERLUDE_FADE)
-	await fade_in_tween.finished
+	await _show_interlude_item(interlude_label, INTERLUDE_FADE,
+		INTERLUDE_HOLD_BASE + line.length() * INTERLUDE_HOLD_PER_CHAR)
 
+## Fades a line or picture in, holds it and fades it out. Space moves it on at
+## any moment: during the fade-in it shows it at once, and then it leaves
+## with a quick fade. One press skips one line (it is cleared per item).
+func _show_interlude_item(item: CanvasItem, fade: float, hold: float) -> void:
 	_skip_line = false
-	var hold := INTERLUDE_HOLD_BASE + line.length() * INTERLUDE_HOLD_PER_CHAR
+	item.modulate.a = 0.0
+	item.show()
+	await _fade_item(item, 1.0, fade)
 	while hold > 0.0 and not _skip_line:
 		await get_tree().process_frame
 		hold -= get_process_delta_time()
+	await _fade_item(item, 0.0, INTERLUDE_SKIP_FADE if _skip_line else fade)
+	item.hide()
 
-	var fade_out_tween := create_tween()
-	fade_out_tween.tween_property(interlude_label, "modulate:a", 0.0, INTERLUDE_FADE)
-	await fade_out_tween.finished
-	interlude_label.hide()
+## A fade that a press of Space cuts short (it jumps to the end).
+func _fade_item(item: CanvasItem, target_alpha: float, duration: float) -> void:
+	var tween := create_tween()
+	tween.tween_property(item, "modulate:a", target_alpha, duration)
+	while tween.is_running():
+		if _skip_line and target_alpha > 0.0:
+			tween.kill()
+			item.modulate.a = target_alpha
+			return
+		await get_tree().process_frame
 
 func _input(event: InputEvent) -> void:
 	if (interlude_label.visible or interlude_image.visible) and event.is_action_pressed("ui_accept"):
