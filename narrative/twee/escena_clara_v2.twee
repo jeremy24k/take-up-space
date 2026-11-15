@@ -1,0 +1,247 @@
+:: StoryTitle
+Escena Clara v2
+
+:: StoryData
+{
+  "ifid": "C06E5F84-E241-4B72-B170-B0DCD08F9122",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Leeme"
+}
+
+:: Leeme
+ESCENA DE CLARA — VERSIÓN 2 (borrador de escritura, 2026-11-15)
+
+Basada en el briefing de escritura de la escena de Clara (plaza de noche). Sustituye a la "Escena Clara" original: no hay escenario, ni multitud coreando, ni show de luces. Es una conversación entre dos personas en una banca.
+
+Arco: Alice entra sintiéndose invisible y agotada. Sale sintiendo que la vieron, sin haber tenido que subirse a ningún sitio. Sigue siendo tímida; solo da un paso pequeño.
+
+CÓMO LEER LAS MARCAS (las mismas de la Escena Lia v2)
+Lo que va sin icono es la caja de diálogo de abajo (Dialogic).
+💭 = pensamiento en la nube de arriba (ThoughtBox).
+🗨 = burbuja corta sobre la cabeza.
+📌 = nota para Código: movimiento, estado, señales.
+Todas las líneas son nuevas: todavía no hay nada de Clara en el juego.
+
+DECISIONES DE ESCRITURA QUE CONVIENE REVISAR
+1. El teléfono. Alice lo perdió en el metro, así que no puede escuchar su canción. Se pone los auriculares sin nada conectado (su manera de esconderse, la misma que Lía señala con "¿Por qué llevas auriculares si no escuchas nada?") y tararea la canción de memoria sin darse cuenta. Eso es lo que oye Clara.
+2. La canción. Es inventada, para no usar letra de nadie: "Bolsillo". Recoge el motivo del bolsillo de la escena de Lía (el dibujo, el número de Leo). Si la sesión de sonido hace una canción de verdad, se cambia la letra.
+3. Los vecinos de la plaza. Es de noche y la gente de día ya se fue, así que se acercan los que siguen por ahí: el chico de los auriculares, la corredora con Toby, el heladero recogiendo y los paseantes. Nadie aplaude fuerte ni corea.
+4. Dos momentos podrían ser el minijuego de ansiedad (están marcados con 📌): cuando Clara le pide el verso y cuando le pregunta qué hace ahí. Si se usan los dos puede ser demasiado; mi recomendación es dejar el minijuego solo en la confesión del final, y que el verso sea un menú normal, para no romper el momento íntimo con un reloj.
+
+[[Empezar|Llegada a la Banca]]
+
+:: Llegada a la Banca
+📌 Plaza de noche, después del metro cerrado y del fundido a negro ("No llora. Canta."). Al otro lado de la plaza, Clara termina una canción con su guitarra. Unas pocas personas aplauden flojito y se van.
+
+(La voz viene del otro lado de la plaza. Una chica con una guitarra gastada termina una canción. Tres o cuatro personas aplauden y siguen su camino.)
+💭 Canta como si no le costara nada.
+💭 ...Yo no podría ni en mi cuarto.
+
+📌 Alice se sienta en una banca, lejos del grupo. Se pone los auriculares. No suena nada: no tiene teléfono.
+Alice: (se sienta en la banca más apartada. Se pone los auriculares. No hay nada conectado. Da igual.)
+Alice: (cierra los ojos. Sin darse cuenta, tararea su canción favorita. Muy bajito.)
+
+[[Continuar|Clara se Acerca]]
+
+:: Clara se Acerca
+📌 Clara guarda la guitarra, cruza la plaza despacio y se sienta en la misma banca, en la otra punta. No la toca ni se acerca más.
+
+(Alguien se sienta en la otra punta de la banca. Deja una funda de guitarra en el suelo, con cuidado.)
+Clara: Perdona. ¿Te importa si me siento? Es la única banca sin palomas.
+Alice: (abre los ojos de golpe. Niega con la cabeza.)
+💭 Está demasiado cansada para levantarse e irse. Y la chica no se acerca más.
+Clara: (señala los auriculares con la barbilla) ¿Qué escuchas?
+Alice: N-nada. No... no tienen nada conectado.
+Clara: ¿Ah, no? (sonríe) Pues lo que tarareabas sonaba a algo.
+Alice: (se le encienden las mejillas. No sabía que se le oía.)
+Clara: Tienes una voz bonita.
+
+📌 Menú: cómo responde Alice al cumplido.
+[[«N-no... yo no canto.»|Respuesta Negar]]
+[[Decirle cómo se llama la canción|Respuesta Cancion]]
+[[Quedarse callada, mirando las manos|Respuesta Silencio]]
+
+:: Respuesta Negar
+Alice: N-no... yo no canto.
+Clara: Acabas de hacerlo. Te escuché.
+Alice: Eso no cuenta. Era... bajito.
+Clara: Lo bajito también cuenta. A veces es lo que más cuenta.
+📌 confidence +0
+
+[[Continuar|La Cancion]]
+
+:: Respuesta Cancion
+Alice: Se... se llama "Bolsillo". No es muy conocida.
+Clara: (abre mucho los ojos) ¿"Bolsillo"? No me lo puedo creer. Esa no la conoce nadie.
+Alice: (casi sonríe) Yo sí.
+Clara: Ya somos dos.
+📌 confidence +1
+
+[[Continuar|La Cancion]]
+
+:: Respuesta Silencio
+Alice: (no dice nada. Se mira las manos.)
+(Clara no insiste. Se recuesta en la banca y mira el cielo un rato, como si tuvieran todo el tiempo del mundo.)
+Clara: No te preocupes. Yo tampoco hablaba con extraños. Luego me volví una extraña que canta en la calle, imagínate.
+Alice: (se le escapa un resoplido que casi es una risa)
+📌 confidence -1
+
+[[Continuar|La Cancion]]
+
+:: La Cancion
+📌 Clara saca la guitarra de la funda, sin prisa.
+
+Clara: ¿Era esta? (toca unas notas. Se equivoca en una.)
+Alice: (sin pensar) La tercera es más grave.
+Clara: (la corrige. Suena bien.) ¿Así?
+Alice: ...Así.
+💭 ¿Por qué dije eso? Ahora va a pensar que...
+Clara: Tienes buen oído. (sigue tocando, muy bajito) Te propongo algo. Un verso. Solo uno.
+Clara: Solo un pedacito. Para mí.
+💭 No. No, no, no.
+💭 ...Pero aquí no hay nadie. Solo ella.
+
+📌 Menú (o minijuego de ansiedad, ver Leeme; recomiendo menú). Las tres opciones llevan a que Alice cante; cambia cómo llega a hacerlo.
+[[Cerrar los ojos y cantar|Cantar Ojos Cerrados]]
+[[«N-no puedo...»|Cantar Corrigiendo]]
+[[No contestar|Cantar Tarareando]]
+
+:: Cantar Ojos Cerrados
+Alice: (respira hondo. Cierra los ojos. Si no ve a nadie, quizá nadie la ve a ella.)
+📌 confidence +2
+
+[[Cantar|El Verso]]
+
+:: Cantar Corrigiendo
+Alice: N-no puedo...
+Clara: Está bien. Entonces la canto yo. Y tú me corriges si me equivoco.
+Clara: (canta la primera línea. Cambia una palabra, a propósito. Muy mal.)
+Alice: (sin pensar) No, es "guardo la voz", no "guardo la tos".
+Clara: (deja de cantar. Sigue tocando. La mira, esperando.)
+💭 ...Me engañó.
+💭 Bueno. Ya empecé.
+📌 confidence +1
+
+[[Cantar|El Verso]]
+
+:: Cantar Tarareando
+Alice: (no contesta)
+(Clara no repite la pregunta. Sigue tocando la canción, despacio, una y otra vez, como si no esperara nada.)
+(A la tercera vuelta, Alice tararea. A la cuarta, se le escapa la primera palabra.)
+📌 confidence +0
+
+[[Cantar|El Verso]]
+
+:: El Verso
+📌 EL CLÍMAX ÍNTIMO. Alice canta con los ojos cerrados, muy bajito. Clara la acompaña con la guitarra. Mientras canta, los vecinos de la plaza que siguen por ahí se acercan despacio y se quedan a escuchar, sin interrumpir: el chico de los auriculares (se quita uno), la corredora con Toby (Toby se sienta), el heladero (deja de recoger) y los paseantes.
+📌 La letra sale línea a línea, más despacio que el diálogo normal. Es inventada (ver Leeme).
+
+Alice: (canta, muy bajito, con los ojos cerrados)
+Alice: ♪ Guardo la voz en el bolsillo ♪
+Alice: ♪ junto a las cosas que no digo. ♪
+Alice: ♪ Si alguien la encuentra, que la cuide: ♪
+Alice: ♪ está hecha de miedo y de abrigo. ♪
+(La guitarra de Clara sigue un momento más. Después, silencio.)
+
+[[Abrir los ojos|Abrir los Ojos]]
+
+:: Abrir los Ojos
+📌 Alice abre los ojos y ve a los vecinos alrededor, a unos pasos. Nadie dice nada.
+
+(Alice abre los ojos.)
+(Hay gente. No mucha. El chico de los auriculares, con uno en la mano. La corredora, con Toby sentado a sus pies. El señor de los helados, con un trapo todavía en la mano.)
+💭 Me están mirando.
+💭 Me están mirando todos.
+Clara: (bajito, sin dejar de mirarla) Mira. No están aquí para juzgarte.
+(El chico asiente una vez, como quien dice "estuvo bien". Toby mueve la cola. El heladero aplaude dos veces, despacito, como para no romper nada.)
+
+📌 Menú: cómo reacciona Alice.
+[[Sostenerles la mirada un segundo|Mirada Sostenida]]
+[[Bajar la vista al suelo|Mirada Baja]]
+
+:: Mirada Sostenida
+Alice: (no baja la vista. Un segundo. Dos.)
+Alice: (y entonces, sin pedirle permiso, le sale una sonrisa.)
+📌 confidence +1
+
+[[Continuar|La Foto]]
+
+:: Mirada Baja
+Alice: (baja la vista al suelo. Le arde la cara.)
+(Toby se acerca y le apoya el hocico en la rodilla. Pesa. Está caliente. Como esta tarde.)
+Alice: (y aunque no quiere, se le escapa una sonrisa. Pequeña. Pero se le escapa.)
+📌 confidence +0
+
+[[Continuar|La Foto]]
+
+:: La Foto
+📌 Clara aprovecha la sonrisa: saca una cámara Polaroid de la funda y hace la foto. Sonido de cámara instantánea. La gente vuelve poco a poco a lo suyo.
+
+(Clic.)
+Alice: (parpadea) ¿Q-qué...?
+Clara: (agita la foto mientras se revela) Perdona. Tenía que guardar esa cara.
+(En la foto, Alice sonríe con los auriculares en el cuello. Detrás, borroso, se ve a un perro moviendo la cola.)
+Clara: (se la da) Mírala cuando vuelvas a pensar que no puedes hacer cosas difíciles.
+Alice: (la toma con las dos manos. No sabe qué decir.) ...Gracias.
+📌 inventory: foto_clara
+
+[[Continuar|La Pregunta]]
+
+:: La Pregunta
+Clara: Oye. ¿Y tú qué haces aquí a estas horas? No pareces de las que salen de noche.
+
+📌 Menú o minijuego de ansiedad (recomendado aquí: es una confesión). Respuestas: "truth" = «Perdí... el último tren.»; "basic" = «Nada. Me perdí.»; silencio = no contesta.
+[[Contarle todo|Confesion Completa]]
+[[Solo lo básico|Confesion Basica]]
+[[No contestar|Confesion Silencio]]
+
+:: Confesion Completa
+Alice: Perdí... el último tren.
+Alice: Me dormí en el metro. Me desperté en la terminal. Perdí el teléfono. Encontré una tienda. Y luego había una niña que se había perdido, y... y me quedé con ella hasta que vino su mamá.
+Clara: (silba bajito) ¿Todo eso hoy?
+Alice: (asiente)
+Clara: Y yo aquí, quejándome de que hoy nadie me echó monedas.
+Alice: (se ríe. Una risa de verdad, corta, que le sale sola.)
+📌 confidence +1
+
+[[Continuar|Despedida]]
+
+:: Confesion Basica
+Alice: Nada. Me... me perdí.
+Clara: (asiente. No pregunta más.) Le pasa a cualquiera.
+📌 confidence +0
+
+[[Continuar|Despedida]]
+
+:: Confesion Silencio
+Alice: (no contesta. Aprieta la foto.)
+Clara: Está bien. No me tienes que contar nada.
+📌 confidence -1
+
+[[Continuar|Despedida]]
+
+:: Despedida
+Clara: ¿Tienes dónde pasar la noche?
+Alice: (niega con la cabeza)
+Clara: En la esquina hay una cafetería. La de Rosa. Cierra tarde, y Rosa es buena gente. Si le dices que vas de mi parte, te deja quedarte un rato.
+(Clara saca un bolígrafo y escribe algo en el dorso de la foto.)
+Clara: La dirección. Y mi número, por si te vuelves a perder.
+(Por detrás de la foto: "Cafetería de Rosa — Calle de los Árboles". Y un número.)
+📌 inventory: numero_clara
+Clara: (se cuelga la guitarra al hombro) Ah, y una cosa.
+Clara: La próxima vez que pases por aquí, me cantas el segundo verso.
+Alice: (abre la boca para decir que no. La cierra.) ...Lo intentaré.
+Clara: Con eso me basta.
+(Clara se aleja silbando la canción. Bajito. Como la cantó Alice.)
+
+[[Continuar|Hacia la Cafeteria]]
+
+:: Hacia la Cafeteria
+📌 Alice camina hacia la cafetería de Rosa. Nube final; transición a la escena de Rosa.
+
+Alice: (guarda la foto en el bolsillo de dentro. Junto al dibujo de Lía. Junto al número de Leo.)
+💭 Me escucharon.
+💭 Y no pasó nada malo.
+
+(Siguiente escena: Rosa)

@@ -34,12 +34,10 @@
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 [ext_resource type="PackedScene" path="res://global/remark_interactable.tscn" id="remark_interactable"]
 [ext_resource type="AudioStream" uid="uid://c8um8odkwev65" path="res://audio/ambience/street.ogg" id="sa_ambience"]
-[ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/street.tres" id="sa_music"]
+[ext_resource type="AudioStream" path="res://audio/music/playlists/street.tres" id="sa_music"]
 [ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
 [ext_resource type="SpriteFrames" uid="uid://dm7qwiqtnsv06" path="res://global/npcs/assets/street_cat.aseprite" id="street_cat"]
 [ext_resource type="Texture2D" uid="uid://cd0cj73bhbbf7" path="res://scenes/street_scenes/assets/vehicles.aseprite" id="vehicles"]
-
-[ext_resource type="PackedScene" path="res://global/silhouette_zone.tscn" id="silhouette_zone"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4frjd"]
 texture = ExtResource("1_axu3w")
@@ -4451,9 +4449,6 @@ size = Vector2(68.5, 20)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_couple_blocker"]
 size = Vector2(34, 12)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tower_silhouette"]
-size = Vector2(96, 224)
-
 [node name="StreetZone1" type="Node2D" unique_id=2004074922]
 y_sort_enabled = true
 script = ExtResource("30_street")
@@ -4610,18 +4605,16 @@ region_rect = Rect2(174, 29, 37, 67)
 y_sort_enabled = true
 
 [node name="OfficeManNPC" parent="MiddleLayer/NPCS" unique_id=116967306 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(143, 121)
 column_npc = 17
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/OfficeManNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 17
 
 [node name="Shadow" parent="MiddleLayer/NPCS/OfficeManNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4634,18 +4627,16 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="StudentNPC" parent="MiddleLayer/NPCS" unique_id=1794500184 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(118, 427)
 column_npc = 2
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/StudentNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 2
 
 [node name="Shadow" parent="MiddleLayer/NPCS/StudentNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4658,18 +4649,15 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="CoupleGuyNPC" parent="MiddleLayer/NPCS" unique_id=103842882 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(741, 893)
 column_npc = 10
 
 [node name="CoupleGirlNPC" parent="MiddleLayer/NPCS" unique_id=958644570 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(763, 893)
 column_npc = 21
 
 [node name="CarOwnerNPC" parent="MiddleLayer/NPCS" unique_id=1064314859 instance=ExtResource("31_basenpc")]
 visible = false
-y_sort_enabled = true
 position = Vector2(514, 794)
 column_npc = 18
 
@@ -4678,7 +4666,7 @@ flip_h = true
 frame = 18
 
 [node name="Shadow" parent="MiddleLayer/NPCS/CarOwnerNPC/Sprite2D" index="0"]
-position = Vector2(0, 14)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4690,18 +4678,16 @@ position = Vector2(4, 3)
 position = Vector2(4, 2)
 
 [node name="PhoneGirlNPC" parent="MiddleLayer/NPCS" unique_id=103055351 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(1047, 986)
 column_npc = 3
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/PhoneGirlNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 3
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PhoneGirlNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4714,16 +4700,14 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="BenchNewspaperNPC" parent="MiddleLayer/NPCS" unique_id=1302447711 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(928, 1065)
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BenchNewspaperNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchNewspaperNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4737,18 +4721,16 @@ disabled = true
 position = Vector2(0, -16)
 
 [node name="BenchSittingNPC" parent="MiddleLayer/NPCS" unique_id=1302447712 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(140, 528)
 column_npc = 9
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BenchSittingNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -14)
-offset = Vector2(0, -9)
 frame = 9
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BenchSittingNPC/Sprite2D" index="0"]
-position = Vector2(0, -9)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4762,18 +4744,16 @@ disabled = true
 position = Vector2(0, -16)
 
 [node name="VinylWindowNPC" parent="MiddleLayer/NPCS" unique_id=1302447713 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(1185, 748)
 column_npc = 13
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/VinylWindowNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 13
 
 [node name="Shadow" parent="MiddleLayer/NPCS/VinylWindowNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4786,18 +4766,16 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="DeliveryNPC" parent="MiddleLayer/NPCS" unique_id=1473158606 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(785, 560)
 column_npc = 14
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/DeliveryNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 14
 
 [node name="Shadow" parent="MiddleLayer/NPCS/DeliveryNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4810,18 +4788,16 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="BusStopGrandmaNPC" parent="MiddleLayer/NPCS" unique_id=339081663 instance=ExtResource("31_basenpc")]
-y_sort_enabled = true
 position = Vector2(1043, 114)
 column_npc = 15
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" parent="MiddleLayer/NPCS/BusStopGrandmaNPC" index="0" unique_id=2102186028]
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
 frame = 15
 
 [node name="Shadow" parent="MiddleLayer/NPCS/BusStopGrandmaNPC/Sprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4834,21 +4810,20 @@ shape = SubResource("RectangleShape2D_npc_feet")
 position = Vector2(0, -16)
 
 [node name="PedestrianA" parent="MiddleLayer/NPCS" unique_id=192636796 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
-frames = ExtResource("36_redcap")
-y_sort_enabled = true
 position = Vector2(992, 531)
+frames = ExtResource("36_redcap")
 patrol_points = [NodePath("../../../PedestrianRoutes/PedestrianA/Point1"), NodePath("../../../PedestrianRoutes/PedestrianA/Point2")]
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/PedestrianA" index="0" unique_id=1544429594]
+position = Vector2(0, -7)
+sprite_frames = ExtResource("36_redcap")
 animation = &"idle_front"
 autoplay = "idle_front"
-frame_progress = 0.458629
-position = Vector2(0, -7)
-offset = Vector2(0, -9)
+frame_progress = 0.89306766
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianA/AnimatedSprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4867,20 +4842,20 @@ first_timeline = ""
 first_line = ""
 
 [node name="PedestrianB" parent="MiddleLayer/NPCS" unique_id=1854181935 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
-frames = ExtResource("37_blonde")
-y_sort_enabled = true
 position = Vector2(305, 439)
+frames = ExtResource("37_blonde")
 patrol_points = [NodePath("../../../PedestrianRoutes/PedestrianB/Point1"), NodePath("../../../PedestrianRoutes/PedestrianB/Point2")]
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/PedestrianB" index="0" unique_id=1544429594]
-animation = &"walk_side"
-autoplay = "idle_front"
 position = Vector2(0, -7)
-offset = Vector2(0, -9)
+sprite_frames = ExtResource("37_blonde")
+animation = &"idle_front"
+autoplay = "idle_front"
+frame_progress = 0.89306766
 
 [node name="Shadow" parent="MiddleLayer/NPCS/PedestrianB/AnimatedSprite2D" index="0"]
-position = Vector2(0, -2)
+position = Vector2(0, 5)
 texture = ExtResource("18_ia8eo")
 centered = false
 offset = Vector2(-7, -3)
@@ -4899,22 +4874,22 @@ first_timeline = ""
 first_line = ""
 
 [node name="StreetCat" parent="MiddleLayer/NPCS" unique_id=753911802 node_paths=PackedStringArray("patrol_points") instance=ExtResource("32_walknpc")]
-frames = ExtResource("street_cat")
-y_sort_enabled = true
 position = Vector2(144, 247)
+frames = ExtResource("street_cat")
 talk_animation = "meow"
 pause_near_player = 20.0
 patrol_points = [NodePath("../../../PedestrianRoutes/StreetCat/Point1"), NodePath("../../../PedestrianRoutes/StreetCat/Point2")]
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" parent="MiddleLayer/NPCS/StreetCat" index="0" unique_id=1544429594]
-animation = &"walk_side"
-autoplay = "idle_front"
 position = Vector2(0, 1)
-offset = Vector2(0, -9)
+sprite_frames = ExtResource("street_cat")
+animation = &"idle_front"
+autoplay = "idle_front"
+frame_progress = 0.33950305
 
 [node name="Shadow" parent="MiddleLayer/NPCS/StreetCat/AnimatedSprite2D" index="0"]
-position = Vector2(0, 6)
+position = Vector2(0, 5)
 texture = ExtResource("26_3ceu0")
 centered = false
 offset = Vector2(-5, -3)
@@ -5044,7 +5019,7 @@ first_line = ""
 
 [node name="WhiteVanRemark" parent="InteractableDetectors" unique_id=1917065871 instance=ExtResource("remark_interactable")]
 position = Vector2(197, 474)
-lines = Array[String](["Hay alguien dentro comiéndose un bocadillo. No miro. No miro."])
+lines = Array[String](["Hay alguien dentro comiéndose un sándwich. No miro. No miro."])
 loop_lines = true
 pool = null
 group_id = ""
@@ -5088,6 +5063,7 @@ position = Vector2(497, 79)
 script = ExtResource("39_transition")
 target_scene_path = "res://scenes/leo_store_scene/scenes/leo_store.tscn"
 fade_duration = 1.0
+spawn_point = ""
 prompt_text = "[Espacio] Entrar"
 
 [node name="CollisionShape2D" parent="InteractableDetectors/ShopDoor" index="0" unique_id=1198806918]
@@ -5196,7 +5172,7 @@ shape = SubResource("RectangleShape2D_ia_VendingMachines")
 
 [node name="AdColumn" parent="InteractableDetectors" unique_id=399655412 instance=ExtResource("remark_interactable")]
 position = Vector2(404, 211)
-lines = Array[String](["El mismo volante del minimercado."])
+lines = Array[String](["El mismo folleto del minimercado."])
 loop_lines = true
 pool = null
 group_id = "ad_column"
@@ -5216,7 +5192,7 @@ shape = SubResource("RectangleShape2D_ia_Payphone")
 
 [node name="AdColumn2" parent="InteractableDetectors" unique_id=1880000001 instance=ExtResource("remark_interactable")]
 position = Vector2(612, 86)
-lines = Array[String](["El mismo volante del minimercado."])
+lines = Array[String](["El mismo folleto del minimercado."])
 loop_lines = true
 pool = null
 group_id = "ad_column"
@@ -5350,7 +5326,7 @@ shape = SubResource("RectangleShape2D_ti_door")
 
 [node name="BuildingDoorNorthwest" parent="InteractableDetectors" unique_id=1880000011 instance=ExtResource("remark_interactable")]
 position = Vector2(113, 74)
-lines = Array[String](["Un portero automático. Odio hablar por esas cosas."])
+lines = Array[String](["Un intercomunicador. Odio hablar por esas cosas."])
 loop_lines = true
 pool = null
 group_id = ""
@@ -5419,7 +5395,7 @@ rect = Rect2(-40, -70, 80, 140)
 
 [node name="FirstCrossing" parent="ThoughtTriggers" unique_id=515253519 instance=ExtResource("35_thought")]
 position = Vector2(574, 1025)
-thought_lines = Array[String](["Solo por el paso de cebra.", "No me gusta romper las reglas."])
+thought_lines = Array[String](["Solo por el paso peatonal.", "No me gusta romper las reglas."])
 display_duration = 1.5
 wait_for_current = true
 metadata/_edit_group_ = true
@@ -5437,7 +5413,7 @@ shape = SubResource("RectangleShape2D_thought_Houses")
 
 [node name="ShoppingBlock" parent="ThoughtTriggers" unique_id=2056651043 instance=ExtResource("35_thought")]
 position = Vector2(1088, 784)
-thought_lines = Array[String](["Esta parece una zona comercial...", "Seguro hay una tienda cerca."])
+thought_lines = Array[String](["Esta parece una zona comercial...", "Seguro que hay una tienda cerca."])
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" parent="ThoughtTriggers/ShoppingBlock" index="0" unique_id=1377474002]
@@ -5499,16 +5475,10 @@ ambience = ExtResource("sa_ambience")
 music = ExtResource("sa_music")
 music_volume_db = -12.0
 
-[node name="SpawnPoints" type="Node2D" parent="."]
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=908405146]
 
-[node name="LeoStore" type="Marker2D" parent="SpawnPoints"]
+[node name="LeoStore" type="Marker2D" parent="SpawnPoints" unique_id=667437832]
 position = Vector2(497, 102)
-
-[node name="GlassTowerSilhouette" parent="." instance=ExtResource("silhouette_zone")]
-position = Vector2(568, 248)
-
-[node name="CollisionShape2D" parent="GlassTowerSilhouette" index="0"]
-shape = SubResource("RectangleShape2D_tower_silhouette")
 
 [editable path="MiddleLayer/Player"]
 [editable path="MiddleLayer/NPCS/OfficeManNPC"]
@@ -5566,4 +5536,3 @@ shape = SubResource("RectangleShape2D_tower_silhouette")
 [editable path="ThoughtTriggers/ShoppingBlock"]
 [editable path="ThoughtTriggers/WalkNormally"]
 [editable path="ThoughtTriggers/BeenHereBefore"]
-[editable path="GlassTowerSilhouette"]

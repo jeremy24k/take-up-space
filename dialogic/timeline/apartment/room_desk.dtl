@@ -1,7 +1,7 @@
 if {GameManager.quest_step} == 2.0:
 	alice: (mira la pantalla de la PC) ¿Qué...? #id:98
 	join alice (shocked) leftmost
-	alice: (se inclina un poco más, como si no pudiera creer lo que ve) No hay servicio de delivery... #id:99
+	alice: (se inclina un poco más, como si no pudiera creer lo que ve) No hay servicio a domicilio... #id:99
 	alice: ¿Cómo es posible que justo hoy...? #id:9a
 	update alice (worried)
 	alice: (mira la puerta, luego a Wilson) Eso significa que voy a tener que salir. #id:9b
@@ -18,13 +18,13 @@ if {GameManager.quest_step} == 2.0:
 	alice: Primero... ¿dónde dejé la mochila? #id:a3
 	[signal arg="step_3"]
 elif {GameManager.quest_step}  ==  3.0:
-	alice: Aún no encuentro el delivery... #id:a4
+	alice: Sigo sin encontrar servicio a domicilio... #id:a4
 	alice: Pero ya sé que no está. Solo estoy postergando lo inevitable. #id:a5
 	alice: El plato de Wilson sigue vacío. Y yo sigo aquí, mirando la pantalla. #id:a6
 	alice: No puedo quedarme más tiempo. #id:a7
 else:
 	join alice (relaxed) leftmost
-	alice: (mira la luz del sol entrando por la ventana) Qué linda mañana hace hoy. #id:a8
+	alice: (mira la luz del sol entrando por la ventana) Qué mañana tan bonita hace hoy. #id:a8
 	alice: (mira su escritorio iluminado) El sol entra justo por aquí a esta hora. #id:a9
 	alice: Mi café... todavía caliente. #id:aa
 	alice: (lo toma, lo mira) Debería esperar a que se enfríe un poco. #id:ab

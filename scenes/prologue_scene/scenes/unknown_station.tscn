@@ -2077,7 +2077,7 @@ shape = SubResource("RectangleShape2D_ti_vending")
 
 [node name="TicketWindows" parent="InteractableDetectors" unique_id=1776361100 instance=ExtResource("remark_interactable")]
 position = Vector2(276, 557)
-lines = Array[String](["Ya tengo billete."])
+lines = Array[String](["Ya tengo boleto."])
 loop_lines = true
 pool = null
 group_id = ""

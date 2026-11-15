@@ -18,6 +18,7 @@ extends Node2D
 ## [signal arg="anxiety_puzzle:<id>"].
 const ANXIETY_PUZZLES := {
 	"plaza_lia": preload("res://scenes/plaza_scene/puzzles/plaza_lia.tres"),
+	"plaza_guard": preload("res://scenes/plaza_scene/puzzles/plaza_guard.tres"),
 }
 ## Until Clara's part exists, the night ends the demo here.
 const DEMO_END_SCENE := "res://scenes/demo_end/demo_end.tscn"
@@ -79,10 +80,28 @@ const LIA_CHATTER_EVERY := Vector2(20.0, 30.0)
 const ALICE_REPLY_DELAY: float = 1.4
 ## Alice's speech bubble hangs this far above her origin.
 const ALICE_BARK_OFFSET := Vector2(0, -34)
-## Curiosity points: Lía goes to look (at LIA_PIGEON_SPEED), comes back if
-## Alice gets this far from her, and waits this long before the next point.
-const CURIOSITY_LEAVE_DISTANCE: float = 90.0
+## Curiosity points: Lía calls Alice first (CURIOSITY_CALL_LINES, in her
+## bubble, from where she is), then goes to look (at LIA_PIGEON_SPEED). She
+## comes back if Alice gets this far from her (enough to hear her even if
+## Alice keeps walking, slower meanwhile), and waits this long before the
+## next point.
+const CURIOSITY_LEAVE_DISTANCE: float = 140.0
 const CURIOSITY_COOLDOWN: float = 15.0
+## Alice's speed while Lía looks at something: she slows down to listen.
+const CURIOSITY_SPEED_SCALE: float = 0.6
+## Seconds between Lía's call and her running off.
+const CURIOSITY_CALL_TIME: float = 0.7
+## One at random, never the same as the last one.
+const CURIOSITY_CALL_LINES: Array[String] = [
+	"¡Alice, mira!",
+	"¡Espera, espera!",
+	"¡Uy! ¿Qué es eso?",
+	"¡Para! ¡Mira allá!",
+]
+## Points passed while Lía cannot go (the cooldown, a conversation) wait in
+## a queue and play as soon as she can, if Alice is still this close to them
+## (see _notice_curiosities); otherwise they stay unseen for the next time.
+const CURIOSITY_PENDING_REACH: float = 120.0
 ## The pigeon moment (see _on_pigeons_approached): its bubbles are the
 ## "Pigeons" entry of LiaCuriosity; Alice "stays" if she stands still within
 ## PIGEON_STAY_DISTANCE of Lía for PIGEON_STAY_TIME s; after the bubbles Lía
@@ -92,7 +111,7 @@ const PIGEONS_POINT := "Pigeons"
 ## walking on means getting PIGEON_LEAVE_DISTANCE away.
 const PIGEON_STAY_DISTANCE: float = 85.0
 const PIGEON_LEAVE_DISTANCE: float = 110.0
-const PIGEON_STAY_TIME: float = 2.0
+const PIGEON_STAY_TIME: float = 1.0
 const PIGEON_WAIT: float = 8.0
 ## Lía runs to the pigeons at this speed and stops this far from the flock.
 const LIA_PIGEON_SPEED: float = 110.0
@@ -111,7 +130,7 @@ const ARRIVAL_LINES: Array[String] = [
 ## gets that close to Lía or to the stairs, each a while after the previous.
 const ARRIVAL_BEATS: Array = [
 	["Está sola. ¿Dónde están sus padres?", -1.0, -1.0],
-	["Alguien la va a ayudar. Alguien que no tenga un tren que coger.", 160.0, 200.0],
+	["Alguien la va a ayudar. Alguien que no tenga un tren que tomar.", 160.0, 200.0],
 	["...Debería preguntarle qué le pasa. Pero el metro...", 100.0, 130.0],
 ]
 const ARRIVAL_BEAT_GAP: float = 4.0
@@ -169,7 +188,7 @@ const ICE_CREAM_VAN_POINT := "IceCreamVan"
 ## after Lía went home, only a thought about Leo's number. A different text
 ## from the second time on, per phase.
 const PAYPHONE_WITH_LIA := {
-	"first": {"thought": ["Una cabina. No me queda ni una moneda."], "lia": ["¡Un teléfono! ¡Me sé el número de mi mamá!", "Seis... cuatro... dos... ¿o era cinco?"], "alice": "No pasa nada. La vamos a encontrar igual."},
+	"first": {"thought": ["Una cabina. No me queda ni una moneda."], "lia": ["¡Un teléfono! ¡Me sé el número de mi mamá!", "Seis... cuatro... dos... ¿o era cinco?"], "alice": "No pasa nada. La vamos a encontrar de todos modos."},
 	"again": {"thought": [], "lia": ["(se pone el auricular en la oreja) ¿Hola? ¿Mamá? Estoy con Alice.", "...No contesta. Porque es de mentira."], "alice": ""},
 }
 const PAYPHONE_ALONE := {
@@ -200,6 +219,22 @@ const MOTHER_WALK_TIME: float = 1.8
 ## At the fountain Lía stands beside Alice, and her mother stops beside Lía.
 const LIA_BESIDE_ALICE := Vector2(22, -2)
 const MOTHER_BESIDE_LIA := Vector2(16, 0)
+## The security guard (the metro worker's sprite, another person) walks a
+## slow round southwest of the fountain all afternoon (GuardRoute), with an
+## AmbientThought. "Buscar a alguien de seguridad": he stops where he is and
+## Alice and Lía walk up to him (Alice stops this far from him, Lía on her
+## other side); afterwards he goes back to his round.
+const GUARD_TALK_DISTANCE: float = 22.0
+## His AmbientThought: with Lía on her sleeve, and once Lía went home.
+const GUARD_THOUGHT_WITH_LIA: Array[String] = ["Un guardia.", "Seguro que tiene cosas más importantes que hacer."]
+const GUARD_THOUGHT_AFTER: Array[String] = ["Sigue con su ronda.", "Como si fuera un día cualquiera."]
+## Why they do not just ask him: the first time they walk near him while
+## searching, Lía refuses (her mom would find out she left the bench) and
+## Alice is relieved (she would have to talk to a guard). Once per game.
+const GUARD_REFUSAL_LIA := "¡A ese no! Si le contamos, mi mamá va a saber que me levanté de la banca."
+const GUARD_REFUSAL_ALICE: Array[String] = ["...Y yo tendría que hablar con un guardia.", "Mejor le preguntamos a la gente."]
+## How long Dialogic waits while he turns back to his round.
+const GUARD_LEAVE_WAIT: float = 1.2
 const LEAVING_WALK_TIME: float = 3.0
 ## Toby keeps to this side of his owner, a little lower (closer to the
 ## camera): behind her one way, ahead of her on the way back.
@@ -266,6 +301,8 @@ const HELPER_TIMELINES := {
 ## Things Lía wants to look at while she holds the sleeve (CuriosityPoint).
 @onready var curiosity_points: Node2D = $CuriosityPoints
 @onready var mother_start: Marker2D = $StoryPoints/MotherStart
+@onready var guard: WalkingNPC = $MiddleLayer/NPCS/PlazaGuard
+@onready var guard_thought: InteractableArea = $MiddleLayer/NPCS/PlazaGuard/AmbientThought
 @onready var family_exit: Marker2D = $StoryPoints/FamilyExit
 
 var _lia_following: bool = false
@@ -283,6 +320,10 @@ var _watched_flock: PigeonFlock
 ## The curiosity point Lía is looking at (null when she holds the sleeve).
 var _exploring: CuriosityPoint
 var _curiosity_cooldown: float = 0.0
+var _pending_curiosities: Array[CuriosityPoint] = []
+## The point whose lines Lía is saying (set from its first line on).
+var _curiosity_talking: CuriosityPoint
+var _last_call_line: String = ""
 ## The pigeon moment: how long Alice has stood still by Lía, how long Lía
 ## still waits after her bubbles, and where Alice was last frame.
 var _pigeon_stay_time: float = 0.0
@@ -329,6 +370,9 @@ func _ready() -> void:
 	dog_lady.start_patrol()
 	for stroller in strollers:
 		stroller.start_patrol()
+	guard.start_patrol()
+	# interacted comes first, so the lines can still follow the story.
+	guard_thought.interacted.connect(_on_guard_thought)
 	toby.global_position = dog_lady.global_position + TOBY_LEASH_OFFSET
 	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
 
@@ -429,6 +473,7 @@ func _physics_process(delta: float) -> void:
 		_chatter(delta)
 		_notice_curiosities(delta)
 		_point_out_helpers()
+		_lia_refuses_guard()
 	elif _exploring != null:
 		_watch_alice_while_exploring()
 	elif _watched_flock != null and not _in_cutscene:
@@ -447,7 +492,7 @@ func _cry_for_mother(delta: float) -> void:
 ## they walk close to them (the jogger moves around and the boy is easy to
 ## miss). Once per helper, never over another bubble or a conversation.
 func _point_out_helpers() -> void:
-	if GameManager.plaza_stage != GameManager.PlazaStage.WITH_LIA or _in_cutscene:
+	if GameManager.plaza_stage != GameManager.PlazaStage.WITH_LIA or _in_cutscene or _curiosity_talking != null:
 		return
 	if Dialogic.current_timeline != null or lia_bark.is_showing() or _alice_bark.is_showing():
 		return
@@ -483,7 +528,7 @@ func _lia_then_alice(lia_lines: Array, answer: String) -> void:
 ## Lía's bubbles while she walks along (LiaChatter), each with Alice's
 ## answer out loud a moment later. Never over a conversation or a thought.
 func _chatter(delta: float) -> void:
-	if Dialogic.current_timeline != null:
+	if Dialogic.current_timeline != null or _curiosity_talking != null:
 		return
 	_chatter_timer -= delta
 	if _chatter_timer > 0.0 or lia_bark.is_showing() or _alice_bark.is_showing():
@@ -532,6 +577,10 @@ func _on_dialogic_signal(argument: Variant) -> void:
 			_toby_goes_back()
 		"time_passes":
 			_let_time_pass()
+		"guard_comes":
+			_guard_comes()
+		"guard_leaves":
+			_guard_leaves()
 		"lia_mom_arrives":
 			_mother_arrives()
 		"pigeons_fly":
@@ -654,55 +703,100 @@ func _toby_goes_back() -> void:
 ## answers in hers. Alice can wait or walk on: if she gets
 ## CURIOSITY_LEAVE_DISTANCE away, or a conversation starts, Lía runs back
 ## to the sleeve. Then nothing for CURIOSITY_COOLDOWN s.
+## A point Alice passes while Lía cannot go (the cooldown, a conversation)
+## is not lost: it waits in _pending_curiosities and plays as soon as she
+## can, if Alice is still within CURIOSITY_PENDING_REACH of it. A point only
+## counts as seen once Lía says its first line (_lia_explores).
 func _notice_curiosities(delta: float) -> void:
 	_curiosity_cooldown -= delta
-	if _curiosity_cooldown > 0.0 or _in_cutscene or Dialogic.current_timeline != null:
-		return
+	var talking := Dialogic.current_timeline != null and not ThoughtBox.is_showing()
+	var blocked := _curiosity_cooldown > 0.0 or _in_cutscene or talking
 	for point: CuriosityPoint in curiosity_points.get_children():
 		if GameManager.lia_curiosities_seen.has(point.name):
 			continue
 		if player.global_position.distance_to(point.global_position) < point.trigger_radius:
+			if blocked:
+				if not _pending_curiosities.has(point):
+					_pending_curiosities.append(point)
+				return
+			_pending_curiosities.erase(point)
 			_lia_explores(point)
+			return
+	if blocked:
+		return
+	while not _pending_curiosities.is_empty():
+		var pending: CuriosityPoint = _pending_curiosities.pop_front()
+		if GameManager.lia_curiosities_seen.has(pending.name):
+			continue
+		if player.global_position.distance_to(pending.global_position) <= CURIOSITY_PENDING_REACH:
+			_lia_explores(pending)
 			return
 
 func _lia_explores(point: CuriosityPoint) -> void:
-	GameManager.lia_curiosities_seen.append(point.name)
-	if point.name == ICE_CREAM_VAN_POINT and GameManager.lia_clues.is_empty() \
-			and not GameManager.lia_helper_hints.has("ice_cream"):
-		GameManager.lia_helper_hints.append("ice_cream")
 	_exploring = point
 	_lia_lets_go_sleeve()
-	lia_bark.hide_now()
 	_alice_bark.hide_now()
-	player.speed_scale = 1.0
+	player.speed_scale = CURIOSITY_SPEED_SCALE
+	# She calls Alice first, from where she is, so a player walking past knows
+	# something is coming.
+	lia.face_direction(lia.global_position.direction_to(point.global_position))
+	var calls := CURIOSITY_CALL_LINES.filter(func(line: String) -> bool: return line != _last_call_line)
+	_last_call_line = calls.pick_random()
+	lia_bark.say(_last_call_line, CURIOSITY_CALL_TIME + 0.6)
+	await get_tree().create_timer(CURIOSITY_CALL_TIME).timeout
+	if _exploring != point:
+		return
 	var spot := point.global_position + point.global_position.direction_to(lia.global_position) * point.look_distance
 	await _slide(lia, spot, lia.global_position.distance_to(spot) / LIA_PIGEON_SPEED)
 	if _exploring != point:
 		return
 	_face(lia, point.global_position)
 	var lines: Dictionary = LiaCuriosity.for_point(point.name)
+	if _exploring != point:
+		return
+	# Seen only now: cut off before this, it stays for next time.
+	_mark_curiosity_seen(point)
+	_curiosity_talking = point
+	# From here on the lines are said even if Alice walks on: Lía runs back
+	# to the sleeve (_watch_alice_while_exploring) and keeps talking in her
+	# bubble, which follows her. Only a conversation or a cutscene cuts it.
 	for line: String in lines["lia"]:
-		if _exploring != point:
+		if not _curiosity_still_on(point):
 			return
 		await lia_bark.say(line)
 	var answer: String = lines["alice"]
-	if _exploring != point:
+	if not _curiosity_still_on(point):
 		return
 	if not answer.is_empty():
 		_alice_bark.say(answer)
 		await get_tree().create_timer(ALICE_REPLY_DELAY).timeout
 	var last: String = lines["lia_after"]
-	if not last.is_empty() and _exploring == point:
+	if not last.is_empty() and _curiosity_still_on(point):
 		await get_tree().create_timer(1.2).timeout
-		if _exploring == point:
+		if _curiosity_still_on(point):
 			await lia_bark.say(last)
+	_curiosity_talking = null
 	_lia_comes_back()
+
+func _curiosity_still_on(point: CuriosityPoint) -> bool:
+	var talking := Dialogic.current_timeline != null and not ThoughtBox.is_showing()
+	return _curiosity_talking == point and not _in_cutscene and not talking
+
+func _mark_curiosity_seen(point: CuriosityPoint) -> void:
+	if not GameManager.lia_curiosities_seen.has(point.name):
+		GameManager.lia_curiosities_seen.append(point.name)
+	if point.name == ICE_CREAM_VAN_POINT and GameManager.lia_clues.is_empty() \
+			and not GameManager.lia_helper_hints.has("ice_cream"):
+		GameManager.lia_helper_hints.append("ice_cream")
 
 ## Alice walked off, or a conversation started: Lía runs back to her.
 func _watch_alice_while_exploring() -> void:
 	var talking := Dialogic.current_timeline != null and not ThoughtBox.is_showing()
 	if talking or player.global_position.distance_to(lia.global_position) > CURIOSITY_LEAVE_DISTANCE:
-		lia_bark.hide_now()
+		# Already talking about the point: she keeps talking on her way back.
+		if talking or _curiosity_talking != _exploring:
+			_curiosity_talking = null
+			lia_bark.hide_now()
 		_lia_comes_back()
 
 func _lia_comes_back() -> void:
@@ -1061,6 +1155,68 @@ func _mother_arrives() -> void:
 	var stop := lia.global_position + MOTHER_BESIDE_LIA
 	lia_mom.sprite.flip_h = stop.x < mother_start.global_position.x
 	await _slide(lia_mom, stop, MOTHER_WALK_TIME)
+	Dialogic.paused = false
+
+## Like the helper hints: automatic, once, never over another bubble, a
+## thought or a conversation.
+func _lia_refuses_guard() -> void:
+	if GameManager.lia_guard_refused or GameManager.plaza_stage != GameManager.PlazaStage.WITH_LIA:
+		return
+	if _in_cutscene or _curiosity_talking != null or Dialogic.current_timeline != null:
+		return
+	if lia_bark.is_showing() or _alice_bark.is_showing():
+		return
+	if player.global_position.distance_to(guard.global_position) > HELPER_HINT_DISTANCE:
+		return
+	GameManager.lia_guard_refused = true
+	_chatter_timer = maxf(_chatter_timer, LIA_CHATTER_EVERY.x)
+	await lia_bark.say(GUARD_REFUSAL_LIA)
+	if not _in_cutscene:
+		ThoughtBox.say(GUARD_REFUSAL_ALICE)
+
+func _on_guard_thought() -> void:
+	match GameManager.plaza_stage:
+		GameManager.PlazaStage.LIA_HOME, GameManager.PlazaStage.MISSED_TRAIN:
+			guard_thought.set_lines(GUARD_THOUGHT_AFTER)
+		_:
+			guard_thought.set_lines(GUARD_THOUGHT_WITH_LIA)
+			# The security branch can echo it.
+			GameManager.plaza_guard_noticed = true
+
+## "guard_comes": the guard stops on his round when he sees them coming and
+## Alice and Lía walk up to him (Dialogic waits).
+func _guard_comes() -> void:
+	Dialogic.paused = true
+	guard.stop_patrol()
+	var from_guard := guard.global_position.direction_to(player.global_position)
+	if from_guard == Vector2.ZERO:
+		from_guard = Vector2.RIGHT
+	var spot := guard.global_position + from_guard * GUARD_TALK_DISTANCE
+	_face(guard, player.global_position)
+	# Lía stands beside Alice (not behind her), both facing him.
+	var side := Vector2(-from_guard.y, from_guard.x)
+	if side.x < 0.0:
+		side = -side
+	var lia_spot := spot + side * LIA_BESIDE_ALICE.length()
+	_slide(lia, lia_spot, lia.global_position.distance_to(lia_spot) / LIA_CHASE_SPEED)
+	await _walk_player(spot)
+	player.face_direction(player.global_position.direction_to(guard.global_position))
+	lia.face_direction(lia.global_position.direction_to(guard.global_position))
+	_face(guard, player.global_position)
+	Dialogic.paused = false
+
+## "guard_leaves": he goes back to his round (not awaited: he walks off
+## while the scene goes on, keeping an eye on them).
+func _guard_leaves() -> void:
+	Dialogic.paused = true
+	# He would wait for Alice to move away (pause_near_player): not now.
+	var pause_near := guard.pause_near_player
+	guard.pause_near_player = 0.0
+	guard.start_patrol(true)
+	get_tree().create_timer(GUARD_LEAVE_WAIT * 4.0).timeout.connect(func() -> void:
+		guard.pause_near_player = pause_near)
+	await get_tree().create_timer(GUARD_LEAVE_WAIT).timeout
+	player.face_direction(player.global_position.direction_to(lia.global_position))
 	Dialogic.paused = false
 
 ## Lía and her mother walk off together while the goodbye lines go on.

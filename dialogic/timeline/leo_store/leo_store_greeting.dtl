@@ -6,7 +6,7 @@ alice: (se queda paralizada en la entrada) #id:137
 alice: ... #id:138
 (Un chico de sonrisa fácil la mira desde el mostrador.) #id:139
 [signal arg="leo_wave_end"]
-alice: (siente que le arden las mejillas y se desvía hacia las góndolas) #id:13a
+alice: (siente que le arden las mejillas y se desvía hacia los estantes) #id:13a
 leave alice
 leave leo
 [signal arg="leo_greeted"]

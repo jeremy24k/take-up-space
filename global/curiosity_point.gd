@@ -11,7 +11,7 @@ extends Marker2D
 ## owning scene polls the points and decides (plaza.gd). Its node name is its
 ## id (the key of its lines in the scene's data). Put the marker where the
 ## thing is; the companion stops look_distance px short of it, on her side.
-@export var trigger_radius: float = 48.0:
+@export var trigger_radius: float = 80.0:
 	set(value):
 		trigger_radius = value
 		queue_redraw()

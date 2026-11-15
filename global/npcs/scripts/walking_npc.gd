@@ -70,6 +70,9 @@ const PAUSE_HYSTERESIS: float = 12.0
 var _walk_tween: Tween
 var _walk_direction := Vector2.ZERO
 var _paused_for_player: bool = false
+## Bumped by start_patrol / stop_patrol: a patrol loop that sees a newer
+## token stops.
+var _patrol_token: int = 0
 
 # =========================
 # Pausing near Alice
@@ -197,7 +200,10 @@ func walk_to(target_position: Vector2, speed: float = DEFAULT_WALK_SPEED) -> voi
 func walk_path(points: Array[Vector2], speed: float = DEFAULT_WALK_SPEED) -> void:
 	collision_layer = 0
 	var last_direction := Vector2.ZERO
+	var patrol := _patrol_token
 	for point in points:
+		if patrol != _patrol_token:
+			break
 		var direction := await _walk_leg(point, speed)
 		if direction != Vector2.ZERO:
 			last_direction = direction
@@ -206,21 +212,29 @@ func walk_path(points: Array[Vector2], speed: float = DEFAULT_WALK_SPEED) -> voi
 	collision_layer = SOLID_COLLISION_LAYER
 
 ## Walks patrol_points forward, then backwards, forever, resting
-## patrol_pause seconds at each end. Starts at the first point. Does nothing
-## with fewer than two points.
-func start_patrol() -> void:
+## patrol_pause seconds at each end. Starts at the first point (placed there,
+## or walking there from where it stands with from_here). Does nothing with
+## fewer than two points. stop_patrol() ends it.
+func start_patrol(from_here: bool = false) -> void:
 	var points: Array[Vector2] = []
 	for marker in patrol_points:
 		if marker:
 			points.append(marker.global_position)
 	if points.size() < 2:
 		return
-	global_position = points[0]
+	_patrol_token += 1
+	var patrol := _patrol_token
+	if from_here:
+		await walk_to(points[0], patrol_speed)
+		if patrol != _patrol_token:
+			return
+	else:
+		global_position = points[0]
 	if patrol_loop:
 		_patrol_circuit(points)
 		return
 	var forward := true
-	while is_inside_tree():
+	while is_inside_tree() and patrol == _patrol_token:
 		var leg: Array[Vector2] = points.duplicate()
 		if not forward:
 			leg.reverse()
@@ -233,13 +247,25 @@ func start_patrol() -> void:
 		heading = global_position.direction_to(next_point)
 		await get_tree().create_timer(_rest_time()).timeout
 
+## Stops the patrol where it is (mid-leg too), standing still. A scene uses
+## it to have a walker stop for a moment, then start_patrol(true).
+func stop_patrol() -> void:
+	_patrol_token += 1
+	if _walk_tween and _walk_tween.is_valid():
+		_walk_tween.kill()
+		# Wakes up the leg that was waiting for it, so the old patrol ends.
+		_walk_tween.finished.emit()
+	_paused_for_player = false
+	face_direction(Vector2.DOWN)
+
 ## Laps around points, back to the first one each time, with patrol_pause
 ## (if any) at the start of every lap.
 func _patrol_circuit(points: Array[Vector2]) -> void:
 	var lap: Array[Vector2] = points.duplicate()
 	lap.remove_at(0)
 	lap.append(points[0])
-	while is_inside_tree():
+	var patrol := _patrol_token
+	while is_inside_tree() and patrol == _patrol_token:
 		await walk_path(lap, patrol_speed)
 		if patrol_pause > 0.0:
 			face_direction(Vector2.DOWN)

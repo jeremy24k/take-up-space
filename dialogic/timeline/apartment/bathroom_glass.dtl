@@ -7,7 +7,7 @@ elif {GameManager.quest_step} >= 4.0:
 	else:
 		alice: (se pone frente al espejo del lavamanos) Hola, Alice. #id:50
 	join alice (nervous) leftmost
-	alice: (respira hondo) Vale. Un par de frases. Como si fuera de verdad. #id:51
+	alice: (respira hondo) Bueno. Un par de frases. Como si fuera de verdad. #id:51
 	alice: Primero algo fácil. Entro a una tienda y... #id:52
 	leave alice
 	[signal arg="anxiety_puzzle:practice_store"]
@@ -52,8 +52,8 @@ elif {GameManager.quest_step} >= 4.0:
 		join alice (worried) leftmost
 		alice: ...Callarse también es una respuesta. Supongo. #id:65
 	update alice (nervous)
-	alice: (suspira) Bueno. Con eso alcanza. #id:66
-	alice: Allá afuera no va a ser igual. Pero algo es algo. #id:67
+	alice: (suspira) Bueno. Con eso basta. #id:66
+	alice: Ahí afuera no va a ser igual. Pero algo es algo. #id:67
 	leave alice
 	[signal arg="mirror_practice_done"]
 else:

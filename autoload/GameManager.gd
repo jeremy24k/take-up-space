@@ -92,6 +92,11 @@ var lia_helper_hints: Array[String] = []
 ## How many times Alice used a plaza payphone, per phase ("with_lia",
 ## "alone"): the second time has its own text.
 var plaza_payphone_visits: Dictionary = {}
+## Alice already thought about the guard on his round (his AmbientThought):
+## the security branch can echo it.
+var plaza_guard_noticed: bool = false
+## Lía already refused to ask the guard (plaza.gd, once per game).
+var lia_guard_refused: bool = false
 ## Curiosity points Lía already went to look at (CuriosityPoint names).
 var lia_curiosities_seen: Array[String] = []
 ## Whether Alice talked to a plaza helper with Lía (they gave their clue, or

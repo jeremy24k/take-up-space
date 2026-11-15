@@ -44,6 +44,7 @@ directories/dch_directory={
 "lia": "res://dialogic/characters/lia.dch",
 "lia_mom": "res://dialogic/characters/lia_mom.dch",
 "metro_worker": "res://dialogic/characters/metro_worker.dch",
+"plaza_guard": "res://dialogic/characters/plaza_guard.dch",
 "plaza_old_man": "res://dialogic/characters/plaza_old_man.dch",
 "wilson": "res://dialogic/characters/wilson.dch"
 }
@@ -195,7 +196,7 @@ translation/add_separator=true
 translation/intern/save_mode=0
 translation/intern/file_mode=0
 translation/intern/translation_folder="res://translations"
-translation/id_counter=973
+translation/id_counter=983
 
 [display]
 
