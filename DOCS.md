@@ -162,7 +162,8 @@ Escucha `Dialogic.signal_event` y avanza `quest_step` con las señales
 `AppExit.quit_game()` es la única forma de cerrar el juego desde código. En
 macOS se salta el cierre normal de Godot para evitar un crash del addon
 TileMapDual, y también atiende Cmd+Q y el botón de cerrar la ventana. Detalles
-en "Cosas pendientes".
+en "Cosas pendientes". Por eso, en macOS, "Salir" termina con código 137
+(`OS.kill`): es a propósito, no un fallo (lo vio el playtest del 2026-11-14).
 
 ### `ThoughtBox` (`autoload/ThoughtBox.gd`) — la mente de Alice
 El juego tiene **dos lenguajes visuales**, los dos con Dialogic:
@@ -273,7 +274,14 @@ await FadeTransition.transition_with_interlude("res://ruta.tscn", ["Línea 1", "
 ```
 
 `transition_with_interlude` muestra unas líneas (m3x6, centradas) con la
-pantalla en negro antes de cargar la escena; Espacio salta la línea actual. La
+pantalla en negro antes de cargar la escena. **Espacio adelanta línea a
+línea** (2026-11-14, playtest: las cartelas tras la tienda y tras el metro
+cerrado no se podían saltar): pulsado durante el fundido de entrada, la línea
+se completa al instante; pulsado mientras está en pantalla, se va con un
+fundido rápido (`INTERLUDE_SKIP_FADE`, 0,2 s). Cada línea limpia la pulsación,
+así que una pulsación salta una sola línea (`_show_interlude_item`,
+`_fade_item`; vale también para la ilustración). Antes, una pulsación durante
+el fundido de entrada se perdía. La
 narración sale en lila; lo que Alice piensa se escribe entre «» y sale en
 blanco (p. ej. «Le di mi número. ¿Qué hice?»). Es
 un puente entre dos lugares para que Alice no parezca teletransportarse. La
@@ -302,6 +310,12 @@ player.play_animation("sit_down", "idle_front")   # el 2º es fallback si no exi
 
 `lock_control()` sobrevive a un diálogo que ocurra dentro de la cutscene: al
 terminar el diálogo, Alice sigue bloqueada hasta que llames `unlock_control()`.
+
+**Silueta** (2026-11-14): `set_silhouette(true/false)` muestra u oculta una
+copia plana y semitransparente de su forma (`_silhouette`, creada en código:
+un `AnimatedSprite2D` hijo del cuerpo con un shader de color plano,
+`SILHOUETTE_COLOR`, `z_index` 20) que `_sync_outfit()` mantiene en la misma
+animación y frame. La enciende una `SilhouetteZone` (sección 5).
 
 **Sprite por capas (2026-10-25).** Alice se dibuja desde un solo archivo,
 `player/alice.aseprite`, con cinco capas: `body` (Alice descalza), `backpack`,
@@ -369,7 +383,7 @@ Para especializarla: `extends "res://global/interactable_area.gd"` y sobrescribe
 
 | Script | Qué hace |
 |---|---|
-| `pickable_item.gd` | Objeto recogible; se borra si ya está en `GameManager`. La mochila solo muestra "[Recoger]" cuando ya están los otros tres objetos; antes muestra "[Espacio]" |
+| `pickable_item.gd` | Objeto recogible; se borra si ya está en `GameManager`. La mochila solo muestra "[Recoger]" cuando ya están los otros tres objetos; antes muestra "[Espacio]". Su `AreaDetector` tiene que ser bastante más grande que su colisión: el de los auriculares de la cama (16×11, casi como el objeto) apenas se alcanzaba y se amplió a 40×34 (2026-11-14) |
 | `lamp_interactable.gd` | Sincroniza un `PointLight2D` con `Dialogic.VAR.lamp_is_on` |
 | `seat_interactable.gd` | Sienta a Alice y emite `player_sat_down` |
 | `train_door_area.gd` | Secuencia de subir al tren |
@@ -381,10 +395,43 @@ necesita `[Espacio]`).
 
 ```gdscript
 @export_file target_scene_path
+@export spawn_point              # opcional: Marker2D de SpawnPoints en la escena destino
 var is_locked                    # si está bloqueada emite blocked_interaction
 signal blocked_interaction       # ...para que la escena reaccione (diálogo, pensamiento)
 signal transition_started
 ```
+
+**Punto de aparición** (2026-11-14): `spawn_point` se guarda en
+`GameManager.spawn_point` antes del fundido. La escena destino lo lee una vez
+con `GameManager.take_spawn_point()` y pone a Alice en `SpawnPoints/<nombre>`
+(solo la calle lo hace, `_place_at_spawn_point()` en `street_zone_1.gd`). La
+salida de la tienda de Leo tiene `spawn_point = "LeoStore"`: antes, al salir
+sin comprar, Alice aparecía en la salida del metro, en la otra punta del
+mapa. Desde el 2026-11-14 esa salida ya no deja ir a la calle (sin pagar,
+Alice se niega; pagado, va a la plaza), pero el punto se queda por si algún
+día vuelve a llevar a la calle.
+Para otra puerta: un `Marker2D` en `SpawnPoints` de la escena destino, el
+nombre en la `SceneTransitionArea`, y que la escena destino llame a
+`take_spawn_point()` en su `_ready`.
+
+### `PassageArea` (`global/passage_area.gd` + `.tscn`)
+Paso sin arte entre dos habitaciones de la misma escena (2026-11-14). Al
+pisarla (cuerpo de Alice, `collision_mask = 2`) funde a negro un momento
+(`fade_time`, 0,2 s), pone a Alice en `exit_point` (un `Marker2D`) mirando a
+`exit_facing` y le devuelve el control. Va una en cada extremo, y el
+`exit_point` de cada una tiene que quedar fuera del área de la otra. Uso: la
+puerta del salón al baño del piso (`BathroomPassage` en `apartment.tscn`):
+el pasillo entre las dos habitaciones está tapado por baldosas negras de
+`SuperiorLayer` y Alice desaparecía unos 60 px.
+
+### `SilhouetteZone` (`global/silhouette_zone.gd` + `.tscn`)
+Zona detrás de algo alto que tapa a Alice entera (2026-11-14). Mientras su
+cuerpo está dentro, `Player.set_silhouette(true)` dibuja una copia plana y
+semitransparente de su forma (lila, `SILHOUETTE_COLOR`) por encima del
+decorado (`z_index` 20). La forma solo debe cubrir la parte donde queda
+escondida, no por donde pasa por delante. Uso: detrás de la torre de cristal
+de la calle (`GlassTowerSilhouette`). La torre se sigue dibujando encima de la
+calzada: es perspectiva (un edificio alto delante de la calle), no un error.
 
 ### `ExitArea` (`global/exit_area.gd`)
 Cambia de escena **sola**, al entrar en su radio — sin `[Espacio]`, sin depender
@@ -421,6 +468,9 @@ Alice (`body_entered`) e ignora su `InteractionDetector`.
 Se repite cada vez que vuelve al borde, salvo que `one_time_interaction` esté
 activo. Emite `interacted` al empezar y `pushed_back` al terminar, por si la
 escena quiere cambiar el `timeline_name` (por ejemplo, otro texto la segunda vez).
+Las señales corren al instante, así que la escena puede cambiar
+`thought_lines` en `interacted` y Alice ya piensa el texto nuevo (la entrada
+de la plaza lo hace según la etapa, sección 15).
 Uso: instanciar `boundary_area.tscn`, darle un `RectangleShape2D` propio a su
 `CollisionShape2D` y fijar `thought_lines` (o `timeline_name`) y
 `push_direction`. En la calle usan la línea "Mejor no me alejo más. Si me
@@ -591,7 +641,10 @@ vez y se ve mientras al menos una la pida.
   la teñía de rosa, y paredes y techos la podían tapar.
 - Arriba a la derecha de la cabeza (`BASE_POSITION` = (10, −24)), no encima:
   encima suele estar la persona a la que Alice mira.
-- Aparece con un pop, flota 1 px, y se apaga con un fundido. Al pulsar Espacio
+- Aparece con un pop, flota 2 px, y se apaga con un fundido. Desde el
+  2026-11-14 (playtest) el pop es un pulso claro (crece hasta 1,6× y vuelve
+  a 1, `POP_SCALE`) y, mientras siga visible, da un pulso suave (1,25×,
+  `PULSE_SCALE`) cada 3,5 s (`PULSE_EVERY`). Solo escala, nunca color. Al pulsar Espacio
   se apaga y suben las burbujas de verdad hacia la nube.
 - **Nunca mientras se prepara o se muestra un pensamiento** (`_refresh_notice`
   mira `_starting` e `is_showing()`, y se vuelve a evaluar al empezar y al
@@ -599,6 +652,13 @@ vez y se ve mientras al menos una la pida.
   pensamiento viejo y el nuevo hay ~0,2 s sin timeline (suben las burbujas), y
   el área volvía a pedir el aviso: la nubecita asomaba un instante. Además
   espera 0,12 s (`SHOW_DELAY`) antes de aparecer, para no parpadear nunca.
+- **Playtest (2026-11-14):** el tester dijo que la gente de fondo de la plaza
+  (guitarrista, señora de las palomas, pareja, lector) "no respondía".
+  Comprobado en el juego: con Alice al lado, la nubecita sale y Espacio
+  muestra su línea, desde abajo y desde los lados. El problema es que es
+  discreta (15×13, 1 px de vaivén) y, si el NPC está justo encima, se
+  confunde con su cabeza. Se resolvió con el pulso y el vaivén de 2 px
+  (arriba); el "[Espacio]" la primera vez se descartó.
 
 **Regla de coherencia:** si un tipo de objeto responde en algún lugar,
 responden todos los que se ven igual. Si un tipo no tiene contenido en ningún
@@ -685,9 +745,37 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
 - **Frase que no lleva a ningún lado:** además de temblar en rojo y
   reacomodarse, la pista de arriba muestra "No... así no." durante 1,2 s. Sin
   eso, el reinicio parecía un fallo.
-- **Ninguna palabra tiene el foco al abrir.** La primera flecha enfoca una; hasta
-  entonces Espacio no dice nada. Antes el foco caía en una palabra al azar y
-  el Espacio de cerrar el diálogo anterior la decía sin querer.
+- **Al abrir ya hay una palabra elegida** (2026-11-14, playtest: "al empezar
+  no hay ninguna palabra seleccionada"): la primera en orden de lectura
+  (arriba a la izquierda, por filas de una palabra de alto), nunca "(...)"
+  (`_focus_first_word`). Lo mismo tras elegir una palabra o tras un error.
+  Para que el Espacio de cerrar el diálogo anterior no la diga sin querer,
+  Espacio no hace nada los primeros `OPEN_GRACE` (0,5 s) tras el fundido.
+  Antes no había foco hasta la primera flecha.
+- **Flechas predecibles** (2026-11-14): la navegación de foco de Godot
+  saltaba a palabras inesperadas. `_input` intercepta las flechas antes que la
+  GUI y `_word_towards` elige la palabra más cercana en esa dirección:
+  puntuación = distancia hacia delante + distancia de lado × `NAV_SIDE_WEIGHT`
+  (2), así gana la que está más alineada. Arriba/abajo exige al menos media
+  palabra de altura de diferencia (una palabra unos píxeles más alta está en
+  la misma fila). Si no hay ninguna en esa dirección, el foco no se mueve.
+- **El tiempo se nota sin reloj** (2026-11-14): además de la viñeta que se
+  cierra y los pensamientos que cambian más rápido, la viñeta **late** como
+  un corazón (doble golpe, `_heartbeat_pulse`): de 1 a 2,1 latidos por
+  segundo (`BEAT_RATE`) y más hondo cuanto menos tiempo queda (`BEAT_DEPTH`,
+  uniform `beat` del shader). Las palabras tiemblan hasta 2 píxeles de arte al
+  final (`MAX_JITTER` 6 px de pantalla en `thought_word.gd`; antes 3).
+- **Cuando se acaba el tiempo** (2026-11-14): `_run_out_of_time()` pone en el
+  lugar de la consigna una frase de `TIME_OUT_LINES` (8 de Guion: "(Se queda
+  en blanco.)", "(Un nudo en la garganta. Nada.)"...), al azar y nunca la
+  misma que la vez anterior en cualquier puzzle (`_next_time_out_line`, con
+  una `static var`). Las palabras bajan y se desvanecen y, tras
+  `TIME_OUT_HOLD` (1,4 s), devuelve `"silence"`. Antes el puzzle se cerraba de
+  golpe y el tester creyó que el juego no registraba sus pulsaciones. Elegir
+  "(...)" sigue cerrando directamente.
+- **"Bueno... gracias." con Leo es a propósito:** es la respuesta `"leave"` de
+  `leo_number` (dos palabras: Alice se despide sin pedirle el número), con su
+  rama en `leo_store_checkout.dtl`. No es un fallo.
 - **`relaxed`** (ensayo): sin reloj, sin viñeta que se cierra y sin perder
   tiempo por error. Solo se sale eligiendo una frase o "(...)". Lo usan los
   tres ensayos del espejo.
@@ -1181,6 +1269,61 @@ func _on_worker_area_entered(area: Area2D) -> void:
     if area.get_parent() is Player:
         worker_interactable.interact()
 ```
+
+### Torniquetes (2026-11-14, playtest)
+Son baldosas de `AssetsLayerSuperior` (atlas 8×8): tres torniquetes con poste
+(columnas 2/6) y brazo; los dos rojos (brazo `3:8`/`4:8`) bloquean y el verde
+(brazo `7:8`/`8:8`, sin colisión) deja pasar. El tester solo podía cruzar por
+una franja de unos 12 px y no entendía por qué no pasaba por los rojos:
+- **Paso más ancho:** la reja del trabajador (celdas `15–18`/`14` × filas
+  44–47) se movió dos celdas a la derecha y el `WorkerNPC` con ella. El hueco
+  entre el poste verde y la reja pasó de 24 a 40 px (Alice mide 17).
+  **Ojo (2026-11-14):** después, en el editor, la reja se alargó hacia la
+  izquierda (piezas 16 y 17 repetidas, desde la celda 92) y el trabajador
+  volvió a x 753, así que el hueco vuelve a ser de 24 px. Lo cambió el
+  usuario a propósito: no tocar.
+- **Los rojos dicen algo:** `RedTurnstiles/RedTurnstileLeft` y `...Right`
+  (`BoundaryArea`, 20×8 justo debajo del brazo, x 660 y 692, y 376) la
+  devuelven 14 px hacia abajo con un pensamiento. Lo lleva la pieza
+  `Turnstiles` (abajo).
+- **El verde se distingue:** `LightsContainer/GreenTurnstileLight`, una
+  `PointLight2D` verde pequeña sobre la luz del torniquete, que respira.
+
+**`Turnstiles` (`global/turnstiles.gd`)** (2026-11-14): va en el nodo
+`RedTurnstiles` de las dos estaciones, cuyos hijos son los `BoundaryArea`
+de los torniquetes rojos. Al chocar con uno (en `interacted`, antes de que
+lea sus líneas) le pone el pensamiento: la primera vez "Este no
+funciona..." y las siguientes "Este tampoco." / "Tiene que haber uno que
+funcione." (`FIRST_LINES`/`AGAIN_LINES`, cuenta compartida entre los rojos
+de la escena). Si vuelve a chocar antes de 3 s (`QUIET_TIME`, p. ej. con la
+flecha mantenida, que la hace rebotar cada medio segundo), la devuelve sin
+pensamiento nuevo, para no tapar el que está en pantalla. También hace
+respirar su `green_light` (energía 0,7–1,4 en 1,6 s). Pasar por debajo de
+los torniquetes no dispara los rojos.
+
+**En `metro_stations`** (la primera estación): un torniquete rojo (poste en
+la celda 72, brazo 73–74) y uno verde (poste 76, brazo 77–78), en la fila
+81. La valla de la derecha (celdas 80–83) no podía moverse porque al lado
+hay una estructura: se acortó a sus dos extremos (`15` en la 82, `18` en la
+83), así el paso verde pasó de 24 a 40 px (el centro de Alice cruza entre
+x 626 y 646). `RedTurnstiles/RedTurnstile` (x 596, y 668, empuja hacia
+abajo: Alice viene de la entrada de abajo) y `GreenTurnstileLight`
+(612, 644). Mismo `y_sort_origin` de vallas y torniquetes que en la
+terminal. Alice ya tiene billete (la taquilla lo explica): el verde la deja
+pasar sin más.
+
+**Orden de dibujado de vallas y torniquetes** (2026-11-14): cada baldosa se
+ordenaba por su propia altura y solo la fila de abajo tiene colisión, así
+que Alice, al norte de una valla, quedaba entre las filas (pintada encima de
+la de arriba). Ahora todas las baldosas de esas piezas (`2:7–9`, `3:8–9`,
+`4:8`, `6:7–9`, `7:8–9`, `8:8`, `14:7–9`, `15–18:8–9`) tienen
+`y_sort_origin` hasta su fila de abajo (fila 10): si está al norte, queda
+detrás de toda la pieza.
+
+**Pilares negros** (2026-11-14): los dos pilares (`WallBorders`, TileMapDual)
+solo tenían colisión en su mitad de abajo (`ColisonesDual`, fila 15) y Alice
+se metía en la de arriba y desaparecía. Se añadieron las celdas
+`(17,14)`, `(18,14)`, `(24,14)` y `(25,14)` a `ColisonesDual`.
 
 ### El primer Rompecabezas de la Ansiedad de verdad (el trabajador)
 Es el **primer contacto de Alice con un desconocido** (regla 1 del puzzle).
@@ -1845,8 +1988,15 @@ LeoStore (Node2D, y_sort)               leo_store.gd
      se habían perdido al guardar desde el editor.)
    - Darle el suyo (menú): +2 si había pedido el de él, +1 si no; o no
      dárselo (0).
-5. **La salida.** Al terminar la charla, `ExitToStreet` queda bloqueada
-   (`is_locked`). Al intentar salir, `blocked_interaction` dispara
+5. **La salida.** `ExitToStreet` está siempre bloqueada (`is_locked`).
+   **Sin haber pagado** (`leo_talk_done` en falso, 2026-11-14, el usuario no
+   quiere que se pueda salir sin la comida de Wilson): `_refuse_to_leave()`
+   muestra en la nube una de `LEAVE_REFUSAL_LINES` ("No puedo irme ahora.",
+   "Tengo que encontrar la comida de Wilson.", "Sé que estás nerviosa, Alice,
+   pero tenemos que hacer esto."), al azar y nunca la misma que la anterior,
+   y la hace retroceder 16 px hacia dentro (`LEAVE_REFUSAL_STEP`), como un
+   borde del mapa. Antes se podía salir a la calle sin comprar.
+   **Ya pagado:** al intentar salir, `blocked_interaction` dispara
    `leo_store_farewell` ("Oye, Alice", dos variantes) y al cerrarse se pasa a
    `scenes/demo_end/demo_end.tscn`. Leo solo nombra a Wilson si Alice se lo
    dijo (rama de la verdad o al pedirle el número, señal `leo_knows_wilson`);
@@ -2270,7 +2420,11 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
    - **Ignorarla e ir al metro**: al entrar en `SubwayArea`,
      `_lia_at_the_metro()` bloquea a Alice y arranca
      `Dialogic.start("plaza_lia_meet", "metro")`. `[signal arg="focus_on_lia"]`
-     lleva la cámara hasta Lía (`pan_camera_to`, 0,9 s): "(La niña sigue
+     lleva la cámara hacia Lía (`pan_camera_to`, 0,9 s). Desde el 2026-11-14
+     encuadra a las dos (`_frame_alice_and_lia`: el punto medio, bajado lo
+     justo para que los pies de Alice queden por encima de la caja de
+     diálogo, que tapa el 27 % de abajo, `DIALOGUE_BOX_SHARE`); antes centraba
+     a Lía y Alice quedaba debajo de la caja. "(La niña sigue
      llorando.)", "(Nadie se detiene...)", "(podría seguir caminando. Nadie la
      obliga a meterse. Pero no puede dejar de mirarla.)". Después el
      rompecabezas `plaza_lia` hace de las tres decisiones del Twine:
@@ -2283,6 +2437,11 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
      - callarse = *Rama_No_Acercarse_Espera*: Lía la ve, se levanta y corre
        hasta ella (`lia_comes_to_alice`), "¡Tú llevas rato mirándome!",
        luego `forced`.
+     `lia_comes_to_alice` la pone en el primer sitio libre junto a Alice
+     (`_free_spot_by_alice`: el lado de donde viene, el otro, debajo,
+     encima; comprueba que sus pies no toquen nada sólido). Lía se desliza
+     con la colisión apagada y antes podía quedar encima de la barandilla de
+     la boca de metro.
      Cada señal de movimiento pausa Dialogic mientras dura. Al terminar, la
      cámara vuelve a Alice y se desbloquea.
    Todas terminan en `[signal arg="lia_grabs_sleeve"]` (`WITH_LIA`): Lía la
@@ -2372,6 +2531,60 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
    `ALICE_BARK_OFFSET`), 1,4 s después; una respuesta `""` = se queda
    callada. Nada sale durante una conversación. Cada frase necesita su fila
    en `game_text.csv`. Seis pares por fase.
+   **Burbujas que no se pisan** (2026-11-14): con Lía de la manga, la
+   respuesta de Alice salía encima de la frase de Lía y no se leía ninguna.
+   `SpeechBark` lleva una lista de las burbujas en pantalla (`_shown`, la más
+   antigua primero) y la que salió después sube por encima de cualquier otra
+   que tape (`_above_earlier_bubbles`, 4 px de separación). Vale para todas
+   las burbujas del juego.
+
+   **Lía señala a los ayudantes** (2026-11-14, playtest: la corredora se
+   mueve y el chico no se ve): en `WITH_LIA`, con Lía de la manga, al pasar a
+   menos de `HELPER_HINT_DISTANCE` (110 px) de un ayudante al que aún no le
+   preguntaron, Lía dice sus burbujas y Alice contesta en la suya
+   (`HELPER_HINTS`, mismo formato que las curiosidades, `_lia_then_alice`).
+   Una vez por ayudante (`GameManager.lia_helper_hints`), nunca encima de
+   otra burbuja ni de una conversación, y retrasa su charla
+   (`_point_out_helpers`). El heladero está junto a su camión: antes de la
+   primera pista, su aviso y la curiosidad `IceCreamVan` (versión `early`)
+   hablan del mismo sitio, así que solo sale la primera que toque (cada una
+   marca la otra como vista).
+
+   **La fuente con una sola pista** (2026-11-14): llegar a la fuente en
+   `WITH_LIA` con una pista no hacía nada y parecía un cuelgue. Ahora sale un
+   pensamiento una vez por visita (se rearma al salir del área) y la escena
+   no se dispara (`_fountain_too_early`): con una pista
+   `FOUNTAIN_ONE_CLUE_LINES` ("No está aquí. Todavía no."...), sin pistas
+   `FOUNTAIN_NO_CLUE_LINES` ("Una fuente... pero ni rastro de su mamá."...).
+
+   **La entrada de la plaza** (`MapBoundaries/BoundaryEntry`, 2026-11-14):
+   decía "Por ahí vine. Ahora, a buscar el metro." también con Lía. Ahora
+   `plaza.gd` le cambia `thought_lines` según la etapa en su `interacted`
+   (`ENTRY_LINES`): con Lía, "Por ahí vine yo." / "Su mamá se fue hacia la
+   plaza, no por aquí."; después, "Por ahí no. La entrada del metro está
+   aquí al lado.". La pista de Lía también cambió (`plaza_lia_meet`, ids
+   293, 29d, 2a6, 2ba): su mamá se fue "hacia la plaza", al otro lado de la
+   calle, no "por la entrada de la plaza", que está cerrada.
+
+   **Cabinas de la plaza** (2026-11-14): las cuatro cabinas azules de la valla
+   de abajo del parque (`InteractableDetectors/Payphones/Payphone1..4`,
+   `InteractableArea` sin timeline, 18×34, en x 276/404/884/1012, y 858)
+   responden igual y comparten la cuenta. Antes de Lía (`ARRIVED`) están
+   apagadas (`_refresh_payphones`). Con Lía (`WITH_LIA`/`KNOWS_FOUNTAIN`), la
+   primera vez Alice piensa "Una cabina. No me queda ni una moneda." y Lía
+   contesta en burbujas (se sabe el número de su mamá... más o menos), con
+   respuesta de Alice; las siguientes, Lía juega a llamar. Sin pista y sin
+   caja. Después de que Lía se va, solo nube sobre el número de Leo, y otra
+   las siguientes veces. Textos en `PAYPHONE_WITH_LIA` / `PAYPHONE_ALONE`;
+   la cuenta por fase en `GameManager.plaza_payphone_visits`. Las dos
+   cabinas de la calle (`street_payphone*`) no cambian: ahí Alice todavía no
+   tiene el número de Leo.
+
+   **Setos** (2026-11-14): los setos de la plaza (atlas `41–46 × 4–7` de
+   `Addons`) solo tenían colisión en la fila de abajo y Alice podía cruzar
+   por su mitad de arriba, como si caminara por dentro. Las filas 5 y 6
+   tienen ahora colisión; la de arriba (4) sigue libre para que pueda
+   quedarse detrás con las piernas tapadas.
 
    **Lía y las palomas** (2026-11-12, rediseñado el 2026-11-13; opcional,
    una sola vez, no da pista): empieza como una curiosidad y solo pasa a la

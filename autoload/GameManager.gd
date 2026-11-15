@@ -6,6 +6,18 @@ extends Node
 # Door used to enter the train interior.
 var target_door_id: int = 1
 
+## Where the next scene puts Alice: the name of a Marker2D under its
+## SpawnPoints node ("" = where the scene places her). Set by a
+## SceneTransitionArea's spawn_point; the scene reads it once with
+## take_spawn_point().
+var spawn_point: String = ""
+
+## The pending spawn point, cleared so it only applies once.
+func take_spawn_point() -> String:
+	var point := spawn_point
+	spawn_point = ""
+	return point
+
 # True after Alice checks the backpack.
 var prep_items_unlocked: bool = false
 
@@ -75,6 +87,11 @@ var lia_knows_fountain: bool:
 		return plaza_stage == PlazaStage.KNOWS_FOUNTAIN
 ## True once Lía stopped to watch the pigeons (it happens only once).
 var lia_pigeons_seen: bool = false
+## Helpers Lía already pointed out to Alice (plaza.gd, one hint each).
+var lia_helper_hints: Array[String] = []
+## How many times Alice used a plaza payphone, per phase ("with_lia",
+## "alone"): the second time has its own text.
+var plaza_payphone_visits: Dictionary = {}
 ## Curiosity points Lía already went to look at (CuriosityPoint names).
 var lia_curiosities_seen: Array[String] = []
 ## Whether Alice talked to a plaza helper with Lía (they gave their clue, or

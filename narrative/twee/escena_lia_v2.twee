@@ -113,7 +113,7 @@ Alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 Alice: (respira hondo) Primero... cuéntame cómo era tu mamá. Qué ropa traía. #id:290
 Lía: Un vestido rosa. Y pelo largo. Y tenía una bolsa de esas grandes, de tela. #id:291
 Alice: ¿Y por dónde la viste por última vez? #id:292
-Lía: (señala la entrada de la plaza) Allí. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293
+Lía: (señala al otro lado de la calle, hacia la plaza) Por allá. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293 ✎
 Lía: Pero pasó mucho, y pasó mucha gente, y yo me asusté y me levanté... y ya no supe dónde estaba. #id:294
 Alice: (algo se le retuerce adentro) Está bien. Vamos a buscar. #id:295
 📌 lia_confidence +2
@@ -129,7 +129,7 @@ Lía: Mi mamá dice que cuando uno está asustado hay que respirar. Así. #id:29
 Lía: ¿Funcionó? ✚
 Alice: ...Un poco. Sí, estoy asustada. Pero igual vamos a buscar. #id:29b ✎
 Lía: Vale. Si estamos las dos, menos asustadas. #id:29c ✎
-Lía: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza. #id:29d
+Lía: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por allá, hacia la plaza. #id:29d ✎
 Alice: Perfecto. Vamos a buscar a la señora del vestido rosa. #id:29e
 📌 lia_confidence +1
 
@@ -146,7 +146,7 @@ Lía: Yo soy buenísima a las estatuas. Mira. ✚
 (Y sin saber muy bien por qué, a Alice le dejan de temblar los dedos.) ✚
 Alice: Lo siento. #id:2a5
 Lía: ¿Por qué? Ganaste tú. Yo me reí. ✚
-Lía: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos? #id:2a6
+Lía: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por allá, hacia la plaza. ¿Vamos? #id:2a6 ✎
 Alice: Sí. Vamos. #id:2a7
 📌 lia_confidence -1
 
@@ -195,7 +195,7 @@ Lía: ¿Y por qué estás perdida? #id:2b6
 Alice: Me dormí en el metro. #id:2b7
 Lía: (se ríe) ¡Qué tonta! #id:2b8
 Alice: (no sabe si ofenderse. Pero la risa le hace un cosquilleo en el pecho.) #id:2b9
-Lía: Mi mamá se fue por la entrada de la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba
+Lía: Mi mamá se fue hacia la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba ✎
 Lía: Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí? #id:2bb
 Alice: ...Vale. Buscamos a tu mamá. ✚
 Alice: (No sabe muy bien por qué ha dicho que sí. Quizá porque decir que no le cuesta más.) ✚
@@ -230,7 +230,7 @@ Antes de conocer a Lía y después de la fuente:
 📌 Las conversaciones "ya saben lo de la fuente" van en `plaza_ice_cream_extra`, `plaza_dog_lady_extra` y `plaza_teen_extra`. Las palomas, en `plaza_lia_pigeons`.
 
 Siempre durante la búsqueda:
-[[Burbujas de Lía|Burbujas Lia]] · [[Lía se para a mirar cosas|Lia Curiosa]] · [[Palomas (opcional, una vez)|Palomas]] · [[Si Alice vuelve al metro|Metro Con Lia]]
+[[Burbujas de Lía|Burbujas Lia]] · [[Lía señala a los ayudantes|Lia Senala]] · [[Arreglos del playtest|Arreglos Playtest]] · [[Cabinas telefónicas|Cabinas Plaza]] · [[Lía se para a mirar cosas|Lia Curiosa]] · [[Palomas (opcional, una vez)|Palomas]] · [[Si Alice vuelve al metro|Metro Con Lia]]
 
 📌 Pensamientos al conseguir pistas (existentes):
 Con 1 pista: 💭 Mejor preguntarle a alguien más, por si acaso.
@@ -498,6 +498,54 @@ Tarde: 🗨 Lía: Si me siento en esa mesa, ¿parezco mayor? → 🗨 Alice: Un 
 AdColumn · columna de anuncios junto al café (opcional)
 Temprano: 🗨 Lía: ¿Por qué esa columna tiene papeles pegados? → 🗨 Alice: Son anuncios.
 Tarde: 🗨 Lía: Cuando sea mayor voy a poner un anuncio. «Se busca mamá». ...No, mejor no. → 🗨 Alice: Mejor no. Seguimos buscando.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Lia Senala
+📌 Playtest: con Lía de la manga, al acercarse a un ayudante al que todavía no han preguntado, Lía lo señala. Una vez por ayudante. Solo burbujas. Todas las líneas son ✚.
+📌 El heladero está junto al camión de helados: si sale esta burbuja, conviene saltarse la curiosidad IceCreamVan "temprano" (o al revés), para que Lía no hable dos veces seguidas del mismo sitio.
+
+Heladero: 🗨 Lía: ¡Un señor de los helados! Los señores de los helados lo ven todo. → 🗨 Alice: ...Podemos preguntarle.
+Corredora con Toby: 🗨 Lía: ¡Mira, un perro gigante! A lo mejor su dueña vio a mi mamá. → 🗨 Alice: A lo mejor.
+Chico de auriculares: 🗨 Lía: Ese chico lleva auriculares como tú. ¿Le preguntamos? → 🗨 Alice: No sé si nos va a oír.
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Arreglos Playtest
+📌 Arreglos del playtest a ciegas en la escena de Lía. Todas las líneas son pensamientos (💭) nuevos (✚), que van en game_text.csv.
+
+LA PISTA DE LÍA
+📌 "Se fue por la entrada de la plaza" llevaba a la salida sur, que está bloqueada. Ahora Lía señala "por allá, hacia la plaza", al otro lado de la calle, donde están los ayudantes. Son las líneas #id:293, #id:29d, #id:2a6 y #id:2ba (marcadas ✎ en el encuentro).
+
+SALIDA SUR BLOQUEADA (BoundaryEntry), según la etapa
+Antes de conocer a Lía (sin cambios): 💭 Por ahí vine. Ahora, a buscar el metro.
+Con Lía, buscando: 💭 Por ahí vine yo. ✚ / 💭 Su mamá se fue hacia la plaza, no por aquí. ✚
+Después de que Lía se va: 💭 Por ahí no. La entrada del metro está aquí al lado. ✚
+
+LA FUENTE ANTES DE TENER DOS PISTAS (antes de la escena de la fuente)
+Con 1 pista: 💭 No está aquí. Todavía no. ✚ / 💭 Alguien más tiene que haberla visto. ✚
+Con 0 pistas (por si acaso): 💭 Una fuente... pero ni rastro de su mamá. ✚ / 💭 Primero habría que preguntarle a alguien. ✚
+
+[[Volver a la plaza|Busqueda Plaza]]
+
+:: Cabinas Plaza
+📌 Las 4 cabinas azules de la valla de abajo de la plaza (mismo group_id). Sin caja: un pensamiento en la nube y burbujas. Todas las líneas son ✚.
+📌 Coherencia: Alice gastó el dinero justo en el atún, así que no le quedan monedas. Encaja con el "No tengo dinero" del metro cerrado.
+
+CON LÍA DE LA MANGA (buscando a su mamá). No da pista ni resuelve nada.
+Primera vez:
+💭 Una cabina. No me queda ni una moneda.
+🗨 Lía: ¡Un teléfono! ¡Me sé el número de mi mamá! / Seis... cuatro... dos... ¿o era cinco? → 🗨 Alice: No pasa nada. La vamos a encontrar igual.
+Segunda vez:
+🗨 Lía: (se pone el auricular en la oreja) ¿Hola? ¿Mamá? Estoy con Alice. / ...No contesta. Porque es de mentira. → (sin respuesta)
+
+DESPUÉS DE QUE LÍA SE VA (LIA_HOME / MISSED_TRAIN), Alice sola con el número de Leo
+Primera vez:
+💭 El número de Leo... ¿Y qué le digo? ¿«Hola, soy la del atún»?
+💭 Mejor no. Todavía no.
+Segunda vez:
+💭 Sigo sin monedas.
+💭 Ni valor, la verdad.
 
 [[Volver a la plaza|Busqueda Plaza]]
 

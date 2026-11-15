@@ -63,7 +63,7 @@ alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 	alice: (respira hondo) Primero... cuéntame cómo era tu mamá. Qué ropa traía. #id:290
 	lia: Un vestido rosa. Y pelo largo. Y tenía una bolsa de esas grandes, de tela. #id:291
 	alice: ¿Y por dónde la viste por última vez? #id:292
-	lia: (señala la entrada de la plaza) Allí. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293
+	lia: (señala al otro lado de la calle, hacia la plaza) Por allá. Dijo que iba a comprar algo rápido. Que me quedara quieta en la banca. #id:293
 	update lia (crying)
 	lia: Pero pasó mucho, y pasó mucha gente, y yo me asusté y me levanté... y ya no supe dónde estaba. #id:294
 	update alice (worried)
@@ -80,7 +80,7 @@ alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 	update alice (relaxed)
 	alice: ...Un poco. Sí, estoy asustada. Pero igual vamos a buscar. #id:29b
 	lia: Vale. Si estamos las dos, menos asustadas. #id:29c
-	lia: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por la entrada de la plaza. #id:29d
+	lia: Mi mamá tiene vestido rosa. Y pelo largo. Y una bolsa grande. Se fue por allá, hacia la plaza. #id:29d
 	alice: Perfecto. Vamos a buscar a la señora del vestido rosa. #id:29e
 	[signal arg="lia_confidence:1"]
 - Bloqueada por el contacto #id:29f
@@ -97,7 +97,7 @@ alice: (la mano pequeña le aprieta el brazo. El contacto la tensa. Pero no se a
 	(Y sin saber muy bien por qué, a Alice le dejan de temblar los dedos.) #id:379
 	alice: Lo siento. #id:2a5
 	lia: ¿Por qué? Ganaste tú. Yo me reí. #id:37a
-	lia: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por la entrada de la plaza. ¿Vamos? #id:2a6
+	lia: Mi mamá tiene vestido rosa. Y una bolsa grande. Y se fue por allá, hacia la plaza. ¿Vamos? #id:2a6
 	alice: Sí. Vamos. #id:2a7
 	[signal arg="lia_confidence:-1"]
 leave lia
@@ -137,7 +137,7 @@ lia: (se ríe) ¡Qué tonta! #id:2b8
 update alice (relaxed)
 alice: (no sabe si ofenderse. Pero la risa le hace un cosquilleo en el pecho.) #id:2b9
 update lia (crying)
-lia: Mi mamá se fue por la entrada de la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba
+lia: Mi mamá se fue hacia la plaza. Dijo que iba a comprar algo rápido. Pero no volvió. #id:2ba
 update lia (happy)
 lia: Vamos a buscar a mi mamá y después te ayudo a encontrar tu casa, ¿sí? #id:2bb
 update alice (neutral)

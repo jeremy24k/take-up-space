@@ -17,6 +17,13 @@ const FADE_TIME: float = 0.2
 const BACKGROUND := Color(0.98, 0.95, 0.9, 1)
 const BORDER := Color(0.22, 0.16, 0.28, 1)
 const TEXT_COLOR := Color(0.22, 0.16, 0.28, 1)
+## Two characters side by side (Lía holding Alice's sleeve) answer each
+## other: the bubble that came out later moves up above the earlier one
+## instead of covering it, with this much space between them.
+const STACK_GAP: float = 4.0
+
+## Bubbles on screen, oldest first.
+static var _shown: Array[SpeechBark] = []
 
 var _layer: CanvasLayer
 var _panel: PanelContainer
@@ -66,6 +73,8 @@ func say(text: String, duration: float = -1.0) -> void:
 	_label.text = text
 	_panel.reset_size()
 	_panel.show()
+	_shown.erase(self)
+	_shown.append(self)
 	_fade_to(1.0)
 	var hold := duration if duration > 0.0 else 1.8 + tr(text).length() * 0.05
 	await get_tree().create_timer(hold).timeout
@@ -76,6 +85,10 @@ func hide_now() -> void:
 	_token += 1
 	await _fade_to(0.0)
 	_panel.hide()
+	_shown.erase(self)
+
+func _exit_tree() -> void:
+	_shown.erase(self)
 
 func is_showing() -> bool:
 	return _panel.visible
@@ -91,7 +104,21 @@ func _process(_delta: float) -> void:
 	var talking := Dialogic.current_timeline != null and not ThoughtBox.is_showing()
 	_layer.visible = not talking
 	var screen := get_viewport().get_canvas_transform() * global_position
-	_panel.position = (screen - Vector2(_panel.size.x / 2.0, _panel.size.y)).round()
+	var spot := (screen - Vector2(_panel.size.x / 2.0, _panel.size.y)).round()
+	_panel.position = _above_earlier_bubbles(spot)
+
+## Moves the bubble up past every older bubble on screen it would overlap.
+func _above_earlier_bubbles(spot: Vector2) -> Vector2:
+	var rect := Rect2(spot, _panel.size)
+	for other in _shown:
+		if other == self:
+			break
+		if not other.is_showing() or not other._layer.visible:
+			continue
+		var other_rect := Rect2(other._panel.position, other._panel.size)
+		if rect.intersects(other_rect):
+			rect.position.y = other_rect.position.y - rect.size.y - STACK_GAP
+	return rect.position
 
 func _fade_to(alpha: float) -> void:
 	if _tween:

@@ -132,6 +132,50 @@ const SEARCH_START_LINES: Array[String] = [
 ]
 const ONE_CLUE_LINES: Array[String] = ["Mejor preguntarle a alguien más, por si acaso."]
 const ENOUGH_CLUES_LINES: Array[String] = ["La fuente. Vamos a la fuente."]
+## At the fountain with Lía before having both clues: nothing happens there
+## yet, so Alice says why (the scene needs both clues). Once per visit.
+const FOUNTAIN_ONE_CLUE_LINES: Array[String] = [
+	"No está aquí. Todavía no.",
+	"Alguien más tiene que haberla visto.",
+]
+const FOUNTAIN_NO_CLUE_LINES: Array[String] = [
+	"Una fuente... pero ni rastro de su mamá.",
+	"Primero habría que preguntarle a alguien.",
+]
+## The plaza entry Alice came in by (BoundaryEntry) turns her back with a
+## thought that fits the moment.
+const ENTRY_LINES := {
+	GameManager.PlazaStage.ARRIVED: ["Por ahí vine. Ahora, a buscar el metro."],
+	GameManager.PlazaStage.WITH_LIA: ["Por ahí vine yo.", "Su mamá se fue hacia la plaza, no por aquí."],
+	GameManager.PlazaStage.KNOWS_FOUNTAIN: ["Por ahí vine yo.", "Su mamá se fue hacia la plaza, no por aquí."],
+	GameManager.PlazaStage.LIA_HOME: ["Por ahí no. La entrada del metro está aquí al lado."],
+	GameManager.PlazaStage.MISSED_TRAIN: ["Por ahí no. La entrada del metro está aquí al lado."],
+}
+## Lía points out a helper Alice has not asked yet when they walk this close
+## to them (once per helper, while searching): her bubbles, then Alice's
+## answer out loud ("" = she says nothing), like the curiosity points.
+const HELPER_HINT_DISTANCE: float = 110.0
+const HELPER_HINTS := {
+	"ice_cream": {"lia": ["¡Un señor de los helados!", "Los señores de los helados lo ven todo."], "alice": "...Podemos preguntarle."},
+	"dog_lady": {"lia": ["¡Mira, un perro gigante!", "A lo mejor su dueña vio a mi mamá."], "alice": "A lo mejor."},
+	"teen": {"lia": ["Ese chico lleva auriculares como tú.", "¿Le preguntamos?"], "alice": "No sé si nos va a oír."},
+}
+## The ice-cream man stands by his van: before the first clue, his hint and
+## the van's early curiosity talk about the same spot, so only one of them
+## plays (whichever comes first).
+const ICE_CREAM_VAN_POINT := "IceCreamVan"
+## The four blue payphones on the park railing (Payphones/*): Alice has no
+## coins. With Lía she thinks a line and Lía answers in bubbles (no clue);
+## after Lía went home, only a thought about Leo's number. A different text
+## from the second time on, per phase.
+const PAYPHONE_WITH_LIA := {
+	"first": {"thought": ["Una cabina. No me queda ni una moneda."], "lia": ["¡Un teléfono! ¡Me sé el número de mi mamá!", "Seis... cuatro... dos... ¿o era cinco?"], "alice": "No pasa nada. La vamos a encontrar igual."},
+	"again": {"thought": [], "lia": ["(se pone el auricular en la oreja) ¿Hola? ¿Mamá? Estoy con Alice.", "...No contesta. Porque es de mentira."], "alice": ""},
+}
+const PAYPHONE_ALONE := {
+	"first": ["El número de Leo... ¿Y qué le digo? ¿«Hola, soy la del atún»?", "Mejor no. Todavía no."],
+	"again": ["Sigo sin monedas.", "Ni valor, la verdad."],
+}
 ## Twine: Transicion_Clara.
 const NIGHT_LINES: PackedStringArray = [
 	"Alice da la vuelta a la estación cerrada. La noche empieza a caer.",
@@ -167,6 +211,10 @@ const LIA_BESIDE_TOBY: float = 38.0
 ## Played while Lía waits alone, crying for her mother, once it is drawn in
 ## lia.aseprite. Until then she stands facing the camera.
 const LIA_CRY_ANIMATION := "cry"
+## Bottom share of the screen the dialogue box covers, and how far below
+## Alice's position (her feet) must still be visible above it.
+const DIALOGUE_BOX_SHARE: float = 0.27
+const ALICE_FEET_MARGIN: float = 6.0
 
 @onready var player: Player = $MiddleLayer/Player
 @onready var lia: WalkingNPC = $MiddleLayer/NPCS/Lia
@@ -181,6 +229,8 @@ const LIA_MUSIC: AudioStream = preload("res://audio/music/playlists/lia.tres")
 const LIA_MUSIC_DB: float = -10.0
 @onready var fountain_area: Area2D = $StoryAreas/FountainArea
 @onready var subway_area: Area2D = $StoryAreas/SubwayArea
+@onready var boundary_entry: BoundaryArea = $MapBoundaries/BoundaryEntry
+@onready var payphones: Node2D = $InteractableDetectors/Payphones
 ## Who helps look for the mother: talk area -> clue id. Each one has three
 ## timelines: the clue one (while searching with Lía and not asked yet),
 ## "<timeline>_extra" (an optional full conversation once Alice already knows
@@ -244,6 +294,8 @@ var _arrival_beat: int = 0
 var _since_arrival_beat: float = 0.0
 var _greeted: bool = false
 var _subway_thought_shown: bool = false
+var _fountain_thought_shown: bool = false
+var _using_payphone: bool = false
 
 # =========================
 # Setup
@@ -256,6 +308,14 @@ func _ready() -> void:
 	subway_area.body_exited.connect(func(body: Node2D) -> void:
 		if body == player:
 			_subway_thought_shown = false)
+	fountain_area.body_exited.connect(func(body: Node2D) -> void:
+		if body == player:
+			_fountain_thought_shown = false)
+	# Signals run at once, so the lines are in place before she thinks them.
+	boundary_entry.interacted.connect(func() -> void:
+		boundary_entry.thought_lines.assign(ENTRY_LINES[GameManager.plaza_stage]))
+	for booth: InteractableArea in payphones.get_children():
+		booth.interacted.connect(_on_payphone_used)
 	_chatter_timer = randf_range(LIA_CHATTER_EVERY.x, LIA_CHATTER_EVERY.y)
 	_alice_bark = SpeechBark.new()
 	_alice_bark.position = ALICE_BARK_OFFSET
@@ -361,12 +421,14 @@ func _think_about_lia(delta: float) -> void:
 # Every frame
 # =========================
 func _physics_process(delta: float) -> void:
+	_refresh_payphones()
 	if GameManager.plaza_stage == GameManager.PlazaStage.ARRIVED and not _in_cutscene:
 		_cry_for_mother(delta)
 		_think_about_lia(delta)
 	if _lia_following:
 		_chatter(delta)
 		_notice_curiosities(delta)
+		_point_out_helpers()
 	elif _exploring != null:
 		_watch_alice_while_exploring()
 	elif _watched_flock != null and not _in_cutscene:
@@ -380,6 +442,43 @@ func _cry_for_mother(delta: float) -> void:
 	if lia.global_position.distance_to(player.global_position) <= LIA_CRY_HEARING:
 		_duck_crying(2.0)
 		lia_bark.say(LIA_CRY_LINES.pick_random(), 2.0)
+
+## While searching, Lía points out a helper Alice has not asked yet once
+## they walk close to them (the jogger moves around and the boy is easy to
+## miss). Once per helper, never over another bubble or a conversation.
+func _point_out_helpers() -> void:
+	if GameManager.plaza_stage != GameManager.PlazaStage.WITH_LIA or _in_cutscene:
+		return
+	if Dialogic.current_timeline != null or lia_bark.is_showing() or _alice_bark.is_showing():
+		return
+	for area: InteractableArea in helpers:
+		var clue: String = helpers[area]
+		if GameManager.lia_clues.has(clue) or GameManager.lia_helper_hints.has(clue):
+			continue
+		if player.global_position.distance_to(area.global_position) > HELPER_HINT_DISTANCE:
+			continue
+		GameManager.lia_helper_hints.append(clue)
+		if clue == "ice_cream" and GameManager.lia_clues.is_empty() \
+				and not GameManager.lia_curiosities_seen.has(ICE_CREAM_VAN_POINT):
+			GameManager.lia_curiosities_seen.append(ICE_CREAM_VAN_POINT)
+		# Postpones her chatter so the hint is not followed straight away.
+		_chatter_timer = maxf(_chatter_timer, LIA_CHATTER_EVERY.x)
+		var hint: Dictionary = HELPER_HINTS[clue]
+		_lia_then_alice(hint["lia"], hint["alice"])
+		return
+
+## Lía says her bubbles one after the other, then Alice answers out loud a
+## moment later ("" = she says nothing). Stops if a conversation starts.
+func _lia_then_alice(lia_lines: Array, answer: String) -> void:
+	for line: String in lia_lines:
+		if _in_cutscene:
+			return
+		await lia_bark.say(line)
+	if answer.is_empty() or _in_cutscene:
+		return
+	await get_tree().create_timer(ALICE_REPLY_DELAY).timeout
+	if not _in_cutscene:
+		_alice_bark.say(answer)
 
 ## Lía's bubbles while she walks along (LiaChatter), each with Alice's
 ## answer out loud a moment later. Never over a conversation or a thought.
@@ -568,6 +667,9 @@ func _notice_curiosities(delta: float) -> void:
 
 func _lia_explores(point: CuriosityPoint) -> void:
 	GameManager.lia_curiosities_seen.append(point.name)
+	if point.name == ICE_CREAM_VAN_POINT and GameManager.lia_clues.is_empty() \
+			and not GameManager.lia_helper_hints.has("ice_cream"):
+		GameManager.lia_helper_hints.append("ice_cream")
 	_exploring = point
 	_lia_lets_go_sleeve()
 	lia_bark.hide_now()
@@ -770,11 +872,23 @@ func _lia_at_the_metro() -> void:
 	player.unlock_control()
 	_in_cutscene = false
 
-## "focus_on_lia": the camera glides over to her while she cries.
+## "focus_on_lia": the camera glides over to her while she cries. It frames
+## both of them: on Lía alone, Alice (further down) was left under the
+## dialogue box.
 func _focus_on_lia() -> void:
 	Dialogic.paused = true
-	await player.pan_camera_to(lia.global_position + Vector2(0, -8), LIA_FOCUS_TIME)
+	await player.pan_camera_to(_frame_alice_and_lia(), LIA_FOCUS_TIME)
 	Dialogic.paused = false
+
+## Halfway between the two, moved down if needed so Alice's feet stay above
+## the dialogue box (it covers the bottom DIALOGUE_BOX_SHARE of the screen).
+func _frame_alice_and_lia() -> Vector2:
+	var center := (player.global_position + lia.global_position) / 2.0 + Vector2(0, -8)
+	var camera := player.get_node("Camera2D") as Camera2D
+	var half_height := get_viewport_rect().size.y / camera.zoom.y / 2.0
+	var box_top := half_height - half_height * 2.0 * DIALOGUE_BOX_SHARE
+	center.y = maxf(center.y, player.global_position.y + ALICE_FEET_MARGIN - box_top)
+	return center
 
 ## "alice_goes_to_lia": Alice walks up to her (Rama_Acercarse).
 func _alice_goes_to_lia() -> void:
@@ -805,11 +919,34 @@ func _lia_comes_to_alice() -> void:
 	var side := signf(lia.global_position.x - player.global_position.x)
 	if side == 0.0:
 		side = -1.0
-	var target := player.global_position + Vector2(LIA_FOLLOW_GAP * side, 4)
+	var target := _free_spot_by_alice([
+		Vector2(LIA_FOLLOW_GAP * side, 4),
+		Vector2(-LIA_FOLLOW_GAP * side, 4),
+		Vector2(0, LIA_FOLLOW_GAP),
+		Vector2(0, -LIA_FOLLOW_GAP),
+	])
 	await _slide(lia, target, lia.global_position.distance_to(target) / LIA_CHASE_SPEED)
 	lia.face_direction(lia.global_position.direction_to(player.global_position))
 	player.face_direction(player.global_position.direction_to(lia.global_position))
 	Dialogic.paused = false
+
+## The first of these spots around Alice where Lía's feet touch nothing
+## solid. Lía slides in with her collision off, so without this she could end
+## up standing on the metro entrance's railing.
+func _free_spot_by_alice(offsets: Array[Vector2]) -> Vector2:
+	var feet := RectangleShape2D.new()
+	feet.size = LIA_FEET
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = feet
+	query.collision_mask = 1
+	query.exclude = [player.get_rid()]
+	var space := get_world_2d().direct_space_state
+	for offset in offsets:
+		var spot := player.global_position + offset
+		query.transform = Transform2D(0.0, spot)
+		if space.intersect_shape(query, 1).is_empty():
+			return spot
+	return player.global_position + offsets[0]
 
 ## Walks Alice in a straight line during a cutscene (she is locked).
 func _walk_player(target: Vector2) -> void:
@@ -829,7 +966,12 @@ func _walk_player(target: Vector2) -> void:
 ## Twine: Tercera_Decision and what follows, up to the family walking away
 ## and Alice seeing the time on the fountain's clock.
 func _on_fountain_entered(body: Node2D) -> void:
-	if body != player or _in_cutscene or GameManager.plaza_stage != GameManager.PlazaStage.KNOWS_FOUNTAIN:
+	if body != player or _in_cutscene:
+		return
+	if GameManager.plaza_stage == GameManager.PlazaStage.WITH_LIA:
+		_fountain_too_early()
+		return
+	if GameManager.plaza_stage != GameManager.PlazaStage.KNOWS_FOUNTAIN:
 		return
 	_in_cutscene = true
 	player.lock_control()
@@ -849,6 +991,57 @@ func _on_fountain_entered(body: Node2D) -> void:
 	player.speed_scale = DEFEATED_SPEED_SCALE
 	player.unlock_control()
 	_in_cutscene = false
+
+## With Lía but only one clue: the scene needs both, so instead of a silent
+## fountain (it looked like the game had hung) Alice says it is too soon.
+func _fountain_too_early() -> void:
+	if _fountain_thought_shown:
+		return
+	if Dialogic.current_timeline != null and not ThoughtBox.is_showing():
+		return
+	_fountain_thought_shown = true
+	if GameManager.lia_clues.is_empty():
+		ThoughtBox.say(FOUNTAIN_NO_CLUE_LINES)
+	else:
+		ThoughtBox.say(FOUNTAIN_ONE_CLUE_LINES)
+
+# =========================
+# Payphones
+# =========================
+## Only once Lía is part of the story: before that, a payphone would be one
+## more thing between Alice and the metro (and they have nothing to say yet).
+func _refresh_payphones() -> void:
+	var active := GameManager.plaza_stage != GameManager.PlazaStage.ARRIVED
+	for booth: InteractableArea in payphones.get_children():
+		if booth.visible != active:
+			_set_area_active(booth, active)
+
+func _on_payphone_used() -> void:
+	if _in_cutscene or _using_payphone:
+		return
+	_using_payphone = true
+	match GameManager.plaza_stage:
+		GameManager.PlazaStage.WITH_LIA, GameManager.PlazaStage.KNOWS_FOUNTAIN:
+			var text: Dictionary = PAYPHONE_WITH_LIA[_payphone_visit("with_lia")]
+			_chatter_timer = maxf(_chatter_timer, LIA_CHATTER_EVERY.x)
+			lia_bark.hide_now()
+			_alice_bark.hide_now()
+			var thought: Array[String] = []
+			thought.assign(text["thought"])
+			if not thought.is_empty():
+				await ThoughtBox.say(thought)
+			await _lia_then_alice(text["lia"], text["alice"])
+		GameManager.PlazaStage.LIA_HOME, GameManager.PlazaStage.MISSED_TRAIN:
+			var lines: Array[String] = []
+			lines.assign(PAYPHONE_ALONE[_payphone_visit("alone")])
+			await ThoughtBox.say(lines)
+	_using_payphone = false
+
+## "first" the first time in this phase, "again" from then on.
+func _payphone_visit(phase: String) -> String:
+	var visits: int = GameManager.plaza_payphone_visits.get(phase, 0)
+	GameManager.plaza_payphone_visits[phase] = visits + 1
+	return "first" if visits == 0 else "again"
 
 ## The waiting is cut short: a fade to black and the sky is redder after it.
 func _let_time_pass() -> void:

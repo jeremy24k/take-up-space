@@ -7,7 +7,8 @@ extends Button
 ## Screen pixels the word drifts up and down while it floats.
 const BOB_HEIGHT: float = 3.0
 ## Tremble at full pressure, in screen pixels (1 art pixel = 3 screen pixels).
-const MAX_JITTER: int = 3
+## Playtest: at 3 the panic did not show; it now reaches two art pixels.
+const MAX_JITTER: int = 6
 ## Seconds between tremble jumps; every frame would just look like noise.
 const JITTER_STEP: float = 0.07
 

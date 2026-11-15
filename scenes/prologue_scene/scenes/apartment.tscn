@@ -39,6 +39,7 @@
 [ext_resource type="AudioStream" uid="uid://drgbunl5y658x" path="res://audio/ambience/apartment.ogg" id="sa_ambience"]
 [ext_resource type="AudioStreamPlaylist" path="res://audio/music/playlists/apartment.tres" id="sa_music"]
 [ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
+[ext_resource type="PackedScene" path="res://global/passage_area.tscn" id="passage_area"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0oi55"]
 texture = ExtResource("1_jh583")
@@ -1869,7 +1870,7 @@ size = Vector2(32, 22)
 size = Vector2(12.5, 11)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_in8mg"]
-size = Vector2(16, 11)
+size = Vector2(40, 34)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eoq23"]
 size = Vector2(17, 6.625)
@@ -3327,6 +3328,24 @@ ambience = ExtResource("sa_ambience")
 ambience_volume_db = -2.0
 music = ExtResource("sa_music")
 music_volume_db = -8.0
+
+[node name="BathroomPassage" type="Node2D" parent="."]
+
+[node name="LivingRoomToBathroom" parent="BathroomPassage" node_paths=PackedStringArray("exit_point") instance=ExtResource("passage_area")]
+position = Vector2(1044, 340)
+exit_point = NodePath("../BathroomSide")
+exit_facing = Vector2(0, -1)
+
+[node name="BathroomToLivingRoom" parent="BathroomPassage" node_paths=PackedStringArray("exit_point") instance=ExtResource("passage_area")]
+position = Vector2(1044, 286)
+exit_point = NodePath("../LivingRoomSide")
+exit_facing = Vector2(0, 1)
+
+[node name="BathroomSide" type="Marker2D" parent="BathroomPassage"]
+position = Vector2(1044, 270)
+
+[node name="LivingRoomSide" type="Marker2D" parent="BathroomPassage"]
+position = Vector2(1044, 392)
 
 [editable path="MiddleLayer/AssetsLayerSuperior/PickableItems/AliceBackpack"]
 [editable path="MiddleLayer/AssetsLayerSuperior/PickableItems/AliceWallet"]
