@@ -19,13 +19,13 @@
 [ext_resource type="Texture2D" uid="uid://c3252cnas5bar" path="res://scenes/prologue_scene/assets/borders.aseprite" id="26_704ny"]
 [ext_resource type="Script" uid="uid://cjk8nronimk5r" path="res://addons/TileMapDual/tile_map_dual.gd" id="27_o4735"]
 [ext_resource type="Texture2D" uid="uid://27cyc8vi7hms" path="res://scenes/prologue_scene/assets/dual_collisions.aseprite" id="28_rldfb"]
-[ext_resource type="Script" uid="uid://cf0avee3l6ary" path="res://scenes/prologue_scene/scenes/lights_container.gd" id="29_0pxkv"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/ambient_thought.tscn" id="ambient_thought"]
 [ext_resource type="PackedScene" path="res://global/boundary_area.tscn" id="boundary"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 [ext_resource type="AudioStream" uid="uid://bgj6dtcjrtqid" path="res://audio/ambience/metro_platform.ogg" id="sa_ambience"]
 [ext_resource type="Script" uid="uid://bhjya0xxq40ab" path="res://global/scene_audio.gd" id="sa_script"]
 [ext_resource type="Script" uid="uid://cp57onvph33d8" path="res://global/turnstiles.gd" id="turnstiles"]
+[ext_resource type="PackedScene" path="res://global/lights/metro_lamp.tscn" id="metro_lamp"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wgfvr"]
 texture = ExtResource("1_ip4l7")
@@ -1111,17 +1111,6 @@ tile_size = Vector2i(8, 8)
 sources/1 = SubResource("TileSetAtlasSource_ggvwr")
 sources/2 = SubResource("TileSetAtlasSource_ch5yu")
 
-[sub_resource type="Gradient" id="Gradient_ip4l7"]
-offsets = PackedFloat32Array(0.057692308, 0.14615385, 0.33076924, 0.50384617, 0.7307692)
-colors = PackedColorArray(1, 1, 1, 1, 0.7335526, 0.7335526, 0.7335526, 1, 0.5088563, 0.5088563, 0.5088563, 1, 0.48076922, 0.48076922, 0.48076922, 1, 0, 0, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_ydnqi"]
-gradient = SubResource("Gradient_ip4l7")
-width = 128
-height = 128
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-
 [sub_resource type="Gradient" id="Gradient_wgfvr"]
 offsets = PackedFloat32Array(0.07692308, 0.1923077, 0.4653846, 0.7692308)
 colors = PackedColorArray(1, 1, 1, 1, 0.75595236, 0.75595236, 0.75595236, 1, 0.48846155, 0.48846155, 0.48846155, 1, 0, 0, 0, 1)
@@ -1325,51 +1314,36 @@ tile_set = SubResource("TileSet_sfob8")
 tile_map_data = PackedByteArray("AABNAEgAAgAJAAEAAABNAEkAAgAJAAIAAABOAEcAAgAKAAAAAABOAEgAAgAKAAEAAABOAEkAAgAKAAIAAABPAEcAAgALAAAAAABPAEgAAgALAAEAAABPAEkAAgALAAIAAABQAEgAAgAMAAEAAABQAEkAAgAMAAIAAABHAEgAAgAJAAQAAABHAEkAAgAJAAUAAABIAEcAAgAKAAMAAABIAEgAAgAKAAQAAABIAEkAAgAKAAUAAABJAEcAAgALAAMAAABJAEgAAgALAAQAAABJAEkAAgALAAUAAABKAEgAAgAMAAQAAABKAEkAAgAMAAUAAABDADAAAgABAAwAAABDADEAAgABAA0AAABEADAAAgACAAwAAABEADEAAgACAA0AAABFAC8AAgADAAsAAABFADAAAgADAAwAAABFADEAAgADAA0AAABGADAAAgAEAAwAAABGADEAAgAEAA0AAABHADAAAgAFAAwAAABHADEAAgAFAA0AAABIADAAAgAGAAwAAABIADEAAgAGAA0AAABJADAAAgAHAAwAAABJADEAAgAHAA0AAABKADAAAgAIAAwAAABKADEAAgAIAA0AAABLADAAAgAJAAwAAABLADEAAgAJAA0AAABMADAAAgAKAAwAAABMADEAAgAKAA0AAABNADAAAgALAAwAAABNADEAAgALAA0AAABOADAAAgAMAAwAAABOADEAAgAMAA0AAABPADAAAgANAAwAAABPADEAAgANAA0AAABQADAAAgAOAAwAAABQADEAAgAOAA0AAABRADAAAgAPAAwAAABRADEAAgAPAA0AAABSAC8AAgAQAAsAAABSADAAAgAQAAwAAABSADEAAgAQAA0AAABTADAAAgARAAwAAABTADEAAgARAA0AAABUADAAAgASAAwAAABUADEAAgASAA0AAAA6AEkAAgAOAAEAAAA7AEkAAgAPAAEAAAA8AEkAAgAQAAEAAAA9AEkAAgARAAEAAABaAEkAAgAOAAEAAABbAEkAAgAPAAEAAABcAEkAAgAQAAEAAABdAEkAAgARAAEAAAA=")
 tile_set = SubResource("TileSet_w7mgy")
 
-[node name="LightsContainer" type="Node2D" parent="." unique_id=2128752134 node_paths=PackedStringArray("flickering_lights")]
-script = ExtResource("29_0pxkv")
-flickering_lights = [null, null, null]
-min_interval = 5.0
-min_energy = 0.0
-max_energy = 0.7
+[node name="LightsContainer" type="Node2D" parent="." unique_id=2128752134]
 
-[node name="MetroAmbientalLight" type="PointLight2D" parent="LightsContainer" unique_id=1269888734]
-position = Vector2(751.59375, 591)
-scale = Vector2(2.243652, 2.5539143)
-color = Color(1, 0.99607843, 0.8509804, 1)
-energy = 0.7
-texture = SubResource("GradientTexture2D_ydnqi")
+[node name="MetroLamp1" parent="LightsContainer" unique_id=1133771699 instance=ExtResource("metro_lamp")]
+position = Vector2(480, 626)
+scale = Vector2(3, 2.4)
+energy = 0.4
 metadata/_edit_lock_ = true
 
-[node name="MetroAmbientalLight2" type="PointLight2D" parent="LightsContainer" unique_id=592376778]
-position = Vector2(465.45313, 590)
-scale = Vector2(2.2272947, 2.5203238)
-color = Color(1, 0.99607843, 0.8509804, 1)
-energy = 0.7
-texture = SubResource("GradientTexture2D_ydnqi")
+[node name="MetroLamp2" parent="LightsContainer" unique_id=806175865 instance=ExtResource("metro_lamp")]
+position = Vector2(736, 626)
+scale = Vector2(3, 2.4)
+energy = 0.4
 metadata/_edit_lock_ = true
 
-[node name="MetroAmbientalLight3" type="PointLight2D" parent="LightsContainer" unique_id=1418732230]
-position = Vector2(383.2102, 238)
-scale = Vector2(3.4967155, 3.140814)
-color = Color(1, 0.99607843, 0.8509804, 1)
-energy = 0.7
-texture = SubResource("GradientTexture2D_ydnqi")
+[node name="MetroLamp3" parent="LightsContainer" unique_id=324611780 instance=ExtResource("metro_lamp")]
+position = Vector2(384, 274)
+scale = Vector2(4, 3.2)
+energy = 0.4
 metadata/_edit_lock_ = true
 
-[node name="MetroAmbientalLight4" type="PointLight2D" parent="LightsContainer" unique_id=2104292890]
-position = Vector2(830.7898, 238)
-scale = Vector2(3.4967155, 3.140814)
-color = Color(1, 0.99607843, 0.8509804, 1)
-energy = 0.7
-texture = SubResource("GradientTexture2D_ydnqi")
+[node name="MetroLamp4" parent="LightsContainer" unique_id=897549969 instance=ExtResource("metro_lamp")]
+position = Vector2(832, 274)
+scale = Vector2(2.81, 2.25)
+energy = 0.4
 metadata/_edit_lock_ = true
 
-[node name="MetroAmbientalLight5" type="PointLight2D" parent="LightsContainer" unique_id=640156777]
-position = Vector2(1072, 238.00002)
-scale = Vector2(1.7773441, 2.0666087)
-color = Color(1, 0.99607843, 0.8509804, 1)
-energy = 0.7
-texture = SubResource("GradientTexture2D_ydnqi")
+[node name="MetroLamp5" parent="LightsContainer" unique_id=715194551 instance=ExtResource("metro_lamp")]
+position = Vector2(1072, 274)
+scale = Vector2(2.81, 2.25)
+energy = 0.4
 metadata/_edit_lock_ = true
 
 [node name="SignLight" type="PointLight2D" parent="LightsContainer" unique_id=738426771]
@@ -1380,7 +1354,7 @@ texture = SubResource("GradientTexture2D_8w0r3")
 metadata/_edit_lock_ = true
 
 [node name="DarkFilter" type="CanvasModulate" parent="LightsContainer" unique_id=1992788213]
-color = Color(0.6484137, 0.7359695, 0.82915205, 1)
+color = Color(0.6, 0.65, 0.74, 1)
 metadata/_edit_lock_ = true
 
 [node name="GreenTurnstileLight" type="PointLight2D" parent="LightsContainer" unique_id=290912414]

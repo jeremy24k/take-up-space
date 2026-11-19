@@ -3,14 +3,18 @@
 [ext_resource type="SpriteFrames" uid="uid://ytlxjd0ggr0u" path="res://scenes/street_scenes/assets/fountain_water.aseprite" id="1_frames"]
 [ext_resource type="AudioStream" uid="uid://ds4pvpfq034ja" path="res://audio/ambience/plaza_fountain_loop.ogg" id="2_water"]
 [ext_resource type="Script" path="res://global/random_start_sound_2d.gd" id="3_sound"]
+[ext_resource type="Script" path="res://global/strip_sorted_sprite.gd" id="4_strips"]
 
 [node name="AnimatedFountain" type="AnimatedSprite2D"]
+y_sort_enabled = true
 texture_filter = 1
 sprite_frames = ExtResource("1_frames")
 animation = &"flow"
 autoplay = "flow"
 centered = false
 offset = Vector2(0, -101)
+script = ExtResource("4_strips")
+strip_sort_y = PackedFloat32Array(89.6, 96, 106, 112, 106, 96, 89.6, 89.6)
 
 [node name="Collision" type="StaticBody2D" parent="."]
 position = Vector2(0, -101)

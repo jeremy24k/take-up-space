@@ -140,6 +140,11 @@ func play_move(direction: Vector2) -> void:
 			sprite.flip_h = direction.x < 0
 	_play_animation(animation_name)
 
+## Set by a scene for a while (e.g. the plaza runner during a talk): a
+## front idle drawn in 3/4 facing right is flipped to face left, so it
+## looks at whoever it talks to. Off: front idles are never flipped.
+var flip_front_idle: bool = false
+
 func face_direction(direction: Vector2) -> void:
 	if direction == Vector2.ZERO:
 		return
@@ -150,7 +155,7 @@ func face_direction(direction: Vector2) -> void:
 	elif sprite.sprite_frames.has_animation("idle_front"):
 		# Several sprites only have a front idle (e.g. the street pedestrians):
 		# standing still facing the camera beats sliding in a walk cycle.
-		sprite.flip_h = false
+		sprite.flip_h = flip_front_idle and direction.x < -0.01
 		sprite.play("idle_front")
 	elif sprite.sprite_frames.has_animation("idle_side"):
 		# Side-only sprites (e.g. a dog) turn towards where they look.

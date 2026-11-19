@@ -12,6 +12,11 @@ extends Node2D
 ## Scene loaded once the train pulls away. Leave empty to just depart with
 ## no follow-up (e.g. an already-boarded train leaving an arrival platform).
 @export_file("*.tscn") var next_scene_path: String = "res://scenes/prologue_scene/scenes/metro_train_interior.tscn"
+## The train pulling out, heard from the platform (Alice stays behind): it
+## rides on the train (pans and fades with the distance) and fades out over
+## the time the train takes to leave. Empty = silent (e.g. Alice on board).
+@export var departure_sound: AudioStream
+@export var departure_hearing_distance: float = 900.0
 @onready var train_visual: Node2D = $Train
 @onready var interactive_areas: Node2D = $EnteredTrainArea
 signal train_arrived
@@ -68,6 +73,8 @@ func close_doors() -> void:
 	leave_station()
 
 func leave_station() -> void:
+	if departure_sound:
+		_play_departure_sound()
 	# Move the train away before loading the interior scene.
 	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
@@ -85,3 +92,15 @@ func leave_station() -> void:
 	await tween.finished
 	train_leaving_station.emit()
 	print("Train has left the station.")
+
+func _play_departure_sound() -> void:
+	var sound := AudioStreamPlayer2D.new()
+	sound.stream = departure_sound
+	sound.bus = &"SFX"
+	sound.max_distance = departure_hearing_distance
+	add_child(sound)
+	sound.play()
+	# Same duration as the departure tween in leave_station().
+	var fade := create_tween()
+	fade.tween_property(sound, "volume_db", -60.0, arrival_time * 1.5) 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	fade.tween_callback(sound.queue_free)

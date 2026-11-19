@@ -281,6 +281,80 @@ func reset_camera(duration: float) -> void:
 	await tween.finished
 
 # =========================
+# Walking off and on screen
+# =========================
+## How far past the screen edge she ends up (whole sprite out of view).
+const OFF_SCREEN_MARGIN := {"up": 4.0, "down": 34.0, "side": 14.0}
+
+## Exits that read as leaving the place (ExitArea.walk_off_screen): with
+## control locked and no physics (she walks through the map edge), Alice
+## walks in `direction` until she is out of view, while the camera stays
+## where it was. Await it. She stays locked.
+func walk_off_screen(direction: Vector2) -> void:
+	lock_control()
+	var camera := get_node_or_null("Camera2D") as Camera2D
+	var target := global_position + direction * 200.0
+	if camera:
+		target = _past_screen_edge(_visible_rect(camera), global_position, direction)
+		_freeze_camera(camera)
+	await _walk_straight_to(target, direction)
+
+## Arrivals that read as coming into the place (SpawnPoint.walk_in): the
+## camera is already at `target`, Alice starts out of view and walks in
+## `direction` until she reaches it; then the camera follows her again and
+## control comes back. Await it.
+func walk_in_from_off_screen(target: Vector2, direction: Vector2) -> void:
+	lock_control()
+	global_position = target
+	var camera := get_node_or_null("Camera2D") as Camera2D
+	if camera:
+		camera.reset_smoothing()
+		# The camera works out its (clamped) centre on the next frame.
+		await get_tree().process_frame
+		var view := _visible_rect(camera)
+		_freeze_camera(camera)
+		global_position = _past_screen_edge(view, target, -direction)
+	# Arriving from another scene the screen is still black: walk in once it
+	# clears, or the whole entrance happens unseen.
+	while FadeTransition.is_covering():
+		await get_tree().process_frame
+	await _walk_straight_to(target, direction)
+	if camera:
+		_release_camera(camera)
+	face_direction(direction)
+	unlock_control()
+
+func _walk_straight_to(target: Vector2, direction: Vector2) -> void:
+	var suffix := get_direction_suffix(direction)
+	play_animation("walk_" + suffix, "idle_" + suffix)
+	var tween := create_tween()
+	tween.tween_property(self, "global_position", target, global_position.distance_to(target) / (SPEED * speed_scale))
+	await tween.finished
+
+func _visible_rect(camera: Camera2D) -> Rect2:
+	var size := get_viewport_rect().size / camera.zoom
+	return Rect2(camera.get_screen_center_position() - size / 2.0, size)
+
+## The point just out of view from `from`, going in `direction` (one axis).
+func _past_screen_edge(view: Rect2, from: Vector2, direction: Vector2) -> Vector2:
+	if absf(direction.x) > absf(direction.y):
+		var x := view.end.x + OFF_SCREEN_MARGIN.side if direction.x > 0.0 else view.position.x - OFF_SCREEN_MARGIN.side
+		return Vector2(x, from.y)
+	var y := view.end.y + OFF_SCREEN_MARGIN.down if direction.y > 0.0 else view.position.y - OFF_SCREEN_MARGIN.up
+	return Vector2(from.x, y)
+
+## The camera stops following her and stays where it is on screen.
+func _freeze_camera(camera: Camera2D) -> void:
+	var frozen_at := camera.global_position
+	camera.top_level = true
+	camera.global_position = frozen_at
+
+func _release_camera(camera: Camera2D) -> void:
+	camera.top_level = false
+	camera.position = Vector2.ZERO
+	camera.reset_smoothing()
+
+# =========================
 # State helpers
 # =========================
 func change_state(new_state: State) -> void:
