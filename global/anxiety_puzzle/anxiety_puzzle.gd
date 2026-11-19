@@ -24,16 +24,16 @@ const HINT_COLOR := Color(1, 0.88, 0.54)
 const HINT_BLINKS: int = 3
 ## Alice's own reaction to a sentence that goes nowhere, shown for a moment
 ## in place of the prompt. Without it the reshuffle looked like a glitch.
+## It stays up there and never blocks picking words: big in the middle it
+## felt unfair after a mistake (2026-11-17).
 const STUMBLE_LINE := "No... así no."
 const STUMBLE_LINE_TIME: float = 1.2
-## Alice's reactions (the stumble, the time running out) show big in the
-## middle of the cloud, where the words were, not up in the prompt: there
-## they went unnoticed (2026-11-15). They pop in from POP_FROM scale.
+## Running out of time shows big in the middle of the cloud, where the words
+## were (up in the prompt it went unnoticed). It pops in from POP_FROM scale.
 const CENTER_LINE_FONT_SIZE: int = 72
 const CENTER_LINE_POP_FROM: float = 0.6
 const CENTER_LINE_POP_TIME: float = 0.22
 const CENTER_LINE_FADE: float = 0.2
-const WORDS_ASIDE_FADE: float = 0.15
 ## Thoughts that crowd in while she tries to talk. Real puzzles only: they
 ## float as distractors and swap in and out with the extra_words.
 const INTRUSIVE_THOUGHTS: PackedStringArray = [
@@ -121,6 +121,8 @@ var _swappable: Array[ThoughtWord] = []
 var _swap_timer: float = 0.0
 var _beat_phase: float = 0.0
 var _center_line: Label
+## Bumped by each stumble, so an older one never puts the prompt back early.
+var _stumble_token: int = 0
 
 ## Emitted once with the key of the answer Alice built, or SILENCE.
 signal finished(result: String)
@@ -413,10 +415,8 @@ func _stumble() -> void:
 	var tween := create_tween()
 	for step in [9, -9, 6, -6, 3, 0]:
 		tween.tween_property(sentence_line, "position:x", start.x + step, 0.04)
+	_show_stumble_line()
 	await tween.finished
-	# The words step aside and her reaction takes their place for a moment.
-	await _words_aside()
-	await _show_center_line(STUMBLE_LINE, STUMBLE_LINE_TIME, true)
 	if _done:
 		return
 	for child in sentence_line.get_children():
@@ -427,17 +427,18 @@ func _stumble() -> void:
 	_accepting = not _done
 	_blink_answer_starts()
 
-## Fades every word out quickly (they come back with the next scatter).
-func _words_aside() -> void:
-	var fade := create_tween().set_parallel(true)
-	for word in _words:
-		if word.visible:
-			word.release_focus()
-			fade.tween_property(word, "modulate:a", 0.0, WORDS_ASIDE_FADE)
-	await fade.finished
+## Shows Alice's reaction where the prompt is, then puts the prompt back
+## (unless a newer stumble replaced it meanwhile).
+func _show_stumble_line() -> void:
+	_stumble_token += 1
+	var token := _stumble_token
+	prompt_label.text = STUMBLE_LINE
+	await get_tree().create_timer(STUMBLE_LINE_TIME).timeout
+	if is_instance_valid(prompt_label) and not _done and token == _stumble_token:
+		prompt_label.text = _data.prompt
 
 ## Alice's reaction big in the middle of the cloud: it pops in (and shakes a
-## little after a mistake), holds, and fades out. Await it.
+## little if asked), holds, and fades out. Await it.
 func _show_center_line(text: String, hold: float, shake: bool) -> void:
 	if _center_line == null:
 		_center_line = Label.new()

@@ -43,6 +43,11 @@ func fade_out(duration: float = -1.0) -> void:
 func fade_in(duration: float = -1.0) -> void:
 	await _fade_to(0.0, duration)
 
+## Whether the black still hides the game more than `opacity` (0-1), e.g. so
+## an entrance waits until it can be seen.
+func is_covering(opacity: float = 0.4) -> bool:
+	return overlay != null and overlay.color.a > opacity
+
 func transition_to_scene(scene_path: String, duration: float = -1.0) -> void:
 	await fade_out(duration)
 	get_tree().change_scene_to_file(scene_path)

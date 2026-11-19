@@ -8,9 +8,9 @@ extends Node2D
 ## Lia"). Alice can go to her, or walk off to the metro (Lía runs after her).
 ## With Lía holding her sleeve they ask the ice-cream man, then the woman
 ## with the dog, and end up waiting at the fountain until the mother comes.
-## By then the last train is gone: Alice walks to the station knowing it and
-## finds the gate down. Then night, and Clara (still to come; for now the
-## night interlude leads to demo_end).
+## Then Alice goes down to the metro platform (plaza_metro.tscn): the train
+## leaves without her, she hears Clara singing from above, and the demo ends
+## on her way out (that scene's cutscene).
 ## The step she is at lives in GameManager.plaza_stage, so the scene can be
 ## reloaded at any point of the sequence.
 
@@ -20,8 +20,13 @@ const ANXIETY_PUZZLES := {
 	"plaza_lia": preload("res://scenes/plaza_scene/puzzles/plaza_lia.tres"),
 	"plaza_guard": preload("res://scenes/plaza_scene/puzzles/plaza_guard.tres"),
 }
-## Until Clara's part exists, the night ends the demo here.
+## Used only by the old ending (_miss_the_train, unused since 2026-11-17).
 const DEMO_END_SCENE := "res://scenes/demo_end/demo_end.tscn"
+## In LIA_HOME the metro entrance takes Alice down to the platform.
+const PLAZA_METRO_SCENE := "res://scenes/plaza_scene/scenes/plaza_metro.tscn"
+const METRO_STEP: float = 16.0
+const METRO_STEP_TIME: float = 0.4
+const METRO_FADE_TIME: float = 1.0
 
 # =========================
 # Alice's pace
@@ -215,7 +220,11 @@ const SKY_LATE := Color(0.94, 0.64, 0.6, 1)
 const SKY_NIGHT := Color(0.42, 0.46, 0.7, 1)
 const NIGHT_FALL_TIME: float = 3.0
 const TIME_SKIP_FADE: float = 0.8
-const MOTHER_WALK_TIME: float = 1.8
+## Walking speeds (px/s) of the mother coming to Lía (in a hurry) and of
+## the two of them walking off. They used to cross 400 px in under two
+## seconds and looked like they slid.
+const MOTHER_WALK_SPEED: float = 75.0
+const LEAVING_WALK_SPEED: float = 50.0
 ## At the fountain Lía stands beside Alice, and her mother stops beside Lía.
 const LIA_BESIDE_ALICE := Vector2(22, -2)
 const MOTHER_BESIDE_LIA := Vector2(16, 0)
@@ -235,7 +244,6 @@ const GUARD_REFUSAL_LIA := "¡A ese no! Si le contamos, mi mamá va a saber que 
 const GUARD_REFUSAL_ALICE: Array[String] = ["...Y yo tendría que hablar con un guardia.", "Mejor le preguntamos a la gente."]
 ## How long Dialogic waits while he turns back to his round.
 const GUARD_LEAVE_WAIT: float = 1.2
-const LEAVING_WALK_TIME: float = 3.0
 ## Toby keeps to this side of his owner, a little lower (closer to the
 ## camera): behind her one way, ahead of her on the way back.
 const TOBY_LEASH_OFFSET := Vector2(16, 5)
@@ -243,6 +251,17 @@ const TOBY_LEASH_OFFSET := Vector2(16, 5)
 ## jogger) and Lía, playing with him, this far on the same side.
 const TOBY_BESIDE_ALICE: float = 20.0
 const LIA_BESIDE_TOBY: float = 38.0
+## Talking to the runner (any of her timelines), the user's layout: Alice on
+## the left facing right and the runner on the right facing left, Lía below
+## Alice's left and Toby below the runner's right, both looking at the middle
+## (mirrored pairs). Everyone walks to their spot while Dialogic waits.
+const RUNNER_TALK_GAP: float = 28.0
+const LIA_BY_ALICE := Vector2(-14, 12)
+const TOBY_BY_RUNNER := Vector2(14, 12)
+const RUNNER_LAYOUT_SPEED: float = 90.0
+## "toby_comes" in that layout: he trots to sniff Alice's knees and, after
+## this long, goes back to his spot.
+const TOBY_SNIFF_TIME: float = 1.4
 ## Played while Lía waits alone, crying for her mother, once it is drawn in
 ## lia.aseprite. Until then she stands facing the camera.
 const LIA_CRY_ANIMATION := "cry"
@@ -255,7 +274,7 @@ const ALICE_FEET_MARGIN: float = 6.0
 @onready var lia: WalkingNPC = $MiddleLayer/NPCS/Lia
 @onready var lia_talk: InteractableArea = $MiddleLayer/NPCS/Lia/TalkArea
 @onready var lia_bark: SpeechBark = $MiddleLayer/NPCS/Lia/Bark
-@onready var lia_mom: CharacterBody2D = $MiddleLayer/NPCS/LiaMom
+@onready var lia_mom: WalkingNPC = $MiddleLayer/NPCS/LiaMom
 @onready var sun_filter: CanvasModulate = $LightsContainer/SunFilter
 ## The plaza plays the street music (its SceneAudio); while Lía is with
 ## Alice her own music plays instead.
@@ -304,8 +323,14 @@ const HELPER_TIMELINES := {
 @onready var guard: WalkingNPC = $MiddleLayer/NPCS/PlazaGuard
 @onready var guard_thought: InteractableArea = $MiddleLayer/NPCS/PlazaGuard/AmbientThought
 @onready var family_exit: Marker2D = $StoryPoints/FamilyExit
+## Cutscene walks (_slide, _walk_player) go round obstacles with it.
+@onready var cutscene_nav: CutsceneNav = $CutsceneNav
 
 var _lia_following: bool = false
+## Alice is talking to the runner in the user's layout (_runner_layout).
+var _runner_talk: bool = false
+## Lía was on the sleeve when that talk began.
+var _runner_took_lia: bool = false
 var _cry_timer: float = 0.0
 var _chatter_timer: float = 0.0
 ## Lines of the current phase not said yet, and which phase that is.
@@ -364,6 +389,7 @@ func _ready() -> void:
 	for flock in get_tree().get_nodes_in_group(&"pigeon_flock"):
 		flock.player_approached.connect(_on_pigeons_approached.bind(flock))
 	_shrink_lia_body()
+	_place_at_spawn_point()
 	_restore_stage()
 	_refresh_helpers()
 	_lia_waits_crying()
@@ -375,6 +401,18 @@ func _ready() -> void:
 	guard_thought.interacted.connect(_on_guard_thought)
 	toby.global_position = dog_lady.global_position + TOBY_LEASH_OFFSET
 	toby.follow(dog_lady, TOBY_LEASH_OFFSET)
+	# Before the timeline's first line: Dialogic waits while they get in place.
+	dog_lady.get_node("TalkArea").interacted.connect(func() -> void:
+		Dialogic.timeline_started.connect(_runner_layout, CONNECT_ONE_SHOT))
+
+## Where Alice arrives (SpawnPoint.arrive): SpawnPoints/FromStreet after
+## Leo's store (she walks in from the street, out of view), MetroExit coming
+## up from the metro platform. Otherwise, where the scene puts her.
+func _place_at_spawn_point() -> void:
+	var point := get_node_or_null("SpawnPoints/" + GameManager.take_spawn_point()) as Marker2D
+	if point == null:
+		return
+	SpawnPoint.arrive(player, point, Vector2.UP)
 
 ## Puts every character where the current story step needs them.
 func _restore_stage() -> void:
@@ -606,6 +644,14 @@ func _play_puzzle(data: AnxietyPuzzleData) -> void:
 	await AnxietyPuzzle.play_from_dialogic(self, data)
 	_lia_stops_crying()
 
+## The only place the plaza's stage changes: the helpers' timelines follow
+## it at once. They used to wait for the next dialogue to end, so the first
+## helper Alice talked to after handing Lía over still spoke as if Lía were
+## with her (2026-11-17).
+func _set_stage(stage: GameManager.PlazaStage) -> void:
+	GameManager.plaza_stage = stage
+	_refresh_helpers()
+
 ## Moves the story on and, once the dialogue is over, reminds Alice (and the
 ## player) where to look next.
 func _advance_to(stage: GameManager.PlazaStage, next_lines: Array[String]) -> void:
@@ -613,7 +659,7 @@ func _advance_to(stage: GameManager.PlazaStage, next_lines: Array[String]) -> vo
 	# fountain once Lía went home).
 	if stage <= GameManager.plaza_stage:
 		return
-	GameManager.plaza_stage = stage
+	_set_stage(stage)
 	Dialogic.timeline_ended.connect(func() -> void: ThoughtBox.say(next_lines), CONNECT_ONE_SHOT)
 
 # =========================
@@ -666,6 +712,9 @@ func _refresh_helpers() -> void:
 ## ("lia_lets_go") and holds on again when Alice calls her ("lia_holds_on");
 ## then Toby goes back to his owner.
 func _toby_comes() -> void:
+	if _runner_talk:
+		_toby_sniffs_alice()
+		return
 	toby.stop_following()
 	# Glued to Alice's legs: as a solid body he would push her around.
 	toby.collision_layer = 0
@@ -676,6 +725,10 @@ func _toby_comes() -> void:
 	toby.face_direction(player.global_position - toby.global_position)
 
 func _lia_plays_with_dog() -> void:
+	if _runner_talk:
+		# She already let go and stands in her spot of the layout.
+		_lia_lets_go_sleeve()
+		return
 	_lia_lets_go_sleeve()
 	lia_bark.hide_now()
 	var by_toby := player.global_position + Vector2(LIA_BESIDE_TOBY * _away_from_jogger(), 2)
@@ -688,6 +741,66 @@ func _lia_plays_with_dog() -> void:
 func _away_from_jogger() -> float:
 	var side := signf(player.global_position.x - dog_lady.global_position.x)
 	return side if side != 0.0 else 1.0
+
+## Everyone walks to the user's layout for a talk with the runner, then the
+## dialogue goes on. Undone when the timeline ends (_runner_talk_over).
+func _runner_layout() -> void:
+	Dialogic.paused = true
+	_runner_talk = true
+	_runner_took_lia = false
+	Dialogic.timeline_ended.connect(_runner_talk_over, CONNECT_ONE_SHOT)
+	var runner := dog_lady.global_position
+	var alice_spot := cutscene_nav.closest(runner + Vector2(-RUNNER_TALK_GAP, 0))
+	var toby_spot := cutscene_nav.closest(runner + TOBY_BY_RUNNER)
+	toby.stop_following()
+	toby.collision_layer = 0
+	toby.collision_mask = 0
+	_slide(toby, toby_spot, toby.global_position.distance_to(toby_spot) / RUNNER_LAYOUT_SPEED)
+	var lia_comes := lia.visible and GameManager.plaza_stage in [
+		GameManager.PlazaStage.WITH_LIA, GameManager.PlazaStage.KNOWS_FOUNTAIN]
+	if lia_comes:
+		_runner_took_lia = _lia_following
+		_lia_lets_go_sleeve()
+		lia_bark.hide_now()
+		var lia_spot := cutscene_nav.closest(alice_spot + LIA_BY_ALICE)
+		_slide(lia, lia_spot, lia.global_position.distance_to(lia_spot) / RUNNER_LAYOUT_SPEED)
+	# Coming from her right, Alice goes round below her, not through her.
+	if player.global_position.x > runner.x:
+		await _walk_player(cutscene_nav.closest(runner + Vector2(0, RUNNER_TALK_GAP * 0.8)))
+	await _walk_player(alice_spot)
+	# The others are shorter walks; give them a moment to finish.
+	await get_tree().create_timer(0.3).timeout
+	player.face_direction(Vector2.RIGHT)
+	# Her only idle is a 3/4 front facing right: flipped, she faces Alice.
+	dog_lady.flip_front_idle = true
+	dog_lady.face_direction(Vector2.LEFT)
+	toby.face_direction(Vector2.LEFT)
+	if lia_comes:
+		lia.face_direction(Vector2.RIGHT)
+	Dialogic.paused = false
+
+func _toby_sniffs_alice() -> void:
+	var spot := toby.global_position
+	var at_knees := player.global_position + Vector2(10, 3)
+	await _slide(toby, at_knees, toby.global_position.distance_to(at_knees) / RUNNER_LAYOUT_SPEED)
+	toby.face_direction(Vector2.LEFT)
+	await get_tree().create_timer(TOBY_SNIFF_TIME).timeout
+	if not _runner_talk:
+		return
+	await _slide(toby, spot, at_knees.distance_to(spot) / RUNNER_LAYOUT_SPEED)
+	toby.face_direction(Vector2.LEFT)
+
+## Back to normal: Toby on the leash, Lía on the sleeve if she was holding
+## it (the long talks take it back themselves with "lia_holds_on"), and the
+## runner jogs on once Alice walks away (pause_near_player).
+func _runner_talk_over() -> void:
+	_runner_talk = false
+	dog_lady.flip_front_idle = false
+	dog_lady.sprite.flip_h = false
+	if not toby.is_following():
+		_toby_goes_back()
+	if _runner_took_lia and not _lia_following:
+		_lia_takes_sleeve()
 
 ## Back on the leash: he catches up with his owner by himself.
 func _toby_goes_back() -> void:
@@ -1044,15 +1157,19 @@ func _free_spot_by_alice(offsets: Array[Vector2]) -> Vector2:
 
 ## Walks Alice in a straight line during a cutscene (she is locked).
 func _walk_player(target: Vector2) -> void:
-	var direction := target - player.global_position
-	if direction.length() < 1.0:
-		return
-	var suffix := player.get_direction_suffix(direction)
-	player.play_animation("walk_" + suffix, "idle_" + suffix)
-	var tween := create_tween()
-	tween.tween_property(player, "global_position", target, direction.length() / ALICE_CUTSCENE_SPEED)
-	await tween.finished
-	player.face_direction(direction)
+	var last := Vector2.ZERO
+	for point in cutscene_nav.route(player.global_position, target).slice(1):
+		var leg := point - player.global_position
+		if leg.length() < 0.5:
+			continue
+		last = leg
+		var suffix := player.get_direction_suffix(leg)
+		player.play_animation("walk_" + suffix, "idle_" + suffix)
+		var tween := create_tween()
+		tween.tween_property(player, "global_position", point, leg.length() / ALICE_CUTSCENE_SPEED)
+		await tween.finished
+	if last != Vector2.ZERO:
+		player.face_direction(last)
 
 # =========================
 # Waiting at the fountain
@@ -1081,7 +1198,7 @@ func _on_fountain_entered(body: Node2D) -> void:
 	Dialogic.start("plaza_lia_fountain")
 	await Dialogic.timeline_ended
 
-	GameManager.plaza_stage = GameManager.PlazaStage.LIA_HOME
+	_set_stage(GameManager.PlazaStage.LIA_HOME)
 	player.speed_scale = DEFEATED_SPEED_SCALE
 	player.unlock_control()
 	_in_cutscene = false
@@ -1153,8 +1270,8 @@ func _mother_arrives() -> void:
 	lia_mom.collision_layer = 0
 	lia_mom.collision_mask = 0
 	var stop := lia.global_position + MOTHER_BESIDE_LIA
-	lia_mom.sprite.flip_h = stop.x < mother_start.global_position.x
-	await _slide(lia_mom, stop, MOTHER_WALK_TIME)
+	await _slide(lia_mom, stop, _path_length(lia_mom.global_position, stop) / MOTHER_WALK_SPEED)
+	lia_mom.face_direction(lia.global_position - lia_mom.global_position)
 	Dialogic.paused = false
 
 ## Like the helper hints: automatic, once, never over another bubble, a
@@ -1221,12 +1338,9 @@ func _guard_leaves() -> void:
 
 ## Lía and her mother walk off together while the goodbye lines go on.
 func _family_leaves() -> void:
-	var leaving := create_tween().set_parallel(true)
-	leaving.tween_property(lia, "global_position", family_exit.global_position, LEAVING_WALK_TIME)
-	leaving.tween_property(lia_mom, "global_position", family_exit.global_position + Vector2(10, 2), LEAVING_WALK_TIME)
-	lia.play_move(family_exit.global_position - lia.global_position)
-	lia_mom.sprite.flip_h = family_exit.global_position.x < lia_mom.global_position.x
-	await leaving.finished
+	var mom_exit := family_exit.global_position + Vector2(10, 2)
+	_slide(lia, family_exit.global_position, _path_length(lia.global_position, family_exit.global_position) / LEAVING_WALK_SPEED)
+	await _slide(lia_mom, mom_exit, _path_length(lia_mom.global_position, mom_exit) / LEAVING_WALK_SPEED)
 	_set_npc_active(lia, false)
 	_set_npc_active(lia_mom, false)
 	# Lía is gone: back to the street music.
@@ -1244,7 +1358,7 @@ func _on_subway_entered(body: Node2D) -> void:
 		GameManager.PlazaStage.WITH_LIA, GameManager.PlazaStage.KNOWS_FOUNTAIN:
 			_think_once(SUBWAY_WITH_LIA_LINES if GameManager.lia_clues.is_empty() else SUBWAY_SEARCHING_LINES)
 		GameManager.PlazaStage.LIA_HOME:
-			_miss_the_train()
+			_go_down_to_the_metro()
 
 func _think_once(lines: Array[String]) -> void:
 	if _subway_thought_shown:
@@ -1252,11 +1366,33 @@ func _think_once(lines: Array[String]) -> void:
 	_subway_thought_shown = true
 	ThoughtBox.say(lines)
 
+## The demo's ending (user, 2026-11-17): after handing Lía over, Alice goes
+## down to the plaza's metro platform (plaza_metro.tscn, SpawnPoints/
+## FromPlaza), where the train leaves without her, she hears Clara singing
+## and the demo ends on her way out (that scene's cutscene). The stage stays
+## LIA_HOME: plaza_metro.gd sets MISSED_TRAIN when the doors close (and, if
+## Alice arrives already in MISSED_TRAIN, skips its cutscene). If she comes
+## back up before that, she is in LIA_HOME at SpawnPoints/MetroExit (just
+## outside SubwayArea) and can go down again.
+func _go_down_to_the_metro() -> void:
+	_in_cutscene = true
+	player.lock_control()
+	# A short step into the entrance under the fade, like an ExitArea.
+	var into := player.global_position.direction_to(subway_area.global_position)
+	var suffix := player.get_direction_suffix(into)
+	player.play_animation("walk_" + suffix, "idle_" + suffix)
+	create_tween().tween_property(player, "global_position", player.global_position + into * METRO_STEP, METRO_STEP_TIME)
+	GameManager.spawn_point = "FromPlaza"
+	FadeTransition.transition_to_scene(PLAZA_METRO_SCENE, METRO_FADE_TIME)
+
 ## Twine: end of Perder_El_Metro. The gate is down; night falls while she
 ## takes it in, she puts her headphones on and walks off.
+## UNUSED since 2026-11-17 (the metro entrance now leads to plaza_metro.tscn,
+## see _go_down_to_the_metro). Kept, with plaza_missed_train.dtl and
+## NIGHT_LINES, until the user decides what to do with them.
 func _miss_the_train() -> void:
 	_in_cutscene = true
-	GameManager.plaza_stage = GameManager.PlazaStage.MISSED_TRAIN
+	_set_stage(GameManager.PlazaStage.MISSED_TRAIN)
 	player.lock_control()
 	player.speed_scale = 1.0
 	create_tween().tween_property(sun_filter, "color", SKY_NIGHT, NIGHT_FALL_TIME)
@@ -1267,18 +1403,37 @@ func _miss_the_train() -> void:
 # =========================
 # Helpers
 # =========================
-## Moves an NPC in a straight line in `duration`. A WalkingNPC (Lía, Toby)
-## plays its walk/run cycle and then stands facing the way it went; the
-## sheet's characters (Lía's mother) still glide, they have no walk cycle.
+## Moves an NPC to target at the speed of a straight line done in
+## `duration`, going round benches, hedges and the fountain (CutsceneNav),
+## so a detour takes a little longer. A WalkingNPC (Lía, Toby, her mother)
+## plays its walk/run cycle on each leg and then stands facing the way it
+## went.
 func _slide(npc: Node2D, target: Vector2, duration: float) -> void:
-	var direction := target - npc.global_position
-	if npc is WalkingNPC and direction.length() > 1.0:
-		npc.play_move(direction)
-	var tween := create_tween()
-	tween.tween_property(npc, "global_position", target, duration)
-	await tween.finished
-	if npc is WalkingNPC and direction.length() > 1.0:
-		npc.face_direction(direction)
+	var straight := npc.global_position.distance_to(target)
+	if straight < 0.5:
+		return
+	var speed := straight / maxf(duration, 0.01)
+	var last := Vector2.ZERO
+	for point in cutscene_nav.route(npc.global_position, target).slice(1):
+		var leg := point - npc.global_position
+		if leg.length() < 0.5:
+			continue
+		last = leg
+		if npc is WalkingNPC and leg.length() > 1.0:
+			npc.play_move(leg)
+		var tween := create_tween()
+		tween.tween_property(npc, "global_position", point, leg.length() / speed)
+		await tween.finished
+	if npc is WalkingNPC and last.length() > 1.0:
+		npc.face_direction(last)
+
+## Length of the way a cutscene walk takes from one point to another.
+func _path_length(from: Vector2, to: Vector2) -> float:
+	var points := cutscene_nav.route(from, to)
+	var length := 0.0
+	for i in range(1, points.size()):
+		length += points[i - 1].distance_to(points[i])
+	return length
 
 ## Turns an NPC towards target. The sheet's characters face right by default.
 func _face(npc: Node2D, target: Vector2) -> void:

@@ -133,16 +133,12 @@ static func _collect_from_script(path: String, found: Array[String]) -> void:
 	var calls := RegEx.create_from_string(r'\btr\("((?:[^"\\]|\\.)*)"\)')
 	for tr_call in calls.search_all(source):
 		_add_value(tr_call.get_string(1).c_unescape(), found)
-	# Constants that read like sentences (e.g. LOST_LINES, STUMBLE_LINE).
+	# Constants that read like sentences (e.g. LOST_LINES, STUMBLE_LINE), also
+	# inside Dictionaries and nested lists (the plaza keeps most of its lines
+	# as {id: {"lia": [...], "alice": "..."}}).
 	var constants: Dictionary = script.get_script_constant_map()
 	for constant_name in constants:
-		var value: Variant = constants[constant_name]
-		if value is String and _reads_like_text(value):
-			_add_value(value, found)
-		elif value is Array or value is PackedStringArray:
-			for item in value:
-				if item is String and _reads_like_text(item):
-					_add_value(item, found)
+		_add_constant(constants[constant_name], found)
 
 ## Shared lists of lines kept in their own .tres (e.g. ambient_npc_pool.tres).
 static func _collect_from_resource(path: String, found: Array[String]) -> void:
@@ -152,6 +148,20 @@ static func _collect_from_resource(path: String, found: Array[String]) -> void:
 	for property in resource.get_property_list():
 		if property.name in TEXT_PROPERTIES:
 			_add_value(resource.get(property.name), found)
+
+## Walks a constant: its sentences are added, its Arrays, PackedStringArrays
+## and Dictionary values are walked in turn (Dictionary keys are ids, not
+## text, and are skipped).
+static func _add_constant(value: Variant, found: Array[String]) -> void:
+	if value is String:
+		if _reads_like_text(value):
+			_add_value(value, found)
+	elif value is Array or value is PackedStringArray:
+		for item in value:
+			_add_constant(item, found)
+	elif value is Dictionary:
+		for key in value:
+			_add_constant(value[key], found)
 
 static func _add_value(value: Variant, found: Array[String]) -> void:
 	if value is String:

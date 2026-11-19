@@ -153,11 +153,7 @@ func _place_at_spawn_point() -> void:
 	var point := get_node_or_null("SpawnPoints/" + point_name) as Marker2D
 	if point_name.is_empty() or point == null:
 		return
-	player.global_position = point.global_position
-	player.face_direction(Vector2.DOWN)
-	var camera := player.get_node_or_null("Camera2D") as Camera2D
-	if camera:
-		camera.reset_smoothing()
+	SpawnPoint.arrive(player, point, Vector2.DOWN)
 
 func _process(delta: float) -> void:
 	_tick_lost_reminder(delta)

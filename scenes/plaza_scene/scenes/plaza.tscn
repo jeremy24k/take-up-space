@@ -22,11 +22,14 @@
 [ext_resource type="SpriteFrames" uid="uid://dq3sddgd3xjnu" path="res://global/npcs/assets/pedestrian_blonde.aseprite" id="blonde_frames"]
 [ext_resource type="PackedScene" path="res://global/boundary_area.tscn" id="boundary"]
 [ext_resource type="Script" uid="uid://bwjmtv07qytme" path="res://global/curiosity_point.gd" id="curiosity_point"]
+[ext_resource type="Script" uid="uid://ce1gq8ulk0b1v" path="res://global/cutscene_nav.gd" id="cutscene_nav"]
+[ext_resource type="Script" path="res://global/spawn_point.gd" id="spawn_point"]
 [ext_resource type="SpriteFrames" uid="uid://h2un0q7k8ctb" path="res://global/npcs/assets/dog.aseprite" id="dog_frames"]
 [ext_resource type="SpriteFrames" uid="uid://biwnjroryy6bl" path="res://global/npcs/assets/metro_worker_npc.aseprite" id="guard_frames"]
 [ext_resource type="Texture2D" uid="uid://ce3f22m4k30bk" path="res://scenes/street_scenes/assets/ice_cream_van.aseprite" id="ice_cream_van"]
 [ext_resource type="PackedScene" uid="uid://bp38bbrvj21e2" path="res://global/interactable_area.tscn" id="interactable_area"]
 [ext_resource type="SpriteFrames" uid="uid://d6c86k44pady" path="res://global/npcs/assets/lia.aseprite" id="lia_frames"]
+[ext_resource type="SpriteFrames" uid="uid://c6s45pnhbv327" path="res://global/npcs/assets/lia_mom.aseprite" id="lia_mom_frames"]
 [ext_resource type="PackedScene" path="res://global/npcs/scenes/npc_talk_area.tscn" id="npc_talk_area"]
 [ext_resource type="Script" uid="uid://cj8moyg4mkpj7" path="res://global/npcs/scripts/pigeon_flock.gd" id="pigeon_flock"]
 [ext_resource type="Script" uid="uid://cfcmlve1adxe6" path="res://scenes/plaza_scene/scenes/plaza.gd" id="plaza_script"]
@@ -2645,16 +2648,22 @@ texture_region_size = Vector2i(8, 8)
 5:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
 7:7/0 = 0
 7:7/0/y_sort_origin = 4
+7:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.91372967, -0.10152531, 4, 0.10152531, 4, -4, -1.015255, -4)
 8:7/0 = 0
 8:7/0/y_sort_origin = 4
+8:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 0, 4, 0.10152531, 4, -4, -4, -4)
 9:7/0 = 0
 9:7/0/y_sort_origin = 4
+9:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(0.91372967, -0.10152531, -4, 0.10152531, -4, -4, 1.015255, -4)
 10:7/0 = 0
 10:7/0/y_sort_origin = 4
+10:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-0.91372967, -0.10152531, 4, 0.10152531, 4, -4, -1.015255, -4)
 11:7/0 = 0
 11:7/0/y_sort_origin = 4
+11:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 0, 4, 0.10152531, 4, -4, -4, -4)
 12:7/0 = 0
 12:7/0/y_sort_origin = 4
+12:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(0.91372967, -0.10152531, -4, 0.10152531, -4, -4, 1.015255, -4)
 21:7/0 = 0
 21:7/0/y_sort_origin = 44
 22:7/0 = 0
@@ -2727,12 +2736,16 @@ texture_region_size = Vector2i(8, 8)
 16:9/0/y_sort_origin = 20
 17:9/0 = 0
 17:9/0/y_sort_origin = 12
+17:9/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -1.0315533, 4, -1.0315533, -4, 4, -4)
 18:9/0 = 0
 18:9/0/y_sort_origin = 12
+18:9/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 19:9/0 = 0
 19:9/0/y_sort_origin = 12
+19:9/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 20:9/0 = 0
 20:9/0/y_sort_origin = 12
+20:9/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 4, 1.0315533, 4, 1.0315533, -4, -4, -4)
 22:9/0 = 0
 22:9/0/y_sort_origin = 28
 25:9/0 = 0
@@ -2758,9 +2771,13 @@ texture_region_size = Vector2i(8, 8)
 4:10/0/y_sort_origin = 4
 4:10/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
 6:10/0 = 0
+6:10/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 7:10/0 = 0
+7:10/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 8:10/0 = 0
+8:10/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 9:10/0 = 0
+9:10/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 10:10/0 = 0
 10:10/0/y_sort_origin = 11
 11:10/0 = 0
@@ -2805,7 +2822,9 @@ texture_region_size = Vector2i(8, 8)
 38:10/0/y_sort_origin = 20
 6:11/0 = 0
 7:11/0 = 0
+7:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 8:11/0 = 0
+8:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -4, 4, -4, -4, 4, -4)
 9:11/0 = 0
 10:11/0 = 0
 10:11/0/y_sort_origin = 3
@@ -2815,8 +2834,10 @@ texture_region_size = Vector2i(8, 8)
 11:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -4, 2, -4, 2, 3, -4, 3)
 12:11/0 = 0
 12:11/0/y_sort_origin = 28
+12:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(4, 4, -1.9484892, 4, -1.9484892, -4, 4, -4)
 13:11/0 = 0
 13:11/0/y_sort_origin = 28
+13:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, 4, 1.9484892, 4, 1.9484892, -4, -4, -4)
 15:11/0 = 0
 15:11/0/y_sort_origin = 4
 15:11/0/physics_layer_0/polygon_0/points = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
@@ -5863,11 +5884,14 @@ size = Vector2(84, 22)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_payphone"]
 size = Vector2(18, 34)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_subway_body"]
+size = Vector2(94, 112)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tables"]
 size = Vector2(139.5, 115)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_subway"]
-size = Vector2(136.5, 115)
+size = Vector2(140, 142)
 
 [node name="Plaza" type="Node2D" unique_id=2004074922]
 y_sort_enabled = true
@@ -5924,6 +5948,7 @@ tile_set = SubResource("TileSet_1nfqb")
 
 [node name="AnimatedFountain" parent="MiddleLayer" unique_id=366114069 instance=ExtResource("animated_fountain")]
 position = Vector2(584, 592)
+strip_sort_y = []
 
 [node name="Addons" type="TileMapLayer" parent="MiddleLayer" unique_id=298016]
 y_sort_enabled = true
@@ -6028,9 +6053,9 @@ position = Vector2(0, -30)
 position = Vector2(0, -30)
 script = ExtResource("speech_bark")
 
-[node name="LiaMom" parent="MiddleLayer/NPCS" unique_id=635830758 instance=ExtResource("base_npc")]
+[node name="LiaMom" parent="MiddleLayer/NPCS" unique_id=635830758 instance=ExtResource("walking_npc")]
 position = Vector2(1355, 590)
-column_npc = 3
+frames = ExtResource("lia_mom_frames")
 metadata/_edit_group_ = true
 
 [node name="IceCreamMan" parent="MiddleLayer/NPCS" unique_id=325274232 instance=ExtResource("base_npc")]
@@ -6049,13 +6074,13 @@ shape = SubResource("RectangleShape2D_talk_small")
 position = Vector2(0, -30)
 
 [node name="Toby" parent="MiddleLayer/NPCS" unique_id=983964810 instance=ExtResource("walking_npc")]
-position = Vector2(51, 163)
+position = Vector2(140, 171)
 frames = ExtResource("dog_frames")
 move_animation = "run"
 metadata/_edit_group_ = true
 
 [node name="DogLady" parent="MiddleLayer/NPCS" unique_id=1194940452 node_paths=PackedStringArray("patrol_points") instance=ExtResource("walking_npc")]
-position = Vector2(33, 154)
+position = Vector2(122, 162)
 frames = ExtResource("sporty_girl_frames")
 move_animation = "run"
 pause_near_player = 44.0
@@ -6397,6 +6422,30 @@ ambience = ExtResource("sa_ambience")
 music = ExtResource("sa_music")
 music_volume_db = -12.0
 
+[node name="CutsceneNav" type="NavigationRegion2D" parent="." unique_id=811529913 node_paths=PackedStringArray("avoid_layers", "keep_layers")]
+script = ExtResource("cutscene_nav")
+bounds = Rect2(-64, 0, 1536, 1500)
+agent_radius = 10.0
+avoid_layers = [NodePath("../InferiorLayer/FloorLayer1")]
+keep_layers = [NodePath("../InferiorLayer/FloorLayer2")]
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromStreet" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(635, 1274)
+script = ExtResource("spawn_point")
+walk_in = true
+direction = 0
+
+[node name="MetroExit" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(1200, 1112)
+
+[node name="SubwayEntranceBody" type="StaticBody2D" parent="." unique_id=1356122243]
+position = Vector2(1200, 1206)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SubwayEntranceBody" unique_id=2030902181]
+shape = SubResource("RectangleShape2D_subway_body")
+
 [node name="StoryAreas" type="Node2D" parent="." unique_id=848428076]
 
 [node name="FountainArea" type="Area2D" parent="StoryAreas" unique_id=394410433]
@@ -6466,11 +6515,11 @@ position = Vector2(1330, 556)
 [node name="JoggingRoute" type="Node2D" parent="." unique_id=1730455120]
 
 [node name="Point1" type="Marker2D" parent="JoggingRoute" unique_id=1730455121]
-position = Vector2(46, 161)
+position = Vector2(135, 169)
 gizmo_extents = 6.0
 
 [node name="Point2" type="Marker2D" parent="JoggingRoute" unique_id=1730455122]
-position = Vector2(1216, 160)
+position = Vector2(1135, 177)
 gizmo_extents = 6.0
 
 [node name="GuardRoute" type="Node2D" parent="." unique_id=1766465636]

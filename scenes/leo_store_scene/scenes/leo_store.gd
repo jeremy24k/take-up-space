@@ -208,5 +208,7 @@ func _refuse_to_leave() -> void:
 func _leave_store() -> void:
 	player.lock_control()
 	var reflection := REFLECTION_GAVE_NUMBER if GameManager.leo_gave_number else REFLECTION_KEPT_NUMBER
+	# She walks into the plaza from the street (plaza SpawnPoints/FromStreet).
+	GameManager.spawn_point = "FromStreet"
 	FadeTransition.transition_with_interlude(PLAZA_SCENE, reflection + REFLECTION_END,
 		exit_to_street.fade_duration)

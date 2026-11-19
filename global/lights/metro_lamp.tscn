@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://global/lights/light_fluorescent.tres" id="1_fluor"]
+
+[node name="MetroLamp" type="PointLight2D"]
+scale = Vector2(2, 1.6)
+color = Color(0.85, 1, 0.97, 1)
+energy = 0.45
+texture = ExtResource("1_fluor")

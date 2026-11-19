@@ -486,6 +486,48 @@ El paso (`Tween` sobre `global_position`) **no se espera** (`await`) antes de
 lanzar el fundido — por eso el corte cae mientras Alice todavía se está moviendo,
 no cuando termina.
 
+Además tiene `spawn_point` (el `Marker2D` de `SpawnPoints` donde aparece en
+la escena siguiente, como `SceneTransitionArea`) y, desde 2026-11-18,
+**`walk_off_screen`** (apagado por defecto). Si está encendido, en vez del
+paso, Alice camina sola en `exit_direction` hasta salir del encuadre: va con
+el control bloqueado y sin física, así que cruza el borde del mapa, y la
+cámara se queda quieta. Solo entonces se emite `walked_out` y empieza el
+fundido. Sin `next_scene_path`, la escena hace su propio final al recibir
+`walked_out`. La caminata es `Player.walk_off_screen(direction)`, a la
+velocidad normal de Alice. Úsalo en salidas que se leen como «irse del
+sitio» (a la calle, por el borde del mapa), **no en puertas**, donde
+funciona el paso con fundido.
+
+### `SpawnPoint` (`global/spawn_point.gd`)
+Un `Marker2D` de `SpawnPoints` con dos opciones: `walk_in` y `direction`
+(UP/DOWN/LEFT/RIGHT). La escena que llega lo usa con
+`SpawnPoint.arrive(player, marcador, mirada_por_defecto)`, sin `await`, desde
+su `_place_at_spawn_point()`.
+- Con `walk_in`, la cámara ya está en el punto y Alice empieza fuera de
+  pantalla, por el lado contrario a `direction`. Entra caminando hasta el
+  punto (`Player.walk_in_from_off_screen`), mira hacia `direction` y
+  recupera el control. Si llega de otra escena, espera fuera de pantalla a
+  que el negro del fundido se aclare (`FadeTransition.is_covering()`), para
+  que la entrada se vea.
+- Sin `walk_in`, aparece directamente en el punto mirando hacia `direction`.
+  Un `Marker2D` normal también vale: aparece ahí, mirando hacia la dirección
+  por defecto que pase la escena.
+
+**Dónde está activado (2026-11-18):**
+- `unknown_station.tscn`: `ExitToStreet` y `ExitToStreet2` tienen
+  `walk_off_screen` y salen hacia arriba, a la calle. Sus
+  `walk_forward_*` / `fade_start_delay` ya no se usan.
+- `plaza.tscn`: `SpawnPoints/FromStreet` (635, 1274) tiene `walk_in` y
+  entra hacia arriba. `leo_store.gd` lo pide al ir a la plaza
+  (`GameManager.spawn_point = "FromStreet"` antes del interludio).
+- `plaza_metro.tscn`: `SpawnPoints/FromPlaza` tiene `walk_in` (entra
+  escalera abajo, hacia la derecha) y `ExitToPlaza` tiene `walk_off_screen`
+  hacia la izquierda, sin `next_scene_path`: el final de la demo lo hace la
+  escena al recibir `walked_out`.
+- Sin activar, porque son puertas o escaleras: la tienda de Leo, el tren,
+  el apartamento, la salida del metro a la calle y `MetroExit` (la subida
+  del andén a la plaza).
+
 ### `BoundaryArea` (`global/boundary_area.gd` + `.tscn`)
 Límite del mapa. Hereda de `InteractableArea`, pero **se dispara al pisarla**,
 sin `[Espacio]` y sin mostrar etiqueta, como `ThoughtTrigger`. La escena la deja
@@ -778,12 +820,14 @@ respuesta eligiendo palabras desordenadas antes de quedarse en blanco.
   (`project.godot`).
 - Es una `CanvasLayer` en la capa 2: por encima de la caja de Dialogic (capa
   1, así el clic no lo atrapa su capa de input) y por debajo del fundido.
-- **Frase que no lleva a ningún lado:** la frase tiembla en rojo, las
-  palabras se apartan (fundido rápido, `_words_aside`) y "No... así no." sale
-  **grande en el centro** de la nube, donde estaban las palabras, con un pop
-  de escala y un pequeño temblor (`_show_center_line`, 72 px, 1,2 s); luego
-  todo se reacomoda. Hasta el 2026-11-15 salía arriba, en la consigna, y
-  pasaba desapercibida.
+- **Frase que no lleva a ningún lado:** la frase tiembla en rojo,
+  "No... así no." sale **arriba, en lugar de la consigna**, durante 1,2 s
+  (`_show_stumble_line`) y las palabras se reacomodan enseguida, sin dejar
+  de poder elegir. Entre el 2026-11-15 y el 2026-11-17 salía grande en el
+  centro y tapaba la selección, y al usuario le pareció injusto tras un
+  error. Si llegan dos errores seguidos, la consigna vuelve solo cuando acaba
+  el último (`_stumble_token`). **Solo cuando se acaba el tiempo** sale la
+  frase grande en el centro (`_show_center_line`, 72 px).
 - **Al abrir ya hay una palabra elegida** (2026-11-14, playtest: "al empezar
   no hay ninguna palabra seleccionada"): la primera en orden de lectura
   (arriba a la izquierda, por filas de una palabra de alto), nunca "(...)"
@@ -867,6 +911,44 @@ por aquí. Creo.").
 
 ### `LightsContainer`
 Parpadeo aleatorio de luces + `fade_out_lights(duración)` y `turn_off_lights()`.
+Hoy solo lo usa el vagón (`metro_train_interior`), con parpadeo real y la
+cutscene del sueño. Las estaciones ya no lo llevan (tenían la lista vacía).
+
+### Iluminación estándar del metro (`global/lights/`)
+Desde el 2026-11-18, todas las estaciones de metro usan la misma luz
+(variante «A′» del andén de la plaza, elegida por el usuario): luz pareja y
+legible, sin puntos quemados por solapamiento ni agujeros negros. La usan
+`metro_stations`, `unknown_station` y `plaza_metro`. **El vagón
+(`metro_train_interior`) no**: sus luces son la del túnel por las ventanas
+y las anima la cutscene del sueño.
+
+- **`global/lights/metro_lamp.tscn`**: una `PointLight2D` con
+  `light_fluorescent.tres` (degradado radial de caída rápida), color
+  (0.85, 1, 0.97), energía 0.45, escala (2, 1.6). **Una instancia por lámpara
+  pintada** (el tile de lámpara de `metro_assets_sheet`, atlas (14..17, 1)),
+  dentro de `LightsContainer`. En la instancia solo se cambian `position`,
+  `scale` y `energy` (son de la raíz: no hace falta Editable Children).
+- **Posición:** centro de la lámpara + 38 px hacia abajo, para que el charco
+  caiga en el suelo. Excepción: las lámparas de la pared alta sobre las vías
+  (andén de la plaza) van casi en la lámpara (+13 px).
+- **Tamaño según la vecina:** el radio visible es ≈ 38,4 px por unidad de
+  escala. Con `d` = distancia a la lámpara más cercana:
+  - si `d` ≥ 140 px: escala x = clamp(0,45 × d / 38,4, 2, 4);
+  - si `d` < 140 px (lámparas muy juntas): escala x = 0,45 × d / 38,4, sin
+    mínimo, para que no se solapen;
+  - escala y = 0,8 × x (en la pared alta sobre las vías, ≈ 0,6 × x);
+  - energía 0.45 si la escala x ≤ 2,5; 0.4 si es mayor.
+- **Relleno base:** el `DarkFilter` (`CanvasModulate`) de cada estación en
+  azul pizarra **(0.6, 0.65, 0.74)**. El relleno viene de ahí, no de sumar
+  halos grandes.
+- `light_soft_wide.tres`: versión ancha y suave para luces que no son
+  lámparas (la del tren y la de la escalera en `plaza_metro`).
+- **No son lámparas y no siguen la regla:** `SignLight` (el resplandor del
+  cartel) y `GreenTurnstileLight` (la usa `turnstiles.gd`: no cambiarle el
+  nombre ni sacarla de `LightsContainer`).
+- Para una estación nueva: una `MetroLamp` por lámpara pintada, con la
+  regla de arriba, y el `DarkFilter` con el color estándar.
+
 
 ### `WalkingNPC` (`global/npcs/scripts/walking_npc.gd`)
 `CharacterBody2D` para un NPC que camina de un punto A a un punto B en una
@@ -2180,7 +2262,15 @@ desde el editor también sale en el último idioma elegido.
   `lines`, `first_line`, `thought_lines`, `thought_text`, `prompt_text`,
   `interlude_lines` (y `text` de `Label`/`Button`); las mismas en los `.tres`
   (p. ej. `global/remarks/ambient_npc_pool.tres`); en código, las constantes
-  que parecen frases y cualquier literal escrito como `tr("...")`. Un texto
+  que parecen frases y cualquier literal escrito como `tr("...")`. Las
+  constantes se recorren enteras: textos sueltos, `Array`,
+  `PackedStringArray` y los **valores** de los `Dictionary`, también
+  anidados (las claves son ids y no se recogen). Antes del 2026-11-17 solo
+  miraba textos y listas de primer nivel, así que al actualizar el CSV
+  **borraba unas 100 claves** que la plaza guarda en diccionarios (charlas y
+  curiosidades de Lía, cabinas, pensamientos, guardia...). Comprobado con
+  el arreglo, dentro del juego y en modo `--script`: el CSV sale con las
+  mismas 309 claves y sin perder ningún `en`. Un texto
   nuevo con otro nombre de propiedad hay que añadirlo a
   `TranslationCollector.TEXT_PROPERTIES`.
 - **Cómo se traduce en el juego:** `ThoughtBox.say()` pasa cada línea por
@@ -2337,6 +2427,16 @@ música nueva necesita lo mismo: si solo se activa Loop, vuelve al segundo 0.
 
 ---
 
+**Arranque del tren visto desde el andén** (2026-11-17): el sonido de
+salida (`audio/sfx/train_departure.ogg`) es del propio tren. `metro_train.gd`
+tiene el export `departure_sound` (vacío por defecto) y
+`departure_hearing_distance` (900 px). Si tiene sonido, `leave_station()` lo
+reproduce en un `AudioStreamPlayer2D` hijo del tren (bus `SFX`): se mueve
+con él y baja a −60 dB durante lo que tarda en irse (`arrival_time` × 1,5).
+Lo usa `unknown_station.tscn`. En `metro_stations` va vacío, porque Alice
+va dentro y la escena cambia enseguida. Antes, cada escena tenía su propia
+copia de `_play_departure_sound()`.
+
 ## 14. Cosas pendientes / a vigilar
 
 - **Feedback de jugadores para el Rompecabezas de la Ansiedad (pendiente, 4 nov 2026).**
@@ -2432,8 +2532,33 @@ plaza de noche (Clara). **Lía tiene su propio sprite** desde 2026-11-05
 (`global/npcs/assets/lia.aseprite`: `idle_front/side/back` y
 `walk_front/side/back`); es un `WalkingNPC` con `frames = lia.aseprite`. `_slide()`
 reproduce el ciclo de caminar (`play_move()`) en los `WalkingNPC` y al final
-los deja quietos mirando hacia donde iban; su madre (columna 3 de
-`npcs_sprite_sheet`) todavía se desliza.
+los deja quietos mirando hacia donde iban. Su madre también tiene sprite
+propio desde 2026-11-16 (`global/npcs/assets/lia_mom.aseprite`, `WalkingNPC`).
+
+**Los movimientos de cutscene rodean obstáculos** (2026-11-17): `_slide()` y
+`_walk_player()` ya no van en línea recta. Piden la ruta a `CutsceneNav`
+(`global/cutscene_nav.gd`, un `NavigationRegion2D` en la raíz de la plaza),
+que al arrancar hornea en segundo plano la zona caminable a partir de todas
+las colisiones estáticas de la escena (tiles y `StaticBody2D`, capa 1) dentro
+de `bounds`, con un margen de `agent_radius` 10 px. Con 6 px pasaban rozando
+el borde de arriba de los setos, que solo chocan en su base. Mientras no está
+lista, `route()` devuelve la línea recta. `_slide()` conserva la velocidad de
+la línea recta, así que un rodeo tarda un poco más. Afecta a la madre, la
+salida de la familia, Lía (curiosidades, palomas, Toby, ir junto a Alice),
+Toby y Alice yendo al guardia. La madre camina a `MOTHER_WALK_SPEED`
+(75 px/s) y la familia se va a `LEAVING_WALK_SPEED` (50 px/s). Antes
+recorrían unos 400 px en 1,8 s y 3 s, y parecía que se deslizaban.
+**Solo por pavimento** (decisión del usuario, 2026-11-17): el césped no tiene
+colisión (Alice puede pisarlo), pero las rutas de cutscene lo evitan.
+`CutsceneNav.avoid_layers` = `FloorLayer1` (el césped): cada celda pintada
+ahí entra como obstáculo de navegación (una franja por fila de celdas),
+salvo si también está pintada en `keep_layers` = `FloorLayer2`, el
+pavimento. Hace falta porque parte de la plazoleta de la fuente tiene
+pavimento encima del césped. Sirve igual en otras escenas: basta con poner
+sus capas de césped y de pavimento. Probadas la llegada de la madre, la
+salida de la familia (por el paseo de la derecha) y rutas a la acera de
+arriba, al guardia y al jardín de abajo a la izquierda: todas van por
+pavimento y llegan a su destino.
 
 **Lía sigue el rastro de Alice** (2026-11-13, `WalkingNPC.follow_trail()`):
 Alice va dejando un punto cada 3 px por donde pasa y Lía va al punto que queda
@@ -2555,11 +2680,27 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
      hablar. Toby la sigue con `follow()` a 16 px a su derecha y 5 px más
      abajo; en las puntas mira hacia el siguiente tramo. Las palomas que
      estaban en esa acera (`Pigeons/TopSidewalk`) pasaron al paseo central de
-     arriba (640, 300). Al empezar, Toby deja de
-     seguirla y va hasta las piernas de Alice (`toby_comes`, sin colisión);
-     Lía le suelta la manga y se pone a su lado a jugar con él
-     (`lia_lets_go`); al llamarla, vuelve a la manga y Toby vuelve a seguir
-     a su dueña (`lia_holds_on`). Menú: preguntar igual (+1) o
+     arriba (640, 300). **Colocación al hablar con ella** (2026-11-17,
+     esquema del usuario; en todos sus timelines: el de la pista, `_extra`,
+     `_idle` y `_after`, con o sin Lía): al empezar el timeline, Dialogic
+     espera (`_runner_layout`, conectado a `interacted` →
+     `timeline_started`) mientras todos caminan a su sitio por la ruta de
+     `CutsceneNav`. Alice queda a 28 px a la izquierda de la corredora,
+     mirando a la derecha; si venía por la derecha, la rodea por abajo.
+     Lía (si está con ella) va abajo a la izquierda de Alice (−14, +12) y
+     mira a la derecha. Toby va abajo a la derecha de la corredora
+     (+14, +12) y mira a la izquierda. La corredora solo tiene `idle_front`
+     y `run_side`, pero su `idle_front` está en 3/4 mirando a la derecha:
+     durante la charla se voltea para mirar a Alice
+     (`WalkingNPC.flip_front_idle`, una variable que la escena activa un
+     rato y que hace que `face_direction()` voltee la pose de frente hacia
+     la izquierda). Al terminar se apaga y ella vuelve a su orientación
+     normal (decisión del usuario, 2026-11-17). En ese
+     arreglo, `toby_comes` hace que Toby trote a olfatear las rodillas de
+     Alice y vuelva a su sitio a los 1,4 s, y `lia_lets_go` solo le suelta la
+     manga (Lía no se mueve). Al terminar (`_runner_talk_over`), Toby vuelve
+     a seguir a su dueña, Lía vuelve a la manga si la llevaba y la corredora
+     sigue corriendo cuando Alice se aleja (`pause_near_player`). Menú: preguntar igual (+1) o
      apartarse primero. Pista: iba preocupada, preguntando por una niña,
      hacia la fuente.
    - **Chico con auriculares** (`Teen`, columna 25 de `npcs_sprite_sheet`,
@@ -2569,7 +2710,12 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
      no vio a nadie, pero la fuente está al otro lado.
    Cada pista se manda con `[signal arg="lia_clue:<id>"]` y se guarda en
    `GameManager.lia_clues`. `plaza.gd` (`_refresh_helpers`) les cambia el
-   `timeline_name`: la de la pista solo mientras se busca y no se les ha
+   `timeline_name` en cuanto cambia la etapa (`_set_stage()`, el único sitio
+   donde se asigna `plaza_stage`) y al terminar cada diálogo. Antes solo lo
+   hacía al terminar un diálogo: como la etapa pasa a `LIA_HOME` justo
+   después de `plaza_lia_fountain`, el primer ayudante al que se hablaba
+   tras entregar a Lía hablaba como si siguiera con Alice (2026-11-17).
+   Reglas: la de la pista solo mientras se busca y no se les ha
    preguntado; en `KNOWS_FOUNTAIN`, al que nunca se le preguntó,
    `<timeline>_extra` (conversación opcional completa, ver abajo); si no,
    `<timeline>_idle` (una línea antes de Lía y otra después). Tras la
@@ -2698,8 +2844,10 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
    `plaza_lia_fountain`. Lía se pone al lado de Alice y viene la **tercera
    decisión** (esperar +2 / buscar a seguridad +1 / pánico −1 y final
    "agridulce"). `time_passes` funde a negro y deja el cielo más rojo;
-   `lia_mom_arrives` trae a la madre (columna 3) desde `MotherStart` hasta el
-   lado de Lía; `lia_drawing_given` añade `dibujo_lia`; `lia_leaves` se las
+   `lia_mom_arrives` trae a la madre desde `MotherStart` hasta el lado de
+   Lía (es un `WalkingNPC` con su propio sprite,
+   `global/npcs/assets/lia_mom.aseprite` en el export `frames`: camina con
+   `walk_*` al deslizarse, mira a Lía al llegar y vuelve a caminar al irse); `lia_drawing_given` añade `dibujo_lia`; `lia_leaves` se las
    lleva a `FamilyExit` mientras siguen las líneas. Termina con el reloj de
    la fuente: Alice ya sabe que perdió el tren (`LIA_HOME`, camina a ×0.8,
    "ya no corre"). En la v2, Alice contesta "Entonces... seguiremos
@@ -2707,10 +2855,23 @@ Dialogic `374`–`3ae` (contador 943); quitadas `302` y `31e`.
    dibujo es "para que te acuerdes de mí" en los dos finales y Alice lo
    guarda en el bolsillo de dentro. El agridulce ya no pesa como un fracaso:
    solo cambia que Alice no consigue despedirse.
-5. **La reja** (`SubwayArea` en `LIA_HOME`): `plaza_missed_train`, cae la
-   noche, se pone los auriculares y el interludio de *Transicion_Clara*
-   (`NIGHT_LINES`; en la v2 "Tiene el número de Leo y el dibujo de Lía en el
-   bolsillo." es una sola línea) lleva a `demo_end`.
+5. **Bajada al andén** (`SubwayArea` en `LIA_HOME`, desde 2026-11-17,
+   decisión del usuario): `_go_down_to_the_metro()` hace que Alice dé un
+   paso hacia la boca y la escena funde a `plaza_metro.tscn` en
+   `SpawnPoints/FromPlaza`. La etapa **sigue en `LIA_HOME`**: el contrato con
+   `plaza_metro.gd` (Código 2) es que esa escena pone `MISSED_TRAIN` cuando
+   se cierran las puertas del tren y, si Alice llega ya en `MISSED_TRAIN`,
+   se salta la cutscene. Allí el tren se le va, oye a Clara cantar desde
+   arriba y, al salir por la escalera, termina la demo. Si sube antes de que
+   se cierren las puertas, vuelve a la plaza en `LIA_HOME` por
+   `SpawnPoints/MetroExit` (1200, 1112), que queda fuera de `SubwayArea`
+   (empieza en y = 1134): la boca no se dispara al aparecer y puede volver a
+   bajar.
+   **Antes era la reja**: `_miss_the_train()` arrancaba `plaza_missed_train`,
+   caía la noche, Alice se ponía los auriculares y el interludio de
+   *Transicion_Clara* (`NIGHT_LINES`) llevaba a `demo_end`. La función, ese
+   timeline y `NIGHT_LINES` / `DEMO_END_SCENE` / `NIGHT_FALL_TIME` siguen en
+   el código **sin uso**; se limpiarán cuando el final nuevo esté hecho.
 Con cada pista nueva, al acabar el diálogo sale un pensamiento con el
 siguiente sitio (`CLUE_*_LINES`).
 
@@ -2800,6 +2961,13 @@ arriba y quien se pare encima queda por delante.
   central y borde de atrás) se ordenan en el centro, y = 557; las del borde
   delantero, cada una en su base (571, 587, 603); los tiles diagonales de las
   esquinas de abajo, en 591.
+- **Boca de metro de la plaza** (2026-11-17): sus tiles (`Buildings` y
+  `Buildings2`, atlas 1–3 × 6–9) no tienen colisión y Alice la atravesaba.
+  Ahora la cubre `SubwayEntranceBody`, un `StaticBody2D` en (1200, 1206) de
+  94×112, que es la huella en el suelo de postes y barandas. `SubwayArea`
+  pasó de 136,5×115 a 140×142 para que Alice siga entrando en ella al
+  chocar por cualquier lado. La boca de la calle (`street_zone_1`, otra
+  variante, atlas 1–3 × 10–13) ya choca por sus tiles y no se tocó.
 - **Fuente animada** (2026-11-15): ya no es de tiles. Es un objeto aparte,
   como el reloj y la taza del apartamento:
   `scenes/plaza_scene/scenes/animated_fountain.tscn` (`AnimatedSprite2D`,
@@ -2812,9 +2980,18 @@ arriba y quien se pare encima queda por delante.
   La piedra se llamaba `ref_fountain` y estaba oculta; Arte la renombró y la
   hizo visible porque es parte del sprite. Su `.import` tiene el patrón de
   exclusión vacío: no le pongas uno que deje fuera `fountain_base`, o la
-  fuente queda sin piedra. Se
-  ordena en un solo punto, y = 592 (el origen del nodo; el dibujo sube con
-  `offset (0, -101)`, `centered` apagado). La colisión, que antes daban los
+  fuente queda sin piedra. El origen del nodo está en y = 592 (el dibujo
+  sube con `offset (0, -101)`, `centered` apagado). **Orden por franjas**
+  (2026-11-17): con un solo punto de orden, quien estaba delante de una
+  esquina de la base octogonal quedaba detrás de la fuente. Ahora la raíz
+  lleva el script `StripSortedSprite` (`global/strip_sorted_sprite.gd`, con
+  `y_sort_enabled`). Al arrancar parte el sprite en franjas verticales de
+  16 px, cada una un `AnimatedSprite2D` hijo con su propio punto de orden
+  (`strip_sort_y`, en px desde arriba del fotograma: el punto más alto del
+  borde delantero dentro de la franja: 89.6, 96, 106, 112, 106, 96, 89.6,
+  89.6). Las franjas siguen el fotograma de la raíz, que ya no se dibuja.
+  Probado en las cuatro esquinas y los dos lados. Sirve para cualquier otro
+  objeto animado ancho con frente diagonal o redondo. La colisión, que antes daban los
   tiles, es un `StaticBody2D` con un polígono que copia la de esos tiles. Se
   quitaron los 56 tiles de la fuente de `WallsSuperior` (celdas x 36–43,
   y 31–37); las entradas del tileset (atlas 19–26 × 8–14) siguen ahí sin
@@ -2982,3 +3159,159 @@ amarillo) y, en rojo, más o menos hasta dónde puede llegar Alice antes de que
 salgan volando (`scare_distance` contado desde el borde del grupo). Las
 palomas de la vista previa no tienen *owner*, así que no se guardan en el
 `.tscn`; en el juego se generan al azar como siempre.
+
+## 16. El andén del metro de la plaza (`plaza_metro.tscn` + `.gd`)
+
+**Estado (2026-11-17):** la sala la diseña el usuario desde cero en el
+editor; la cutscene está programada con los textos de Guion
+(`narrative/final_demo_metro.md`, aprobados por el usuario; en
+`game_text.csv`). La canción de Clara la hará el usuario más adelante:
+hasta entonces `ClaraVoice` no tiene audio y la escena va igual, en
+silencio. Se llega desde la plaza en `LIA_HOME` (lo cablea `plaza.gd`). Se
+puede ejecutar sola: la cutscene corre igual. El anochecer no ocurre en el
+andén: lo cuenta el interludio final (`ENDING_LINES`).
+
+**La cutscene** (`plaza_metro.gd`, todo sale de los `Marker2D` y nodos de
+la escena, nunca de coordenadas fijas):
+1. **Llega el tren mientras Alice baja.** Alice entra caminando sola desde
+   la izquierda, escalera abajo (`SpawnPoints/FromPlaza` es un `SpawnPoint`
+   con `walk_in` y `direction` derecha), y a la vez el tren empieza a llegar
+   (`enter_in_station()`, con su sonido y `TRAIN_ARRIVING_LINES`). El jugador
+   recupera el control en ~1 s, mucho antes de que se abran las puertas
+   (~7 s): oye llegar el tren mientras baja y parece que llega a tiempo.
+2. **Se le va, por poco.** Las puertas se abren y el tren la espera el tiempo
+   que haga falta (no hay límite de tiempo: la escalera está cerrada, así
+   que solo se puede ir hacia delante). Solo cuando Alice llega de verdad al
+   borde del andén, a `DOORS_CLOSE_DISTANCE` (40 px) de
+   `CutscenePoints/AliceSeesDoors`, se bloquea el control, se gira hacia el
+   tren y las puertas se cierran delante de ella (`DOORS_CLOSING_LINES`). La
+   cámara encuadra las puertas y vuelve. El tren se va con su sonido
+   (`departure_sound` de `MetroTrain`, lo pone `leave_station()`) y
+   `TRAIN_GONE_LINES`. Tras `SILENCE_TIME` (2,5 s) de andén vacío vuelve el
+   control. No es un fallo: siempre lo pierde.
+3. **Clara, al volver.** Clara no se oye enseguida: se oye cuando Alice,
+   de vuelta, entra en `CutscenePoints/HearClaraZone` (un `Area2D` cerca del
+   pie de la escalera). Antes de perder el tren esa zona no hace nada (Alice
+   la cruza al entrar). Al entrar: `ClaraVoice` empieza con fundido (si
+   tiene audio, suena sola 1,5 s antes de la nube), Alice se gira hacia la
+   voz y sale `HEARS_CLARA_LINES`; luego se enciende `ExitToPlaza`.
+4. **Fin de la demo.** La bajada es de ida: `ExitToPlaza` está apagada
+   desde que entra hasta que oye a Clara, así que no puede volver a subir a
+   media cutscene ni antes de oírla. Después, al cruzarla, `ExitToPlaza`
+   (`walk_off_screen`, hacia la izquierda, sin `next_scene_path`) le quita el
+   control y la hace caminar sola escalera arriba hasta salir del mapa, con
+   la cámara quieta. Al emitir `walked_out`, `transition_with_interlude` con
+   `ENDING_LINES` y luego `demo_end`, igual que el antiguo final de la
+   plaza. `plaza_stage` llega como `LIA_HOME` y pasa a `MISSED_TRAIN`
+   cuando se cierran las puertas; la escena no lo vuelve a mirar.
+
+**Pasajeros.** Bajan por las **puertas centrales** cuando se cumplen las
+dos cosas: las puertas están abiertas y Alice sube hacia el andén (entra en
+`CutscenePoints/PassengersCue`, arriba del paso de los torniquetes, el único
+camino al andén). Cada `WalkingNPC` de `MiddleLayer/Passengers` con ruta en
+`PassengerRoutes/<su nombre>` aparece con fundido en su puerta (primer
+punto), se queda en el umbral y luego camina el resto de la ruta
+(`walk_path`, sin colisión: nunca empuja ni bloquea a Alice) y se desvanece
+al final. **Ritmo adaptativo:** el horario base (`start_delay` + fundido 0,4 s
++ `PASSENGER_DOOR_PAUSE` 0,9 s; el último sale a ~4 s) corre en un reloj
+propio (`_alight_clock`). Cada fotograma se estima cuánto tarda Alice en
+llegar a las puertas a su velocidad (por el hueco de las rejas si aún está
+abajo) y se acelera el reloj (hasta ×4, y su caminata hasta ×2,5) para que
+el último salga `PASSENGER_ETA_MARGIN` (0,4 s) antes de que ella llegue. Si
+va despacio, el ritmo es el base. Si aun así llega con alguien dentro, todos
+bajan en ese instante y las puertas se cierran: **Alice nunca espera ante
+puertas abiertas.** Medido: a toda velocidad, ritmo ×1,26 y las puertas se
+cierran justo al llegar; despacio, ritmo base, los tres bajan mientras ella
+se acerca.
+Todos pasan por el hueco central de la fila de rejas y por los torniquetes
+de la derecha (los de la izquierda están cerrados):
+- `MetroWorker` (0 s): puerta x 644 → puerta de servicio del extremo
+  derecho del pasillo.
+- `RedCap` (1,4 s): puerta x 536 → también a la puerta de servicio.
+- `Blonde` (2,8 s): puerta x 760 → pasillo hacia la izquierda → sube la
+  escalera por el carril de escalones y sale del mapa.
+Las rutas se comprobaron contra la colisión cada 4 px. **Para añadir un
+pasajero:** instancia `walking_npc.tscn` en `Passengers` con su `frames`
+(necesita `walk_front`/`walk_back` para verse bien bajando) y crea en
+`PassengerRoutes` un `Node2D` con el mismo nombre, sus `Marker2D` en orden
+y, si hace falta, `start_delay`.
+(El 2026-11-18 se probaron pasajeros dibujados tras las ventanas del tren y
+se descartaron: parecían pegatinas encima del vagón.)
+
+**`ClaraVoice`** (`AudioStreamPlayer2D`, bus Ambience, junto a la escalera):
+el gancho para la voz de Clara. Su `stream` (en bucle) llegará con la canción; con voz, suena sola 1,5 s antes de la nube de Alice; al
+ser posicional, se oye más fuerte al acercarse a la escalera. Muévelo a
+donde quede la salida del andén. Sin `stream`, la cutscene sigue igual.
+
+**Cómo se hizo:** a partir de `metro_stations.tscn`, con los mismos
+TileSets, capas, tren, luces y ambiente. Del mapa solo queda la sala del
+andén (suelo, vías y paredes con su colisión, todo lo que está por encima
+de y = 360). Se quitaron el pasillo, el vestíbulo, los torniquetes, el
+decorado (bancos, carteles), los NPCs y la lógica de aquella estación. Los
+TileSets están copiados dentro de la escena: cambiarlos aquí no afecta a
+`metro_stations.tscn`.
+
+**Qué es cada nodo (dónde pintar):**
+
+| Nodo | Qué es |
+|---|---|
+| `PlazaMetro` (raíz, `y_sort_enabled`) | Script `plaza_metro.gd`. |
+| `InferiorLayer` | Suelo y vías (tiles de 32 px). Pinta aquí el suelo del andén. |
+| `MiddleLayer` | Capa con orden por y. Tiene el mismo TileSet que la de `metro_stations`; hoy le quedan 20 tiles. Dentro van `AssetsLayerInferior`, para lo que se pisa o queda por debajo, y `AssetsLayerSuperior`, para objetos que tapan a Alice (bancos, columnas, carteles; tiles de 8 px). Las dos están vacías. |
+| `MiddleLayer/NPCS` | Vacío, para la gente del andén. |
+| `MiddleLayer/Player` | Alice. Los límites de la cámara están en `Player/Camera2D` (izquierda 152, arriba −38, derecha 1127, abajo 420): ajústalos al tamaño de la sala. |
+| `MiddleLayer/MetroTrain` | El tren (`metro_train.tscn`). Fuera de pantalla a la derecha (2172, 129) hasta que la cutscene llame a `enter_in_station()`. Se para en `station_position_x` = 600. `next_scene_path` está vacío, para que no lleve al vagón. |
+| `SuperiorLayer` | Capa por encima de todo (z 2). Vacía. |
+| `SuperiorLayer/WallBorders` | Bordes de pared (TileMapDual). Su hija oculta `ColisonesDual` lleva las colisiones de las paredes. Del borde de abajo no queda nada: hay que cerrar la sala por abajo al diseñarla, o Alice puede salirse. |
+| `SuperiorLayer/TileMapLayer` | Decorado alto (8 px). Vacío. |
+| `LightsContainer` | Un `Node2D` simple (sin el script de parpadeo de `metro_stations`). Una `PointLight2D` por lámpara (`MetroAmbientalLight*`), `StairsLight` y `DarkFilter`. Ver **Iluminación** abajo. |
+| `InteractableDetectors`, `ThoughtTriggers` | Vacíos, para lo que se pueda mirar y los pensamientos de suelo. |
+| `SceneAudio` | Ambiente del andén (`metro_platform.ogg`), el mismo de la otra estación. |
+| `SpawnPoints/FromPlaza` | `SpawnPoint` con `walk_in` (dirección derecha): Alice entra caminando desde la izquierda, escalera abajo, hasta este punto. Es el sitio por defecto si no se pide otro. |
+| `CutscenePoints/TrainStop` | Donde se para el tren (600, 129): el mismo `station_position_x`. |
+| `CutscenePoints/AliceSeesDoors` | En el borde del andén frente a las puertas (623, 300): cuando Alice llega a 40 px de aquí, se cierran (el tren espera hasta entonces). |
+| `CutscenePoints/PassengersCue` | `Area2D` (90×24) arriba del paso de los torniquetes de la derecha, en (846, 448): cuando Alice la pisa con las puertas abiertas, empiezan a bajar los pasajeros. |
+| `CutscenePoints/HearClaraZone` | `Area2D` (90×100) cerca del pie de la escalera, en (170, 595): tras perder el tren, al entrar Alice oye a Clara y se abre la salida. Antes no hace nada. Muévela si cambia la escalera. |
+| `ClaraVoice` | La voz de Clara, posicional, encima del rellano de la escalera (24, 530), "desde arriba" (ver arriba). |
+| `MiddleLayer/Passengers` | Pasajeros que bajan del tren (`WalkingNPC`, ocultos y sin colisión hasta que se abren las puertas): `MetroWorker` (trabajador con uniforme granate, `metro_worker_npc_b`), `Blonde` y `RedCap` (los peatones de la calle). |
+| `PassengerRoutes/<nombre>` | La ruta de cada pasajero, con el **mismo nombre** que su nodo en `Passengers`: sus `Marker2D` en orden; el primero es la puerta por la que sale. Metadato opcional `start_delay` (segundos) para que no bajen todos a la vez. |
+| `ExitToPlaza` | La salida por la escalera: un `ExitArea` sobre el rellano de arriba de la escalera (24, 564), con `walk_off_screen` hacia la izquierda y sin `next_scene_path`: Alice sale caminando del mapa y la escena hace el final con `walked_out`. Empieza con `monitoring = false` para no dispararse al llegar; la cutscene la enciende al oír a Clara. |
+
+**Iluminación** (estándar del metro, ver «Iluminación estándar del metro»; variante «A′», elegida por el usuario el 2026-11-18; las luces de lámpara son instancias de `metro_lamp.tscn`): luz
+pareja y legible, sin puntos quemados ni agujeros negros.
+- **Relleno base:** lo da `DarkFilter` (`CanvasModulate`, azul pizarra
+  0.6/0.65/0.74), no la suma de halos.
+- **Lámparas:** cada lámpara pintada tiene su `PointLight2D` con la textura
+  `global/lights/light_fluorescent.tres` (degradado radial de caída rápida),
+  blanco verdoso (0.85/1/0.97), energía 0.45. Cada halo crece hasta casi
+  tocar el de su lámpara más cercana, sin solaparse: radio visible ≈ 38 px
+  por unidad de escala, escala x ≈ 0,45 × distancia a la vecina / 38. Así,
+  las del pasillo, juntas, van a (2, 1.6); el pilar izquierdo
+  (`MetroAmbientalLight3`) a (2.25, 1.8), y las tres de la pared de arriba
+  (12, 13, 14), muy separadas, a ~(3.8, 2.2) con energía 0.4. Las luces de pilares y pasillo están 35 px por debajo de su
+  lámpara para que el charco caiga en el suelo donde camina Alice; las
+  lámparas (tiles) no se movieron.
+- **`MiddleLayer/MetroTrain/TrainLight`:** luz cálida y alargada delante
+  de las puertas, hija del tren solo en esta escena (no toca
+  `metro_train.tscn`): llega y se va con él.
+- **`LightsContainer/StairsLight`:** luz cálida suave en la escalera, por
+  donde llega la voz de Clara.
+- `global/lights/light_soft_wide.tres` es la versión ancha y suave (tren,
+  escalera). Las dos texturas sirven para otras estaciones.
+- Para añadir una lámpara: duplica una `MetroAmbientalLight*` y ponla bajo
+  la nueva lámpara (+35 px en y si está en pared de pasillo o pilar).
+
+**Colisión de la escalera** (TileSet interno de la escena, `stairs.aseprite`):
+la franja diagonal del pasamanos (tiles (1,1), (2,1), (2,2) y (3,2)) está
+puesta **a propósito** por el usuario (2026-11-18): se baja por el carril de
+escalones de abajo, no por todo el ancho. No quitarla. Las rutas que suben o
+bajan la escalera (la de `Blonde`) van por ese carril.
+
+Todas las posiciones son provisionales: mueve los marcadores y la salida a
+donde quede la escalera en el diseño.
+
+**En la plaza:** `SpawnPoints/MetroExit` (1200, 1112), justo encima de la
+boca de metro y fuera de `SubwayArea`. `plaza.gd` lo lee al arrancar
+(`_place_at_spawn_point()`, que deja a Alice mirando hacia arriba).
+**`ExitArea` tiene ahora `spawn_point`**, como `SceneTransitionArea`: es
+el nombre del `Marker2D` bajo `SpawnPoints` en la escena siguiente.
