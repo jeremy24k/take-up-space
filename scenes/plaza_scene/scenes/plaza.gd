@@ -860,6 +860,9 @@ func _lia_explores(point: CuriosityPoint) -> void:
 	if _exploring != point:
 		return
 	var spot := point.global_position + point.global_position.direction_to(lia.global_position) * point.look_distance
+	# Some points sit on what they show (the pet shop window is in the
+	# building's wall): coming from the side, the spot would be in the wall.
+	spot = cutscene_nav.closest(spot)
 	await _slide(lia, spot, lia.global_position.distance_to(spot) / LIA_PIGEON_SPEED)
 	if _exploring != point:
 		return
@@ -960,7 +963,7 @@ func _lia_watches_pigeons(flock: PigeonFlock) -> void:
 	lia_bark.hide_now()
 	_alice_bark.hide_now()
 	player.speed_scale = 1.0
-	var spot := flock.global_position + flock.global_position.direction_to(player.global_position) * LIA_PIGEON_DISTANCE
+	var spot := cutscene_nav.closest(flock.global_position + flock.global_position.direction_to(player.global_position) * LIA_PIGEON_DISTANCE)
 	await _slide(lia, spot, lia.global_position.distance_to(spot) / LIA_PIGEON_SPEED)
 	if _watched_flock != flock or _in_cutscene:
 		return
@@ -1155,7 +1158,7 @@ func _free_spot_by_alice(offsets: Array[Vector2]) -> Vector2:
 			return spot
 	return player.global_position + offsets[0]
 
-## Walks Alice in a straight line during a cutscene (she is locked).
+## Walks Alice during a cutscene (she is locked), going round obstacles.
 func _walk_player(target: Vector2) -> void:
 	var last := Vector2.ZERO
 	for point in cutscene_nav.route(player.global_position, target).slice(1):
@@ -1270,7 +1273,7 @@ func _mother_arrives() -> void:
 	lia_mom.collision_layer = 0
 	lia_mom.collision_mask = 0
 	var stop := lia.global_position + MOTHER_BESIDE_LIA
-	await _slide(lia_mom, stop, _path_length(lia_mom.global_position, stop) / MOTHER_WALK_SPEED)
+	await _slide(lia_mom, stop, _path_length(lia_mom.global_position, stop, true) / MOTHER_WALK_SPEED, true)
 	lia_mom.face_direction(lia.global_position - lia_mom.global_position)
 	Dialogic.paused = false
 
@@ -1339,8 +1342,8 @@ func _guard_leaves() -> void:
 ## Lía and her mother walk off together while the goodbye lines go on.
 func _family_leaves() -> void:
 	var mom_exit := family_exit.global_position + Vector2(10, 2)
-	_slide(lia, family_exit.global_position, _path_length(lia.global_position, family_exit.global_position) / LEAVING_WALK_SPEED)
-	await _slide(lia_mom, mom_exit, _path_length(lia_mom.global_position, mom_exit) / LEAVING_WALK_SPEED)
+	_slide(lia, family_exit.global_position, _path_length(lia.global_position, family_exit.global_position, true) / LEAVING_WALK_SPEED, true)
+	await _slide(lia_mom, mom_exit, _path_length(lia_mom.global_position, mom_exit, true) / LEAVING_WALK_SPEED, true)
 	_set_npc_active(lia, false)
 	_set_npc_active(lia_mom, false)
 	# Lía is gone: back to the street music.
@@ -1407,14 +1410,16 @@ func _miss_the_train() -> void:
 ## `duration`, going round benches, hedges and the fountain (CutsceneNav),
 ## so a detour takes a little longer. A WalkingNPC (Lía, Toby, her mother)
 ## plays its walk/run cycle on each leg and then stands facing the way it
-## went.
-func _slide(npc: Node2D, target: Vector2, duration: float) -> void:
+## went. paved_only keeps the way off the lawns, for people arriving or
+## leaving like passers-by; short moves (Lía's curiosities) go straight
+## across a garden.
+func _slide(npc: Node2D, target: Vector2, duration: float, paved_only := false) -> void:
 	var straight := npc.global_position.distance_to(target)
 	if straight < 0.5:
 		return
 	var speed := straight / maxf(duration, 0.01)
 	var last := Vector2.ZERO
-	for point in cutscene_nav.route(npc.global_position, target).slice(1):
+	for point in cutscene_nav.route(npc.global_position, target, paved_only).slice(1):
 		var leg := point - npc.global_position
 		if leg.length() < 0.5:
 			continue
@@ -1428,8 +1433,8 @@ func _slide(npc: Node2D, target: Vector2, duration: float) -> void:
 		npc.face_direction(last)
 
 ## Length of the way a cutscene walk takes from one point to another.
-func _path_length(from: Vector2, to: Vector2) -> float:
-	var points := cutscene_nav.route(from, to)
+func _path_length(from: Vector2, to: Vector2, paved_only := false) -> float:
+	var points := cutscene_nav.route(from, to, paved_only)
 	var length := 0.0
 	for i in range(1, points.size()):
 		length += points[i - 1].distance_to(points[i])

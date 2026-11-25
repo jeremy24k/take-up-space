@@ -418,6 +418,34 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		# Only the sprite preview runs in the editor.
 		set_physics_process(false)
+		return
+	if xray_silhouette:
+		# Deferred: the scene's camera has to be in place (it sets the zoom).
+		_make_xray.call_deferred()
+
+# =========================
+# X-ray silhouette
+# =========================
+## Someone who follows Alice around (Lía) and can end up behind a tree or a
+## building: its silhouette shows on the hidden part, like Alice's
+## (CharacterXray), in its own colour.
+@export_group("X-ray silhouette")
+@export var xray_silhouette: bool = false
+@export var xray_color: Color = Color(1.0, 0.88, 0.5, 0.7)
+## Share of the sprite that must be hidden for it to show (Alice: 0.7).
+@export_range(0.0, 1.0, 0.05) var xray_min_coverage: float = 0.7
+@export_group("")
+## The silhouette, once made: a scene can switch it off (xray.active) during
+## a cutscene where it would look odd.
+var xray: CharacterXray
+
+func _make_xray() -> void:
+	xray = CharacterXray.new()
+	xray.color = xray_color
+	xray.min_coverage = xray_min_coverage
+	add_child(xray)
+	var no_layers: Array[AnimatedSprite2D] = []
+	xray.setup(self, sprite, no_layers)
 
 ## Puts `frames` on the sprite and shows it standing still (front if it has
 ## that pose, else its side).
