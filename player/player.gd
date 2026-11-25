@@ -45,9 +45,11 @@ const FOOTSTEP_MIN_GAP: float = 0.25
 ## Frames of walk_front/back/side where a foot touches the ground.
 @export var step_frames: Array[int] = [0, 3]
 @export_range(-40.0, 12.0, 0.5, "suffix:dB") var footstep_volume_db: float = -12.0
+## Steps stay silent once the fade's black covers more than this (0-1).
+const FOOTSTEP_MAX_FADE: float = 0.5
 
 ## When something tall hides her (a building, a tree, the glass tower), her
-## silhouette shows on the hidden part (AliceXray, global/alice_xray.gd).
+## silhouette shows on the hidden part (CharacterXray, global/character_xray.gd).
 @export var xray_silhouette: bool = true
 
 var _footstep_player: AudioStreamPlayer
@@ -208,6 +210,10 @@ func _on_frame_changed() -> void:
 		return
 	if not player_animation.animation.begins_with("walk_") or not player_animation.is_playing():
 		return
+	# Never under a fade or an interlude: she may still be "walking" behind
+	# the black (an exit's step), and the steps looped over the end texts.
+	if FadeTransition.is_covering(FOOTSTEP_MAX_FADE):
+		return
 	if not player_animation.frame in step_frames:
 		return
 	var now := Time.get_ticks_msec() / 1000.0
@@ -250,7 +256,7 @@ func _sync_outfit() -> void:
 # X-ray silhouette
 # =========================
 func _make_xray() -> void:
-	var xray := AliceXray.new()
+	var xray := CharacterXray.new()
 	add_child(xray)
 	xray.setup(self, player_animation, outfit_layers)
 
@@ -298,6 +304,9 @@ func walk_off_screen(direction: Vector2) -> void:
 		target = _past_screen_edge(_visible_rect(camera), global_position, direction)
 		_freeze_camera(camera)
 	await _walk_straight_to(target, direction)
+	# Out of view she stops: no walk cycle (and no steps) left running under
+	# the fade or the scene's own ending.
+	face_direction(direction)
 
 ## Arrivals that read as coming into the place (SpawnPoint.walk_in): the
 ## camera is already at `target`, Alice starts out of view and walks in

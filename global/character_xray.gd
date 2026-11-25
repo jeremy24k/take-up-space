@@ -1,13 +1,15 @@
-class_name AliceXray
+class_name CharacterXray
 extends Node2D
 
 # =========================
 # X-ray silhouette
 # =========================
-## When something tall hides Alice (a building, a wall, a tree, the glass
-## tower), her silhouette shows on exactly the hidden part, anywhere in the
-## game (Diablo / RTS style). The Player creates it (xray_silhouette).
-## How it tells "hidden" apart:
+## When something tall hides a character (a building, a wall, a tree, the
+## glass tower), its silhouette shows on exactly the hidden part, anywhere in
+## the game (Diablo / RTS style). One instance per character: the Player
+## creates Alice's (xray_silhouette), and a WalkingNPC with xray_silhouette
+## on creates its own (Lía, in her dress colour). Below, "she" is whoever it
+## follows. How it tells "hidden" apart:
 ## - A SubViewport sharing the world (World2D) renders a small area around
 ##   her, at the camera's zoom and aligned pixel for pixel with the screen,
 ##   WITHOUT her and without the other characters (canvas_cull_mask skips
@@ -28,11 +30,13 @@ extends Node2D
 
 const VIEW_SIZE := Vector2i(96, 96)
 const OVERLAY_Z: int = 4000
+## Alice's lavender; set `color` before setup() for someone else.
 const COLOR := Color(0.78, 0.7, 1.0, 0.7)
 ## Visibility layer (bit index) of Alice, the overlay and the characters:
 ## the "world without them" render leaves it out.
 const HIDDEN_LAYER_BIT: int = 19
-## Share of her that must be hidden for the silhouette to show.
+## Share of her that must be hidden for the silhouette to show (default;
+## `min_coverage` per instance, set before setup()).
 const MIN_COVERAGE: float = 0.7
 ## Standing still (Alice and the camera), the extra render runs only every
 ## this many frames; moving, every frame (or the silhouette would flicker).
@@ -43,16 +47,16 @@ shader_type canvas_item;
 render_mode unshaded;
 uniform sampler2D screen_tex : hint_screen_texture, filter_nearest;
 // Her shape (unlit copy of her layers), 1 texel = 1 world pixel.
-uniform sampler2D alice_ref : filter_nearest;
+uniform sampler2D target_ref : filter_nearest;
 // The world around her without her and without characters.
 uniform sampler2D world_without : filter_nearest;
 // Screen pixel where world_without starts, and its size.
 uniform vec2 world_origin = vec2(0.0);
 uniform vec2 world_size = vec2(288.0);
-// Screen pixel of alice_ref's top-left corner, and the camera zoom.
+// Screen pixel of target_ref's top-left corner, and the camera zoom.
 uniform vec2 ref_origin = vec2(0.0);
 uniform float zoom = 3.0;
-// Her drawing's bounds, in alice_ref pixels: x from, x to, y from, y to.
+// Her drawing's bounds, in target_ref pixels: x from, x to, y from, y to.
 uniform vec4 body = vec4(40.0, 56.0, 20.0, 50.0);
 // Share of her that has to be hidden for the silhouette to show.
 uniform float min_coverage = 0.7;
@@ -68,19 +72,19 @@ bool hidden_at(vec2 screen_pixel, vec2 pixel_size) {
 }
 
 void fragment() {
-	if (texture(alice_ref, UV).a < 0.5) {
+	if (texture(target_ref, UV).a < 0.5) {
 		discard;
 	}
 	vec2 pixel = SCREEN_UV / SCREEN_PIXEL_SIZE;
 	bool hidden = hidden_at(pixel, SCREEN_PIXEL_SIZE);
 	// How much of her is hidden? Only tall things hide most of her.
-	vec2 ref_size = vec2(textureSize(alice_ref, 0));
+	vec2 ref_size = vec2(textureSize(target_ref, 0));
 	float tested = 0.0;
 	float covered = 0.0;
 	for (int i = 0; i < 6; i++) {
 		for (int j = 0; j < 8; j++) {
 			vec2 ref_pixel = vec2(mix(body.x, body.y, (float(i) + 0.5) / 6.0), mix(body.z, body.w, (float(j) + 0.5) / 8.0));
-			if (texture(alice_ref, ref_pixel / ref_size).a < 0.5) {
+			if (texture(target_ref, ref_pixel / ref_size).a < 0.5) {
 				continue;
 			}
 			tested += 1.0;
@@ -99,6 +103,14 @@ void fragment() {
 }
 """
 
+## Set before setup(): the silhouette's colour and how much of her must be
+## hidden for it to show.
+var color: Color = COLOR
+var min_coverage: float = MIN_COVERAGE
+## Off: nothing is drawn or rendered (e.g. during a cutscene where it would
+## look odd). The scene that owns the character switches it.
+var active: bool = true
+
 var _body: AnimatedSprite2D
 var _sources: Array[AnimatedSprite2D] = []
 var _copies: Array[AnimatedSprite2D] = []
@@ -112,12 +124,13 @@ var _last_bounds_key: String = ""
 var _last_start := Vector2.INF
 var _frames_since_update: int = 0
 
-## player: Alice; body: her body sprite; layers: the outfit sprites over it.
-func setup(player: Node2D, body: AnimatedSprite2D, layers: Array[AnimatedSprite2D]) -> void:
+## target: the character; body: its body sprite; layers: sprites drawn over
+## it (Alice's outfit), or none.
+func setup(target: Node2D, body: AnimatedSprite2D, layers: Array[AnimatedSprite2D]) -> void:
 	_body = body
 	_sources = [body]
 	_sources.append_array(layers)
-	var camera := player.get_node_or_null("Camera2D") as Camera2D
+	var camera := get_viewport().get_camera_2d()
 	if camera:
 		_zoom = camera.zoom.x
 
@@ -146,7 +159,7 @@ func setup(player: Node2D, body: AnimatedSprite2D, layers: Array[AnimatedSprite2
 	holder.add_child(back_buffer)
 	_overlay = Sprite2D.new()
 	# A blank texture of the same size: the shader reads her shape from
-	# alice_ref, so if it ever failed to compile, nothing would be drawn
+	# target_ref, so if it ever failed to compile, nothing would be drawn
 	# (with her copy as the texture, she showed on top of everything).
 	var blank := Image.create_empty(VIEW_SIZE.x, VIEW_SIZE.y, false, Image.FORMAT_RGBA8)
 	_overlay.texture = ImageTexture.create_from_image(blank)
@@ -155,16 +168,16 @@ func setup(player: Node2D, body: AnimatedSprite2D, layers: Array[AnimatedSprite2
 	shader.code = SHADER
 	_material = ShaderMaterial.new()
 	_material.shader = shader
-	_material.set_shader_parameter("silhouette_color", COLOR)
-	_material.set_shader_parameter("alice_ref", _ref_viewport.get_texture())
+	_material.set_shader_parameter("silhouette_color", color)
+	_material.set_shader_parameter("target_ref", _ref_viewport.get_texture())
 	_material.set_shader_parameter("world_without", _world_viewport.get_texture())
 	_material.set_shader_parameter("world_size", Vector2(_world_viewport.size))
 	_material.set_shader_parameter("zoom", _zoom)
-	_material.set_shader_parameter("min_coverage", MIN_COVERAGE)
+	_material.set_shader_parameter("min_coverage", min_coverage)
 	_overlay.material = _material
 	holder.add_child(_overlay)
 
-	_hide_from_world_render(player)
+	_hide_from_world_render(target)
 	# Characters already in the scene, and the ones that show up later.
 	_hide_characters(get_tree().current_scene)
 	get_tree().node_added.connect(_on_node_added)
@@ -227,6 +240,11 @@ func _on_node_added(node: Node) -> void:
 func _process(_delta: float) -> void:
 	if _body == null:
 		return
+	# Hidden, inactive or switched off: nothing to show, nothing to render.
+	var showing := active and _body.is_visible_in_tree()
+	_overlay.visible = showing
+	if not showing:
+		return
 	for i in _sources.size():
 		var source := _sources[i]
 		var copy := _copies[i]
@@ -254,7 +272,7 @@ func _process(_delta: float) -> void:
 	_material.set_shader_parameter("ref_origin", ref_origin)
 	_update_bounds()
 
-## Her drawing's bounds in alice_ref pixels, for the coverage grid (cached
+## Her drawing's bounds in target_ref pixels, for the coverage grid (cached
 ## per frame of each animation).
 func _update_bounds() -> void:
 	var key := "%s/%d/%s" % [_body.animation, _body.frame, _body.flip_h]

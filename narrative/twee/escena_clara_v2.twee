@@ -25,14 +25,14 @@ Todas las líneas son nuevas: todavía no hay nada de Clara en el juego.
 
 DECISIONES DE ESCRITURA QUE CONVIENE REVISAR
 1. El teléfono. Alice lo perdió en el metro, así que no puede escuchar su canción. Se pone los auriculares sin nada conectado (su manera de esconderse, la misma que Lía señala con "¿Por qué llevas auriculares si no escuchas nada?") y tararea la canción de memoria sin darse cuenta. Eso es lo que oye Clara.
-2. La canción. Es inventada, para no usar letra de nadie: "Bolsillo". Recoge el motivo del bolsillo de la escena de Lía (el dibujo, el número de Leo). Si la sesión de sonido hace una canción de verdad, se cambia la letra.
+2. La canción. La letra es del usuario y quedó cerrada con la sesión de Sonido (audio/music/lyrics/cancion_clara_es.md). Sustituye a "Bolsillo", la letra provisional. Alice canta el estribillo ("Pero hoy voy a ocupar espacio...") y después el puente sola, cuando Clara deja de tocar. Título: "Grito en voz baja" (en inglés será "Quietly Loud"); conecta con «No es que grite» del estribillo. Por ahora solo hay versión en español; en inglés se oirá la voz en español con subtítulos. "Ocupar espacio" es el título del juego, y por eso es el corazón de la escena.
 3. Los vecinos de la plaza. Es de noche y la gente de día ya se fue, así que se acercan los que siguen por ahí: el chico de los auriculares, la corredora con Toby, el heladero recogiendo y los paseantes. Nadie aplaude fuerte ni corea.
 4. Dos momentos podrían ser el minijuego de ansiedad (están marcados con 📌): cuando Clara le pide el verso y cuando le pregunta qué hace ahí. Si se usan los dos puede ser demasiado; mi recomendación es dejar el minijuego solo en la confesión del final, y que el verso sea un menú normal, para no romper el momento íntimo con un reloj.
 
 [[Empezar|Llegada a la Banca]]
 
 :: Llegada a la Banca
-📌 Plaza de noche, después del metro cerrado y del fundido a negro ("No llora. Canta."). Al otro lado de la plaza, Clara termina una canción con su guitarra. Unas pocas personas aplauden flojito y se van.
+📌 Plaza de noche, después de perder el tren en el andén y del interludio ("No llora. Canta."). Al otro lado de la plaza, Clara termina una canción con su guitarra. Unas pocas personas aplauden flojito y se van.
 
 (La voz viene del otro lado de la plaza. Una chica con una guitarra gastada termina una canción. Tres o cuatro personas aplauden y siguen su camino.)
 💭 Canta como si no le costara nada.
@@ -72,8 +72,8 @@ Clara: Lo bajito también cuenta. A veces es lo que más cuenta.
 [[Continuar|La Cancion]]
 
 :: Respuesta Cancion
-Alice: Se... se llama "Bolsillo". No es muy conocida.
-Clara: (abre mucho los ojos) ¿"Bolsillo"? No me lo puedo creer. Esa no la conoce nadie.
+Alice: Se... se llama "Grito en voz baja". No es muy conocida.
+Clara: (abre mucho los ojos) ¿"Grito en voz baja"? No me lo puedo creer. Esa no la conoce nadie.
 Alice: (casi sonríe) Yo sí.
 Clara: Ya somos dos.
 📌 confidence +1
@@ -97,7 +97,7 @@ Alice: (sin pensar) La tercera es más grave.
 Clara: (la corrige. Suena bien.) ¿Así?
 Alice: ...Así.
 💭 ¿Por qué dije eso? Ahora va a pensar que...
-Clara: Tienes buen oído. (sigue tocando, muy bajito) Te propongo algo. Un verso. Solo uno.
+Clara: Tienes buen oído. (sigue tocando, muy bajito) Te propongo algo. El estribillo. Nada más.
 Clara: Solo un pedacito. Para mí.
 💭 No. No, no, no.
 💭 ...Pero aquí no hay nadie. Solo ella.
@@ -116,8 +116,8 @@ Alice: (respira hondo. Cierra los ojos. Si no ve a nadie, quizá nadie la ve a e
 :: Cantar Corrigiendo
 Alice: N-no puedo...
 Clara: Está bien. Entonces la canto yo. Y tú me corriges si me equivoco.
-Clara: (canta la primera línea. Cambia una palabra, a propósito. Muy mal.)
-Alice: (sin pensar) No, es "guardo la voz", no "guardo la tos".
+Clara: (canta, desafinando un poco a propósito) ♪ Pero hoy voy a ocupar despacio... ♪
+Alice: (sin pensar) Es "espacio", no "despacio".
 Clara: (deja de cantar. Sigue tocando. La mira, esperando.)
 💭 ...Me engañó.
 💭 Bueno. Ya empecé.
@@ -135,14 +135,25 @@ Alice: (no contesta)
 
 :: El Verso
 📌 EL CLÍMAX ÍNTIMO. Alice canta con los ojos cerrados, muy bajito. Clara la acompaña con la guitarra. Mientras canta, los vecinos de la plaza que siguen por ahí se acercan despacio y se quedan a escuchar, sin interrumpir: el chico de los auriculares (se quita uno), la corredora con Toby (Toby se sienta), el heladero (deja de recoger) y los paseantes.
-📌 La letra sale línea a línea, más despacio que el diálogo normal. Es inventada (ver Leeme).
+📌 La letra sale línea a línea, más despacio que el diálogo normal, sincronizada con la grabación maestra de Sonido. Primero el estribillo; luego Clara deja de tocar y Alice sigue sola con el puente (idea del usuario). En inglés: voz en español + subtítulos.
 
 Alice: (canta, muy bajito, con los ojos cerrados)
-Alice: ♪ Guardo la voz en el bolsillo ♪
-Alice: ♪ junto a las cosas que no digo. ♪
-Alice: ♪ Si alguien la encuentra, que la cuide: ♪
-Alice: ♪ está hecha de miedo y de abrigo. ♪
-(La guitarra de Clara sigue un momento más. Después, silencio.)
+Alice: ♪ Pero hoy voy a ocupar espacio, ♪
+Alice: ♪ un poquito, solo un poco de lugar. ♪
+Alice: ♪ No es que grite, no es que gane: ♪
+Alice: ♪ el mundo no se rompe por estar. ♪
+Alice: ♪ Y si el ruido me empuja a esconder, ♪
+Alice: ♪ me quedo aquí, aunque no sepa qué hacer. ♪
+
+📌 Clara levanta la mano de las cuerdas. La guitarra se calla. Alice no se da cuenta y sigue, sola. Es lo más bajito de toda la escena.
+(La guitarra se calla. Alice no se da cuenta. Sigue.)
+Alice: ♪ No soy un fantasma, ♪
+Alice: ♪ no soy un error, ♪
+Alice: ♪ solo estoy aprendiendo a estar. ♪
+(Una pausa. Nadie respira.)
+Alice: ♪ Y si ocupo un poquito de este aire, ♪
+Alice: ♪ quizás yo también pueda respirar. ♪
+(Silencio.)
 
 [[Abrir los ojos|Abrir los Ojos]]
 
@@ -230,7 +241,7 @@ Clara: La dirección. Y mi número, por si te vuelves a perder.
 (Por detrás de la foto: "Cafetería de Rosa — Calle de los Árboles". Y un número.)
 📌 inventory: numero_clara
 Clara: (se cuelga la guitarra al hombro) Ah, y una cosa.
-Clara: La próxima vez que pases por aquí, me cantas el segundo verso.
+Clara: La próxima vez que pases por aquí, me cantas la canción entera.
 Alice: (abre la boca para decir que no. La cierra.) ...Lo intentaré.
 Clara: Con eso me basta.
 (Clara se aleja silbando la canción. Bajito. Como la cantó Alice.)

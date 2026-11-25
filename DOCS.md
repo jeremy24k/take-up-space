@@ -312,7 +312,7 @@ player.play_animation("sit_down", "idle_front")   # el 2º es fallback si no exi
 terminar el diálogo, Alice sigue bloqueada hasta que llames `unlock_control()`.
 
 **Silueta** (2026-11-15): con `xray_silhouette` (export, activado) el Player
-crea un `AliceXray` (sección 5) al empezar cada escena. En todo el juego,
+crea un `CharacterXray` (sección 5) al empezar cada escena. En todo el juego,
 cuando algo alto la tapa, se ve su silueta lila justo en la parte tapada.
 (Sustituye a `set_silhouette` y `SilhouetteZone`, que solo servían en la
 torre de cristal.)
@@ -424,9 +424,31 @@ puerta del salón al baño del piso (`BathroomPassage` en `apartment.tscn`):
 el pasillo entre las dos habitaciones está tapado por baldosas negras de
 `SuperiorLayer` y Alice desaparecía unos 60 px.
 
-### `AliceXray` (`global/alice_xray.gd`) — silueta tipo Diablo
+### `CharacterXray` (`global/character_xray.gd`) — silueta tipo Diablo
 (2026-11-15; sustituye a `SilhouetteZone`, que solo servía detrás de la
-torre de cristal). Cuando algo alto tapa a Alice (edificios, paredes,
+torre de cristal. Hasta el 2026-11-23 se llamaba `AliceXray` y solo servía
+para Alice).
+
+**Una instancia por personaje** (2026-11-23):
+- La de Alice la crea el Player (`xray_silhouette`), en lila.
+- Un `WalkingNPC` con el export `xray_silhouette` activado crea la suya al
+  arrancar, con `xray_color` y `xray_min_coverage` (grupo «X-ray
+  silhouette» del inspector). Hoy solo Lía: amarillo pastel
+  `Color(1, 0.88, 0.5, 0.7)`, sacado del amarillo de su vestido (`#f4c224`)
+  y aclarado para que sea igual de suave que el lila de Alice. Umbral 0,85:
+  es más bajita, y con 0,7 un seto le tapaba lo bastante como para sacar la
+  silueta. Toby no la lleva: su ruta nunca queda tapada.
+- Cada instancia tiene sus dos `SubViewport` de 96×96, y las dos siluetas
+  conviven sin molestarse (probado: Lía tras el camión de helados y Alice
+  tras un edificio a la vez).
+- La de Lía no se dibuja mientras ella está oculta o inactiva
+  (`_set_npc_active`), porque cuelga de ella.
+- Para apagarla en una cutscene: `lia.xray.active = false`. Hoy no hace
+  falta en ninguna.
+- Probado en la plaza: tras los árboles y tras el camión sale; tras un seto
+  y en la banca del principio, no.
+
+Lo que sigue explica Alice, pero vale igual para cualquiera. Cuando algo alto tapa a Alice (edificios, paredes,
 árboles, la torre), su silueta lila semitransparente sale **solo en la parte
 tapada**, en cualquier escena, sin zonas. Lo crea el Player
 (`xray_silhouette`). Cómo funciona:
@@ -494,7 +516,11 @@ el control bloqueado y sin física, así que cruza el borde del mapa, y la
 cámara se queda quieta. Solo entonces se emite `walked_out` y empieza el
 fundido. Sin `next_scene_path`, la escena hace su propio final al recibir
 `walked_out`. La caminata es `Player.walk_off_screen(direction)`, a la
-velocidad normal de Alice. Úsalo en salidas que se leen como «irse del
+velocidad normal de Alice. Al llegar fuera de cuadro se queda quieta (idle)
+antes de emitir `walked_out`. Además, **los pasos de Alice nunca suenan
+mientras el negro de `FadeTransition` tapa más de la mitad**
+(`Player.FOOTSTEP_MAX_FADE`): antes se oían en bucle durante el interludio
+final del andén, porque seguía «andando» fuera de cuadro (2026-11-23). Úsalo en salidas que se leen como «irse del
 sitio» (a la calle, por el borde del mapa), **no en puertas**, donde
 funciona el paso con fundido.
 
@@ -2548,17 +2574,47 @@ salida de la familia, Lía (curiosidades, palomas, Toby, ir junto a Alice),
 Toby y Alice yendo al guardia. La madre camina a `MOTHER_WALK_SPEED`
 (75 px/s) y la familia se va a `LEAVING_WALK_SPEED` (50 px/s). Antes
 recorrían unos 400 px en 1,8 s y 3 s, y parecía que se deslizaban.
-**Solo por pavimento** (decisión del usuario, 2026-11-17): el césped no tiene
-colisión (Alice puede pisarlo), pero las rutas de cutscene lo evitan.
-`CutsceneNav.avoid_layers` = `FloorLayer1` (el césped): cada celda pintada
-ahí entra como obstáculo de navegación (una franja por fila de celdas),
-salvo si también está pintada en `keep_layers` = `FloorLayer2`, el
-pavimento. Hace falta porque parte de la plazoleta de la fuente tiene
-pavimento encima del césped. Sirve igual en otras escenas: basta con poner
-sus capas de césped y de pavimento. Probadas la llegada de la madre, la
-salida de la familia (por el paseo de la derecha) y rutas a la acera de
-arriba, al guardia y al jardín de abajo a la izquierda: todas van por
-pavimento y llegan a su destino.
+**Dos modos de ruta** (2026-11-17, corregido 2026-11-23): el césped no tiene
+colisión (Alice puede pisarlo). `CutsceneNav` hornea dos mallas, cada una en
+su propio mapa de navegación privado (ya no es un `NavigationRegion2D`, es un
+`Node2D`):
+- **Libre** (por defecto, `route(from, to)`): solo bloquean las colisiones.
+  Es para los movimientos cortos: las curiosidades de Lía, ir junto a Alice,
+  Toby, el guardia, el corredor.
+- **Solo pavimento** (`route(from, to, true)`, y `_slide(..., true)` /
+  `_path_length(..., true)` en la plaza): además evita el césped. Solo la
+  usan quienes llegan o se van como transeúntes: la llegada de la madre y la
+  salida de la familia. `avoid_layers` = `FloorLayer1` (el césped): cada celda
+  pintada ahí entra como obstáculo (una franja por fila de celdas), salvo si
+  también está pintada en `keep_layers` = `FloorLayer2`, el pavimento (parte
+  de la plazoleta de la fuente tiene pavimento encima del césped). Si el
+  origen o el destino están en césped no hay camino por pavimento hasta ahí,
+  así que usa la libre.
+
+Antes todo iba solo por pavimento y era un bug (vídeo del usuario,
+2026-11-23): con Alice y Lía dentro del jardín del picnic, Lía salía del
+jardín, daba la vuelta por la acera de fuera de la valla y el último tramo
+la cruzaba (471 px en vez de 76). Probado: desde cualquier punto con línea
+recta despejada las rutas a las 8 curiosidades miden lo mismo que la recta
+(287 casos) y ningún tramo cruza colisiones estáticas. En el juego, Lía va
+directa a cada una (también a la furgoneta de helados). La madre y la salida
+de la familia siguen 100 % por pavimento.
+
+**El sitio de Lía nunca cae dentro de una colisión:** algunos puntos de
+curiosidad están sobre lo que enseñan (el del escaparate, dentro de la pared
+del edificio), así que, llegando de lado, el sitio a `look_distance` caía en
+la fachada. `_lia_explores()` y las palomas pasan el sitio por
+`cutscene_nav.closest()`: el punto caminable más cercano. En el escaparate,
+Lía queda en y=152, justo delante de la fachada.
+
+**Aviso «Navigation region synchronization had N edge error(s)»:** ya salía
+antes de los dos modos (la malla de solo pavimento da 64). Ahora sale también
+para la malla libre (48). Viene de las colisiones de tiles de 8×8 que se tocan
+borde con borde: el horneado deja aristas coincidentes. La peor zona es la
+columna de `MiddleLayer/AddonsSuperior` en x≈1272–1280, y≈1030–1300 (el
+borde derecho, abajo), más algunos remates de setos. No afecta a las rutas.
+Probado sin éxito: `cell_size` 2 o 4, triangular en vez de partición
+convexa, agrandar los obstáculos y excluir esa columna (quedan 34 y 18).
 
 **Lía sigue el rastro de Alice** (2026-11-13, `WalkingNPC.follow_trail()`):
 Alice va dejando un punto cada 3 px por donde pasa y Lía va al punto que queda
@@ -2961,13 +3017,32 @@ arriba y quien se pare encima queda por delante.
   central y borde de atrás) se ordenan en el centro, y = 557; las del borde
   delantero, cada una en su base (571, 587, 603); los tiles diagonales de las
   esquinas de abajo, en 591.
-- **Boca de metro de la plaza** (2026-11-17): sus tiles (`Buildings` y
-  `Buildings2`, atlas 1–3 × 6–9) no tienen colisión y Alice la atravesaba.
-  Ahora la cubre `SubwayEntranceBody`, un `StaticBody2D` en (1200, 1206) de
-  94×112, que es la huella en el suelo de postes y barandas. `SubwayArea`
-  pasó de 136,5×115 a 140×142 para que Alice siga entrando en ella al
-  chocar por cualquier lado. La boca de la calle (`street_zone_1`, otra
-  variante, atlas 1–3 × 10–13) ya choca por sus tiles y no se tocó.
+- **Boca de metro de la plaza** (2026-11-17, rehecha 2026-11-24): son dos
+  tramos de escalera apilados, cada uno de 4 filas de tiles (atlas 1–3 × 6–9,
+  la variante con la escalera hacia la izquierda). El de arriba está en
+  `Buildings` (filas 33–36, base en y = 1198) y el de abajo en `Buildings2`
+  (filas 35–38, base en y = 1263). Funciona como la variante de la calle
+  (`street_zone_1`, atlas 1–3 × 10–13), que tiene la misma configuración en
+  el tileset de la plaza:
+  - **Orden:** cada fila apunta a la base de su tramo (`y_sort_origin` 112,
+    80, 48 y 16 de arriba abajo). Así los postes altos se dibujan delante de
+    Alice y de Lía cuando están detrás de la boca, y detrás cuando están
+    delante. Antes tenían origen 0, cada fila se ordenaba en su centro y
+    Alice, detrás, pasaba por encima de los postes.
+  - **Colisión** solo en la base: la fila 8 desde el pie de la baranda
+    trasera (y = 1,9 del tile) y la fila 9 entera. Las filas altas (6–7,
+    postes y caperuzas) no chocan.
+  - `SubwayEntranceBody` (`StaticBody2D` en (1200, 1207,5), 94×23) ya no
+    cubre toda la boca: solo tapa el hueco entre la base del tramo de arriba
+    (1198) y la baranda trasera del de abajo (1217).
+  - `SubwayArea` es de 140×142 para que Alice entre en ella al chocar por
+    cualquier lado.
+  - Probado: Alice para en y = 1145 por detrás y en 1266 por delante, y
+    choca con la base por los lados (también en el hueco entre los tramos).
+    Los postes tapan a Alice y a Lía por detrás y por los lados, y la
+    silueta no salta tras un poste fino. `CutsceneNav` rodea la boca por el
+    pasillo de la derecha sin cruzar colisiones. En LIA_HOME, entrar por
+    arriba lleva a `plaza_metro.tscn`.
 - **Fuente animada** (2026-11-15): ya no es de tiles. Es un objeto aparte,
   como el reloj y la taza del apartamento:
   `scenes/plaza_scene/scenes/animated_fountain.tscn` (`AnimatedSprite2D`,
@@ -3187,8 +3262,12 @@ la escena, nunca de coordenadas fijas):
    tren y las puertas se cierran delante de ella (`DOORS_CLOSING_LINES`). La
    cámara encuadra las puertas y vuelve. El tren se va con su sonido
    (`departure_sound` de `MetroTrain`, lo pone `leave_station()`) y
-   `TRAIN_GONE_LINES`. Tras `SILENCE_TIME` (2,5 s) de andén vacío vuelve el
-   control. No es un fallo: siempre lo pierde.
+   `TRAIN_GONE_LINES`. El control vuelve justo tras «No, no, no...», con el
+   tren ya arrancando (se va solo, con su sonido; la cámara regresa a Alice
+   a la vez): `TRAIN_GONE_LINES` sale en la nube mientras ella ya camina. Si
+   llega a `HearClaraZone` antes de que acabe esa nube, lo de Clara espera a
+   que termine. El andén sigue en silencio hasta que vuelve a la escalera. No es un fallo: siempre lo
+   pierde.
 3. **Clara, al volver.** Clara no se oye enseguida: se oye cuando Alice,
    de vuelta, entra en `CutscenePoints/HearClaraZone` (un `Area2D` cerca del
    pie de la escalera). Antes de perder el tren esa zona no hace nada (Alice
@@ -3204,6 +3283,19 @@ la escena, nunca de coordenadas fijas):
    `ENDING_LINES` y luego `demo_end`, igual que el antiguo final de la
    plaza. `plaza_stage` llega como `LIA_HOME` y pasa a `MISSED_TRAIN`
    cuando se cierran las puertas; la escena no lo vuelve a mirar.
+
+**Prisa (`HURRY_LINES`).** Mientras las puertas están abiertas y Alice aún
+no ha llegado a `PassengersCue`, si se entretiene o vuelve atrás piensa en
+la nube el siguiente pensamiento del banco, en orden y sin repetir; al
+agotarlo no sale más. Su avance se mide por la distancia a `PassengersCue`
+(el pasillo va recto hacia ahí desde la escalera). Sale uno si no se acerca
+16 px en `HURRY_STALL_TIME` (8 s) o si está 160 px más lejos que lo más
+cerca que llegó; nunca con otra nube o diálogo en pantalla y con al menos
+`HURRY_MIN_GAP` (10 s) entre dos. Se apaga al cruzar `PassengersCue` o al
+cerrarse las puertas. Medido: yendo directo, ninguno; quieta en la
+escalera, uno a los 8 s de abrirse las puertas y luego uno cada 10 s; a
+mitad del pasillo y volviendo, uno al retroceder ~250 px. Son 5
+pensamientos de Guion aprobados por el usuario, de una línea cada uno.
 
 **Pasajeros.** Bajan por las **puertas centrales** cuando se cumplen las
 dos cosas: las puertas están abiertas y Alice sube hacia el andén (entra en
@@ -3227,6 +3319,12 @@ Todos pasan por el hueco central de la fila de rejas y por los torniquetes
 de la derecha (los de la izquierda están cerrados):
 - `MetroWorker` (0 s): puerta x 644 → puerta de servicio del extremo
   derecho del pasillo.
+  Los que se van por la puerta de servicio (metadato de ruta `door_sound`)
+  caminan hasta la propia puerta (último punto (1240, 550), pegado a ella,
+  subiendo con `walk_back`) y se desvanecen ahí en 0,2 s con el sonido
+  `door_open.ogg` posicional en la puerta (bus SFX, −8 dB; si llegan dos
+  en menos de 0,8 s, suena una vez). La rubia acaba en x −40, fuera de
+  cuadro, así que su fundido no se ve.
 - `RedCap` (1,4 s): puerta x 536 → también a la puerta de servicio.
 - `Blonde` (2,8 s): puerta x 760 → pasillo hacia la izquierda → sube la
   escalera por el carril de escalones y sale del mapa.

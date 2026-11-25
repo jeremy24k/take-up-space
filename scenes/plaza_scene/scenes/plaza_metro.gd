@@ -16,7 +16,10 @@ extends Node2D
 ##      (CutscenePoints/AliceSeesDoors) does she stop, and the doors close in
 ##      her face: she almost made it. It is never a fail state: she always
 ##      misses it.
-##   3. Silence on the empty platform; control is back.
+##   3. Control is back right after «No, no, no...», as the train pulls
+##      away; her thoughts after the train keep showing while she walks,
+##      and the empty platform stays silent until she walks back to the
+##      stairs.
 ##   4. Walking back, as she nears the stairs (CutscenePoints/HearClaraZone),
 ##      she hears Clara singing up in the plaza (ClaraVoice, positional:
 ##      louder near the stairs) and turns towards it.
@@ -54,11 +57,23 @@ const TRAIN_ARRIVING_LINES: Array[String] = [
 const DOORS_CLOSING_LINES: Array[String] = [
 	"No, no, no...",
 ]
-## While the train pulls away; then SILENCE_TIME on the empty platform. The
+## While the train pulls away, with control already back. The
 ## second line recalls the prologue (she fell asleep on the train).
 const TRAIN_GONE_LINES: Array[String] = [
 	"Por un segundo.",
-	"La última vez que tomé el metro, me quedé dormida. Esta vez ni siquiera alcancé a subir.",
+	"¿Y ahora qué, Alice?",
+	"Tendré que subir a la calle y buscar otra forma de llegar a casa.",
+	"Y ya debe estar anocheciendo...",
+]
+## Nudges while the train waits with its doors open and Alice dawdles or
+## heads back (see _update_hurry): one thought each time, in order, never
+## repeated (Guion, approved by the user).
+const HURRY_LINES: Array = [
+	["El tren... ¡rápido!"],
+	["Deja de perder el tiempo, Alice."],
+	["Voy a perder el tren si no me apresuro."],
+	["Las puertas siguen abiertas. Muévete, Alice."],
+	["¿Qué estás haciendo, Alice? ¡El tren!"],
 ]
 ## When she hears Clara singing up in the plaza.
 const HEARS_CLARA_LINES: Array[String] = [
@@ -87,8 +102,6 @@ const ENDING_LINES: PackedStringArray = [
 const DOORS_CLOSE_DISTANCE: float = 40.0
 ## The beat she stands still before the doors close, so the player sees it.
 const BEFORE_CLOSING_TIME: float = 0.4
-## Silence on the empty platform after the train, before control is back.
-const SILENCE_TIME: float = 2.5
 const CAMERA_PAN_TIME: float = 1.0
 const CAMERA_RETURN_TIME: float = 0.8
 ## The camera frames the train's stop plus this, to show the doors (same
@@ -102,6 +115,13 @@ const CLARA_VOICE_LEAD_TIME: float = 1.5
 ## the door and out at the end of their route.
 const PASSENGER_SPEED: float = 38.0
 const PASSENGER_FADE_TIME: float = 0.4
+## Going through a door at the end of the route (route metadata door_sound):
+## a quick fade at the door, with the door's sound there.
+const PASSENGER_DOOR_FADE_TIME: float = 0.2
+const DOOR_SOUND := preload("res://audio/sfx/door_open.ogg")
+const DOOR_SOUND_VOLUME_DB: float = -8.0
+## Two passengers reaching the door close together share one door sound.
+const DOOR_SOUND_MIN_GAP: float = 0.8
 ## Each passenger stands a moment in the doorway before walking off, so the
 ## player reads them stepping out of the train.
 const PASSENGER_DOOR_PAUSE: float = 0.9
@@ -115,6 +135,14 @@ const MAX_PASSENGER_PACE: float = 4.0
 ## Where she goes through the grates to the platform's upper part (the only
 ## gap), to estimate her path to the doors from below.
 const PLATFORM_GAP := Vector2(624, 422)
+## Hurry thoughts: she counts as stalling if she has not got this much closer
+## to the platform for HURRY_STALL_TIME seconds, or as heading back once she
+## is HURRY_BACKTRACK px further than her closest. At least HURRY_MIN_GAP
+## seconds between two thoughts.
+const HURRY_STALL_TIME: float = 8.0
+const HURRY_PROGRESS_STEP: float = 16.0
+const HURRY_BACKTRACK: float = 160.0
+const HURRY_MIN_GAP: float = 10.0
 const TRAIN_ARRIVAL_SOUND := preload("res://audio/sfx/train_arrival.ogg")
 const TRAIN_CHIME_SOUND := preload("res://audio/sfx/train_chime.ogg")
 
@@ -140,10 +168,22 @@ const TRAIN_CHIME_SOUND := preload("res://audio/sfx/train_chime.ogg")
 var _doors_open: bool = false
 var _train_missed: bool = false
 var _heard_clara: bool = false
+## While the cloud after the train (TRAIN_GONE_LINES) is still on: Clara's
+## moment waits for it, so it never cuts the hint about going back up.
+var _train_gone_thinking: bool = false
 var _alice_near_platform: bool = false
 var _passengers_released: bool = false
 ## Passengers still inside the train: the doors wait for them.
 var _passengers_aboard: int = 0
+## When (engine msec) the last door sound played.
+var _last_door_sound_msec: int = -100000
+## Hurry thoughts: the next one to say, her closest distance to the
+## platform so far, how long she has not got closer, and the time since
+## the last thought.
+var _hurry_index: int = 0
+var _hurry_best_distance: float = INF
+var _hurry_stall: float = 0.0
+var _hurry_since_last: float = INF
 ## The getting-off clock (base-schedule seconds), its current speed, and
 ## when (on that clock) the last passenger steps off.
 var _alight_clock: float = 0.0
@@ -197,11 +237,46 @@ func _process(delta: float) -> void:
 		_advance_alight_clock(delta)
 	if not _doors_open or _train_missed:
 		return
+	if not _alice_near_platform:
+		_update_hurry(delta)
 	if player.global_position.distance_to(alice_sees_doors.global_position) <= DOORS_CLOSE_DISTANCE:
 		if _passengers_aboard > 0:
 			_alight_clock = _last_alight_time
 			return
 		_miss_the_train()
+
+# =========================
+# Hurry thoughts
+# =========================
+## While the doors are open and she has not reached the platform yet
+## (PassengersCue): if she stalls or heads back, the next HURRY_LINES
+## thought. A player going straight there never sees one. Her progress is
+## her distance to PassengersCue, the foot of the only way up: the corridor
+## runs straight to it from the stairs.
+func _update_hurry(delta: float) -> void:
+	_hurry_since_last += delta
+	if _hurry_index >= HURRY_LINES.size():
+		return
+	var distance := player.global_position.distance_to(passengers_cue.global_position)
+	if distance < _hurry_best_distance - HURRY_PROGRESS_STEP or _hurry_best_distance == INF:
+		_hurry_best_distance = distance
+		_hurry_stall = 0.0
+	else:
+		_hurry_stall += delta
+	var stalled := _hurry_stall >= HURRY_STALL_TIME
+	var heading_back := distance > _hurry_best_distance + HURRY_BACKTRACK
+	if not (stalled or heading_back):
+		return
+	if _hurry_since_last < HURRY_MIN_GAP or ThoughtBox.is_showing() or Dialogic.current_timeline != null:
+		return
+	var lines: Array[String] = []
+	lines.assign(HURRY_LINES[_hurry_index])
+	_hurry_index += 1
+	_hurry_since_last = 0.0
+	# A fresh start: the next one needs a new stall or a new step back.
+	_hurry_stall = 0.0
+	_hurry_best_distance = distance
+	ThoughtBox.say(lines)
 
 # =========================
 # Passengers
@@ -289,8 +364,30 @@ func _walk_passenger(npc: WalkingNPC, route: Node) -> void:
 	_passengers_aboard -= 1
 	await npc.walk_path(points.slice(1), PASSENGER_SPEED * minf(_passenger_pace, 2.5))
 	npc.collision_layer = 0
-	await create_tween().tween_property(npc, "modulate:a", 0.0, PASSENGER_FADE_TIME).finished
+	# Through a door: a quick fade there, with its sound. Off the map's edge:
+	# the route ends out of view, so the fade is never seen.
+	var through_door: bool = route.get_meta("door_sound", false)
+	if through_door:
+		_play_door_sound(points[-1])
+	var fade := PASSENGER_DOOR_FADE_TIME if through_door else PASSENGER_FADE_TIME
+	await create_tween().tween_property(npc, "modulate:a", 0.0, fade).finished
 	npc.queue_free()
+
+## The door's sound where the passenger goes through, at a moderate level.
+## Skipped if another passenger just went through the same way.
+func _play_door_sound(at: Vector2) -> void:
+	var now := Time.get_ticks_msec()
+	if now - _last_door_sound_msec < int(DOOR_SOUND_MIN_GAP * 1000.0):
+		return
+	_last_door_sound_msec = now
+	var sound := AudioStreamPlayer2D.new()
+	sound.stream = DOOR_SOUND
+	sound.bus = &"SFX"
+	sound.volume_db = DOOR_SOUND_VOLUME_DB
+	sound.global_position = at
+	add_child(sound)
+	sound.finished.connect(sound.queue_free)
+	sound.play()
 
 # =========================
 # Missing the train
@@ -312,12 +409,15 @@ func _miss_the_train() -> void:
 	# (leave_station() plays the departure rumble), while her thought stays.
 	metro_train.close_doors()
 	await ThoughtBox.say(DOORS_CLOSING_LINES)
-	# Not waiting for the whole departure (arrival_time * 1.5): the train is
-	# out of sight in a couple of seconds and the rest felt like a hang.
-	await ThoughtBox.say(TRAIN_GONE_LINES)
-	await player.reset_camera(CAMERA_RETURN_TIME)
-	await get_tree().create_timer(SILENCE_TIME).timeout
+	# Control comes back as soon as the doors have shut in her face (the
+	# train is pulling away by itself, with its sound); the camera glides
+	# back to her meanwhile. Her next thoughts play in the cloud while she
+	# already walks: thoughts never stop her.
+	player.reset_camera(CAMERA_RETURN_TIME)
 	player.unlock_control()
+	_train_gone_thinking = true
+	await ThoughtBox.say(TRAIN_GONE_LINES)
+	_train_gone_thinking = false
 
 ## Where the train's doors are, to face them: the train's stop at its height.
 func _train_point() -> Vector2:
@@ -332,6 +432,8 @@ func _on_hear_clara_zone_entered(body: Node2D) -> void:
 	if body != player or not _train_missed or _heard_clara:
 		return
 	_heard_clara = true
+	while _train_gone_thinking:
+		await get_tree().process_frame
 	player.lock_control()
 	await _hear_clara()
 	_lead_exit_to_demo_end()
